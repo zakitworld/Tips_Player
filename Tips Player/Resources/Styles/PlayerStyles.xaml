@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Page Style -->
+    <Style x:Key="PlayerPageStyle" TargetType="ContentPage">
+        <Setter Property="BackgroundColor" Value="{StaticResource PageBackground}"/>
+    </Style>
+
+    <!-- Title Style -->
+    <Style x:Key="PageTitleStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <!-- Track Title Style -->
+    <Style x:Key="TrackTitleStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Track Artist Style -->
+    <Style x:Key="TrackArtistStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Time Label Style -->
+    <Style x:Key="TimeLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextColor" Value="{StaticResource TextMuted}"/>
+    </Style>
+
+    <!-- Control Button Style -->
+    <Style x:Key="ControlButtonStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="HeightRequest" Value="50"/>
+        <Setter Property="WidthRequest" Value="50"/>
+        <Setter Property="CornerRadius" Value="25"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <!-- Play Button Style -->
+    <Style x:Key="PlayButtonStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource AccentColor}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="HeightRequest" Value="70"/>
+        <Setter Property="WidthRequest" Value="70"/>
+        <Setter Property="CornerRadius" Value="35"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Shadow">
+            <Shadow Brush="{StaticResource AccentBrush}"
+                    Offset="0,4"
+                    Radius="16"
+                    Opacity="0.4"/>
+        </Setter>
+    </Style>
+
+    <!-- Secondary Control Button Style -->
+    <Style x:Key="SecondaryControlStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="HeightRequest" Value="44"/>
+        <Setter Property="WidthRequest" Value="44"/>
+        <Setter Property="CornerRadius" Value="22"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <!-- Card Style -->
+    <Style x:Key="CardStyle" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
+        <Setter Property="BorderColor" Value="{StaticResource BorderColor}"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="HasShadow" Value="False"/>
+    </Style>
+
+    <!-- Media Item Card Style -->
+    <Style x:Key="MediaItemCardStyle" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
+        <Setter Property="BorderColor" Value="Transparent"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="HasShadow" Value="False"/>
+    </Style>
+
+    <!-- Album Art Frame Style -->
+    <Style x:Key="AlbumArtFrameStyle" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HasShadow" Value="True"/>
+        <Setter Property="Shadow">
+            <Shadow Brush="Black"
+                    Offset="0,8"
+                    Radius="24"
+                    Opacity="0.5"/>
+        </Setter>
+    </Style>
+
+    <!-- Primary Action Button Style -->
+    <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource AccentColor}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="16,12"/>
+    </Style>
+
+    <!-- Slider Style -->
+    <Style x:Key="PlayerSliderStyle" TargetType="Slider">
+        <Setter Property="MinimumTrackColor" Value="{StaticResource AccentColor}"/>
+        <Setter Property="MaximumTrackColor" Value="{StaticResource Gray700}"/>
+        <Setter Property="ThumbColor" Value="{StaticResource AccentColor}"/>
+    </Style>
+
+    <!-- Empty State Style -->
+    <Style x:Key="EmptyStateTextStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="TextColor" Value="{StaticResource TextMuted}"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+    </Style>
+
+</ResourceDictionary>

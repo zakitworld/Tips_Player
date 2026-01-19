@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             x:Class="Tips_Player.Views.Controls.PlaybackControls"
+             x:DataType="viewmodels:PlayerViewModel">
+
+    <VerticalStackLayout Spacing="20" Padding="20,0">
+
+        <!-- Seek Slider -->
+        <Grid ColumnDefinitions="50,*,50" RowDefinitions="Auto,Auto">
+            <Label Grid.Column="0"
+                   Text="{Binding CurrentPositionFormatted}"
+                   Style="{StaticResource TimeLabelStyle}"
+                   VerticalOptions="Center"/>
+
+            <Slider Grid.Column="1"
+                    Minimum="0"
+                    Maximum="{Binding SliderMaximum}"
+                    Value="{Binding SliderValue, Mode=TwoWay}"
+                    Style="{StaticResource PlayerSliderStyle}"/>
+
+            <Label Grid.Column="2"
+                   Text="{Binding DurationFormatted}"
+                   Style="{StaticResource TimeLabelStyle}"
+                   HorizontalTextAlignment="End"
+                   VerticalOptions="Center"/>
+        </Grid>
+
+        <!-- Main Controls -->
+        <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
+
+            <!-- Shuffle -->
+            <Button Text="&#x1F500;"
+                    Command="{Binding ToggleShuffleCommand}"
+                    Style="{StaticResource SecondaryControlStyle}"
+                    Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+
+            <!-- Previous -->
+            <Button Text="&#x23EE;"
+                    Command="{Binding PreviousCommand}"
+                    Style="{StaticResource ControlButtonStyle}"/>
+
+            <!-- Play/Pause -->
+            <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
+                    Command="{Binding PlayPauseCommand}"
+                    Style="{StaticResource PlayButtonStyle}"/>
+
+            <!-- Next -->
+            <Button Text="&#x23ED;"
+                    Command="{Binding NextCommand}"
+                    Style="{StaticResource ControlButtonStyle}"/>
+
+            <!-- Repeat -->
+            <Button Text="&#x1F501;"
+                    Command="{Binding ToggleRepeatCommand}"
+                    Style="{StaticResource SecondaryControlStyle}"
+                    Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+
+        </HorizontalStackLayout>
+
+        <!-- Volume Control -->
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
+            <Button Grid.Column="0"
+                    Text="{Binding IsMuted, Converter={StaticResource BoolToMuteConverter}}"
+                    Command="{Binding ToggleMuteCommand}"
+                    Style="{StaticResource SecondaryControlStyle}"/>
+
+            <Slider Grid.Column="1"
+                    Minimum="0"
+                    Maximum="1"
+                    Value="{Binding Volume}"
+                    Style="{StaticResource PlayerSliderStyle}"
+                    Margin="10,0"/>
+
+            <Label Grid.Column="2"
+                   Text="&#x1F50A;"
+                   FontSize="18"
+                   TextColor="{StaticResource TextSecondary}"
+                   VerticalOptions="Center"/>
+        </Grid>
+
+    </VerticalStackLayout>
+
+</ContentView>

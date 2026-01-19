@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
+             x:Class="Tips_Player.Views.LibraryPage"
+             x:DataType="viewmodels:LibraryViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Main Content -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,*">
+
+            <!-- Header -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*,Auto"
+                  Padding="24,40,24,16">
+                <Label Grid.Column="0"
+                       Text="Your Library"
+                       Style="{StaticResource PageTitleStyle}"/>
+                <Button Grid.Column="1"
+                        Text="Add Files"
+                        Command="{Binding AddFilesCommand}"
+                        Style="{StaticResource PrimaryActionButtonStyle}"/>
+            </Grid>
+
+            <!-- Library Content -->
+            <Grid Grid.Row="1">
+
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding HasItems, Converter={StaticResource InverseBoolConverter}}"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="16"
+                                     Padding="40">
+                    <Label Text="&#x1F3B5;"
+                           FontSize="80"
+                           HorizontalOptions="Center"/>
+                    <Label Text="No media files yet"
+                           Style="{StaticResource PageTitleStyle}"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="Add some audio or video files to get started"
+                           Style="{StaticResource EmptyStateTextStyle}"/>
+                    <Button Text="Browse Files"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource PrimaryActionButtonStyle}"
+                            HorizontalOptions="Center"
+                            Margin="0,16,0,0"/>
+                </VerticalStackLayout>
+
+                <!-- Media List -->
+                <CollectionView ItemsSource="{Binding MediaItems}"
+                                IsVisible="{Binding HasItems}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedItem}"
+                                Margin="16,0">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="Delete"
+                                                   BackgroundColor="#EF4444"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=RemoveItemCommand}"
+                                                   CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <Frame Style="{StaticResource MediaItemCardStyle}"
+                                       Margin="0,4">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=PlayItemCommand}"
+                                                              CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="56,*,Auto" ColumnSpacing="12">
+
+                                        <!-- Media Icon -->
+                                        <Frame Grid.Column="0"
+                                               BackgroundColor="{StaticResource SurfaceBackground}"
+                                               CornerRadius="8"
+                                               Padding="0"
+                                               HasShadow="False"
+                                               HeightRequest="56"
+                                               WidthRequest="56">
+                                            <Label Text="{Binding MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
+                                                   FontSize="28"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"/>
+                                        </Frame>
+
+                                        <!-- Track Info -->
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             VerticalOptions="Center"
+                                                             Spacing="4">
+                                            <Label Text="{Binding Title}"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                            <Label Text="{Binding DisplaySubtitle}"
+                                                   TextColor="{StaticResource TextSecondary}"
+                                                   FontSize="14"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Duration -->
+                                        <Label Grid.Column="2"
+                                               Text="{Binding DurationFormatted}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="12"
+                                               VerticalOptions="Center"/>
+
+                                    </Grid>
+                                </Frame>
+
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- Mini Player Bar -->
+        <controls:MiniPlayerBar x:Name="MiniPlayerBar" Grid.Row="1"/>
+
+    </Grid>
+
+</ContentPage>

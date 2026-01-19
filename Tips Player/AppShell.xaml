@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Tips_Player.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:Tips_Player.Views"
+    Title="Tips Player"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.BackgroundColor="{StaticResource PageBackground}"
+    Shell.ForegroundColor="{StaticResource TextPrimary}"
+    Shell.TitleColor="{StaticResource TextPrimary}"
+    Shell.TabBarBackgroundColor="{StaticResource CardBackground}"
+    Shell.TabBarForegroundColor="{StaticResource AccentColor}"
+    Shell.TabBarTitleColor="{StaticResource TextSecondary}"
+    Shell.TabBarUnselectedColor="{StaticResource TextMuted}">
+
+    <TabBar>
+        <ShellContent
+            Title="Player"
+            Icon="{OnPlatform Default='', WinUI=''}"
+            ContentTemplate="{DataTemplate views:PlayerPage}"
+            Route="PlayerPage" />
+
+        <ShellContent
+            Title="Library"
+            Icon="{OnPlatform Default='', WinUI=''}"
+            ContentTemplate="{DataTemplate views:LibraryPage}"
+            Route="LibraryPage" />
+    </TabBar>
+
+</Shell>
