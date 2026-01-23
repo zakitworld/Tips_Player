@@ -4,28 +4,50 @@
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
              xmlns:models="clr-namespace:Tips_Player.Models"
              xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Tips_Player.Views.LibraryPage"
              x:DataType="viewmodels:LibraryViewModel"
              Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
              Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
 
     <Grid RowDefinitions="*,Auto">
 
         <!-- Main Content -->
         <Grid Grid.Row="0" RowDefinitions="Auto,*">
 
-            <!-- Header -->
-            <Grid Grid.Row="0"
-                  ColumnDefinitions="*,Auto"
-                  Padding="24,40,24,16">
-                <Label Grid.Column="0"
-                       Text="Your Library"
-                       Style="{StaticResource PageTitleStyle}"/>
-                <Button Grid.Column="1"
-                        Text="Add Files"
-                        Command="{Binding AddFilesCommand}"
-                        Style="{StaticResource PrimaryActionButtonStyle}"/>
-            </Grid>
+                <VerticalStackLayout Grid.Row="0" Spacing="0">
+                    <Grid ColumnDefinitions="*,Auto"
+                          Padding="24,40,24,8">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                            <Image Source="app_logo.png"
+                                   HeightRequest="32"
+                                   WidthRequest="32"
+                                   VerticalOptions="Center"/>
+                            <Label Text="Your Library"
+                                   Style="{StaticResource PageTitleStyle}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Button Grid.Column="1"
+                                Text="Add Files"
+                                Command="{Binding AddFilesCommand}"
+                                Style="{StaticResource PrimaryActionButtonStyle}"/>
+                    </Grid>
+                    
+                    <SearchBar Text="{Binding SearchText}"
+                               Placeholder="Search tracks or artists..."
+                               Margin="16,0,16,16"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextMuted}"
+                               BackgroundColor="{StaticResource CardBackground}"
+                               CancelButtonColor="{StaticResource AccentColor}"/>
+                </VerticalStackLayout>
 
             <!-- Library Content -->
             <Grid Grid.Row="1">
@@ -36,7 +58,8 @@
                                      HorizontalOptions="Center"
                                      Spacing="16"
                                      Padding="40">
-                    <Label Text="&#x1F3B5;"
+                    <Label Text="{x:Static helpers:FontIcons.Music}"
+                           FontFamily="FontAwesome"
                            FontSize="80"
                            HorizontalOptions="Center"/>
                     <Label Text="No media files yet"
@@ -52,7 +75,7 @@
                 </VerticalStackLayout>
 
                 <!-- Media List -->
-                <CollectionView ItemsSource="{Binding MediaItems}"
+                <CollectionView ItemsSource="{Binding FilteredItems}"
                                 IsVisible="{Binding HasItems}"
                                 SelectionMode="Single"
                                 SelectedItem="{Binding SelectedItem}"
@@ -65,7 +88,7 @@
                                     <SwipeItems>
                                         <SwipeItem Text="Delete"
                                                    BackgroundColor="#EF4444"
-                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=RemoveItemCommand}"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=RemoveItemAsyncCommand}"
                                                    CommandParameter="{Binding .}"/>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
@@ -88,6 +111,7 @@
                                                HeightRequest="56"
                                                WidthRequest="56">
                                             <Label Text="{Binding MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
+                                                   FontFamily="FontAwesome"
                                                    FontSize="28"
                                                    HorizontalOptions="Center"
                                                    VerticalOptions="Center"/>
@@ -110,12 +134,26 @@
                                                    MaxLines="1"/>
                                         </VerticalStackLayout>
 
-                                        <!-- Duration -->
-                                        <Label Grid.Column="2"
-                                               Text="{Binding DurationFormatted}"
-                                               TextColor="{StaticResource TextMuted}"
-                                               FontSize="12"
-                                               VerticalOptions="Center"/>
+                                        <!-- Duration & Favorite -->
+                                        <HorizontalStackLayout Grid.Column="2" 
+                                                               Spacing="12"
+                                                               VerticalOptions="Center">
+                                            <Label Text="{Binding DurationFormatted}"
+                                                   TextColor="{StaticResource TextMuted}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center"/>
+                                            
+                                            <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteIconConverter}}"
+                                                    FontFamily="FontAwesome"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=ToggleFavoriteAsyncCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteColorConverter}}"
+                                                    FontSize="18"
+                                                    Padding="0"
+                                                    HeightRequest="32"
+                                                    WidthRequest="32"/>
+                                        </HorizontalStackLayout>
 
                                     </Grid>
                                 </Frame>

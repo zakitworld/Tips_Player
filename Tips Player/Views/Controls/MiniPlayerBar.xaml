@@ -2,19 +2,25 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              x:Class="Tips_Player.Views.Controls.MiniPlayerBar"
              x:DataType="viewmodels:PlayerViewModel"
              IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}, FallbackValue=False}">
 
-    <Frame BackgroundColor="{StaticResource CardBackground}"
-           BorderColor="{StaticResource BorderColor}"
-           CornerRadius="0"
-           Padding="12"
-           HasShadow="False">
+    <Border BackgroundColor="#CC1A1A1D"
+            Stroke="#33FAFAFA"
+            StrokeThickness="1"
+            Padding="12">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="0"/>
+        </Border.StrokeShape>
+        <Border.Shadow>
+            <Shadow Brush="Black" Offset="0,-4" Radius="20" Opacity="0.3"/>
+        </Border.Shadow>
 
-        <Frame.GestureRecognizers>
+        <Border.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnMiniPlayerTapped"/>
-        </Frame.GestureRecognizers>
+        </Border.GestureRecognizers>
 
         <Grid ColumnDefinitions="50,*,Auto,Auto" ColumnSpacing="12">
 
@@ -27,6 +33,7 @@
                    HeightRequest="50"
                    WidthRequest="50">
                 <Label Text="{Binding CurrentMedia.MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
+                       FontFamily="FontAwesome"
                        FontSize="24"
                        HorizontalOptions="Center"
                        VerticalOptions="Center"/>
@@ -52,6 +59,7 @@
             <!-- Play/Pause Button -->
             <Button Grid.Column="2"
                     Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
+                    FontFamily="FontAwesome"
                     Command="{Binding PlayPauseCommand}"
                     BackgroundColor="Transparent"
                     TextColor="{StaticResource TextPrimary}"
@@ -63,7 +71,8 @@
 
             <!-- Next Button -->
             <Button Grid.Column="3"
-                    Text="&#x23ED;"
+                    Text="{x:Static helpers:FontIcons.StepForward}"
+                    FontFamily="FontAwesome"
                     Command="{Binding NextCommand}"
                     BackgroundColor="Transparent"
                     TextColor="{StaticResource TextSecondary}"
@@ -75,6 +84,6 @@
 
         </Grid>
 
-    </Frame>
+    </Border>
 
 </ContentView>

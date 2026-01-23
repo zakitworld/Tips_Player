@@ -1,4 +1,5 @@
 using System.Globalization;
+using Tips_Player.Helpers;
 
 namespace Tips_Player.Converters;
 
@@ -8,9 +9,9 @@ public class BoolToPlayPauseIconConverter : IValueConverter
     {
         if (value is bool isPlaying)
         {
-            return isPlaying ? "\u23F8" : "\u25B6"; // Pause : Play symbols
+            return isPlaying ? FontIcons.Pause : FontIcons.Play;
         }
-        return "\u25B6";
+        return FontIcons.Play;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -63,9 +64,9 @@ public class MediaTypeToIconConverter : IValueConverter
     {
         if (value is Models.MediaType mediaType)
         {
-            return mediaType == Models.MediaType.Video ? "\uD83C\uDFAC" : "\uD83C\uDFB5"; // Video : Music symbols
+            return mediaType == Models.MediaType.Video ? FontIcons.Video : FontIcons.Music;
         }
-        return "\uD83C\uDFB5";
+        return FontIcons.Music;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -101,9 +102,9 @@ public class BoolToMuteConverter : IValueConverter
     {
         if (value is bool isMuted)
         {
-            return isMuted ? "\uD83D\uDD07" : "\uD83D\uDD0A"; // Muted : Speaker symbols
+            return isMuted ? FontIcons.VolumeMute : FontIcons.VolumeUp;
         }
-        return "\uD83D\uDD0A";
+        return FontIcons.VolumeUp;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

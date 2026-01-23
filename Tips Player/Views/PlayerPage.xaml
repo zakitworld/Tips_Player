@@ -3,22 +3,66 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Tips_Player.Views.PlayerPage"
              x:DataType="viewmodels:PlayerViewModel"
              BackgroundColor="{StaticResource PageBackground}"
              Shell.NavBarIsVisible="False"
+             ios:Page.UseSafeArea="True"
              Shell.TabBarIsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}">
+    
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
 
-    <Grid>
+    <Grid x:Name="RootGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DisplayStates">
+                <VisualState x:Name="Mobile">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="NormalModeContentGrid" Property="ColumnDefinitions" Value="*" />
+                        <Setter TargetName="NormalModeContentGrid" Property="RowDefinitions" Value="Auto,Auto" />
+                        <Setter TargetName="NormalMediaContainer" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="NormalMediaContainer" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ControlsPanel" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="ControlsPanel" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="NormalMediaContainer" Property="HeightRequest" Value="320" />
+                        <Setter TargetName="ControlsPanel" Property="Margin" Value="0,10,0,0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Desktop">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="850" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="NormalModeContentGrid" Property="ColumnDefinitions" Value="*, 400" />
+                        <Setter TargetName="NormalModeContentGrid" Property="RowDefinitions" Value="*" />
+                        <Setter TargetName="NormalMediaContainer" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="NormalMediaContainer" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ControlsPanel" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="ControlsPanel" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="NormalMediaContainer" Property="HeightRequest" Value="-1" />
+                        <Setter TargetName="NormalMediaContainer" Property="VerticalOptions" Value="Fill" />
+                        <Setter TargetName="ControlsPanel" Property="Margin" Value="24,0,0,0" />
+                        <Setter TargetName="ControlsPanel" Property="VerticalOptions" Value="Center" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <!-- Single MediaElement that's always present but repositioned -->
         <toolkit:MediaElement x:Name="MediaElement"
-                              ShouldAutoPlay="False"
-                              ShouldShowPlaybackControls="False"
-                              Aspect="AspectFit"
-                              MediaOpened="OnMediaOpened"
-                              PositionChanged="OnPositionChanged"
-                              IsVisible="{Binding ShowVideoPlayer}"
-                              ZIndex="100"/>
+                               ShouldAutoPlay="False"
+                               ShouldShowPlaybackControls="False"
+                               Aspect="{Binding VideoAspect}"
+                               MediaOpened="OnMediaOpened"
+                               PositionChanged="OnPositionChanged"
+                               IsVisible="{Binding ShowVideoPlayer}"
+                               ZIndex="10"/>
 
         <!-- Normal Mode Layout -->
         <Grid IsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}"
@@ -29,34 +73,52 @@
                   ColumnDefinitions="*,Auto"
                   Padding="24,16"
                   BackgroundColor="{StaticResource PageBackground}">
-                <Label Grid.Column="0"
-                       Text="Now Playing"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource TextPrimary}"
-                       VerticalOptions="Center"/>
-                <Button Grid.Column="1"
-                        Text="+"
-                        Command="{Binding AddFilesCommand}"
-                        BackgroundColor="{StaticResource CardBackground}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24"
-                        HeightRequest="44"
-                        WidthRequest="44"
-                        CornerRadius="22"
-                        Padding="0"/>
+                <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                    <Image Source="app_logo.png"
+                           HeightRequest="32"
+                           WidthRequest="32"
+                           VerticalOptions="Center"/>
+                    <Label Text="Now Playing"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <!-- Car Mode Button -->
+                    <Button Text="&#xf1b9;"
+                            FontFamily="FontAwesome"
+                            Command="{Binding EnterCarModeCommand}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="18"
+                            HeightRequest="44"
+                            WidthRequest="44"
+                            CornerRadius="22"
+                            Padding="0"/>
+                    <!-- Add Files Button -->
+                    <Button Text="{x:Static helpers:FontIcons.Plus}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding AddFilesCommand}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="20"
+                            HeightRequest="44"
+                            WidthRequest="44"
+                            CornerRadius="22"
+                            Padding="0"/>
+                </HorizontalStackLayout>
             </Grid>
 
             <!-- Main Content Area -->
             <ScrollView Grid.Row="1">
-                <VerticalStackLayout Spacing="20" Padding="24,0,24,24">
-
+                <Grid x:Name="NormalModeContentGrid" Padding="24,0,24,24">
+                    
                     <!-- Media Display Area -->
                     <Border x:Name="NormalMediaContainer"
                             StrokeThickness="0"
                             BackgroundColor="{StaticResource CardBackground}"
                             StrokeShape="RoundRectangle 16"
-                            HeightRequest="350"
                             HorizontalOptions="Fill">
                         <Border.Shadow>
                             <Shadow Brush="#000000" Offset="0,8" Radius="24" Opacity="0.5"/>
@@ -95,7 +157,8 @@
                                              HorizontalOptions="Center"
                                              VerticalOptions="Center"/>
 
-                                    <Label Text="&#x1F3B5;"
+                                    <Label Text="{x:Static helpers:FontIcons.Music}"
+                                           FontFamily="FontAwesome"
                                            FontSize="80"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"
@@ -105,7 +168,8 @@
                                                          VerticalOptions="Center"
                                                          HorizontalOptions="Center"
                                                          Spacing="8">
-                                        <Label Text="&#x1F3B6;"
+                                        <Label Text="{x:Static helpers:FontIcons.Music}"
+                                               FontFamily="FontAwesome"
                                                FontSize="60"
                                                HorizontalOptions="Center"/>
                                         <Label Text="Select a track"
@@ -116,162 +180,292 @@
                                 </Grid>
                             </Grid>
 
-                            <!-- Fullscreen Button -->
-                            <Button Text="&#x26F6;"
-                                    Command="{Binding ToggleFullScreenCommand}"
-                                    BackgroundColor="#40000000"
-                                    TextColor="{StaticResource TextPrimary}"
-                                    FontSize="18"
-                                    HeightRequest="40"
-                                    WidthRequest="40"
-                                    CornerRadius="20"
-                                    HorizontalOptions="End"
-                                    VerticalOptions="Start"
-                                    Margin="12"
-                                    ZIndex="200"/>
+                            <!-- Video Controls (Top Right) -->
+                            <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="12" Spacing="8" ZIndex="200">
+                                <Button Command="{Binding ToggleAspectCommand}"
+                                        BackgroundColor="#40000000"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="14"
+                                        HeightRequest="40"
+                                        WidthRequest="60"
+                                        CornerRadius="20"
+                                        TextTransform="None">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
+                                            <Setter Property="Text" Value="Fit" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
+                                            <Setter Property="Text" Value="Fill" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+
+                                <Button Text="{x:Static helpers:FontIcons.Expand}"
+                                        FontFamily="FontAwesome"
+                                        Command="{Binding ToggleFullScreenCommand}"
+                                        BackgroundColor="#40000000"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="18"
+                                        HeightRequest="40"
+                                        WidthRequest="40"
+                                        CornerRadius="20"/>
+                            </HorizontalStackLayout>
                         </Grid>
                     </Border>
 
-                    <!-- Track Info -->
-                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,8,0,0">
-                        <Label Text="{Binding CurrentMedia.Title, FallbackValue='No Track Selected'}"
-                               FontSize="22"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource TextPrimary}"
-                               HorizontalTextAlignment="Center"
-                               MaxLines="2"
-                               LineBreakMode="TailTruncation"/>
-                        <Label Text="{Binding CurrentMedia.DisplaySubtitle, FallbackValue='Select a track to play'}"
-                               FontSize="15"
-                               TextColor="{StaticResource TextSecondary}"
-                               HorizontalTextAlignment="Center"/>
-                    </VerticalStackLayout>
+                    <!-- Interaction Controls Panel -->
+                    <VerticalStackLayout x:Name="ControlsPanel" Spacing="10">
+                        
+                        <!-- Track Info -->
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding CurrentMedia.Title, FallbackValue='No Track Selected'}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   HorizontalTextAlignment="Center"
+                                   MaxLines="1"
+                                   LineBreakMode="TailTruncation"/>
+                            <Label Text="{Binding CurrentMedia.DisplaySubtitle, FallbackValue='Select a track to play'}"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
 
-                    <!-- Progress Section -->
-                    <Grid RowDefinitions="Auto,Auto" Margin="0,16,0,0">
-                        <Slider Grid.Row="0"
-                                x:Name="ProgressSlider"
-                                Minimum="0"
-                                Maximum="{Binding SliderMaximum}"
-                                Value="{Binding SliderPosition, Mode=TwoWay}"
-                                MinimumTrackColor="{StaticResource AccentColor}"
-                                MaximumTrackColor="{StaticResource Gray700}"
-                                ThumbColor="{StaticResource AccentColor}"
-                                DragStarted="OnSliderDragStarted"
-                                DragCompleted="OnSliderDragCompleted"
-                                ValueChanged="OnSliderValueChanged"/>
+                        <!-- Progress Section -->
+                        <Grid RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+                            <Slider x:Name="ProgressSlider"
+                                    Minimum="0"
+                                    Maximum="{Binding SliderMaximum}"
+                                    Value="{Binding SliderPosition, Mode=TwoWay}"
+                                    MinimumTrackColor="{StaticResource AccentColor}"
+                                    MaximumTrackColor="{StaticResource Gray700}"
+                                    ThumbColor="{StaticResource AccentColor}"
+                                    DragStarted="OnSliderDragStarted"
+                                    DragCompleted="OnSliderDragCompleted"
+                                    ValueChanged="OnSliderValueChanged"/>
 
-                        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,4,0,0">
-                            <Label Grid.Column="0"
-                                   Text="{Binding CurrentPositionFormatted}"
-                                   FontSize="12"
-                                   TextColor="{StaticResource TextMuted}"/>
-                            <Label Grid.Column="1"
-                                   Text="{Binding DurationFormatted}"
-                                   FontSize="12"
-                                   TextColor="{StaticResource TextMuted}"
-                                   HorizontalTextAlignment="End"/>
+                            <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,2,0,0">
+                                <Label Grid.Column="0"
+                                       Text="{Binding CurrentPositionFormatted}"
+                                       FontSize="11"
+                                       TextColor="{StaticResource TextMuted}"/>
+                                <Label Grid.Column="1"
+                                       Text="{Binding DurationFormatted}"
+                                       FontSize="11"
+                                       TextColor="{StaticResource TextMuted}"
+                                       HorizontalTextAlignment="End"/>
+                            </Grid>
                         </Grid>
-                    </Grid>
 
-                    <!-- Playback Controls -->
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="20" Margin="0,8,0,0">
-                        <Button Text="&#x1F500;"
-                                Command="{Binding ToggleShuffleCommand}"
-                                BackgroundColor="Transparent"
-                                TextColor="{StaticResource TextSecondary}"
-                                FontSize="20"
-                                HeightRequest="48"
-                                WidthRequest="48"
-                                CornerRadius="24"
-                                Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+                        <!-- Playback Controls -->
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="16" Margin="0,4,0,0">
+                            <Button Text="{x:Static helpers:FontIcons.Shuffle}"
+                                    Command="{Binding ToggleShuffleCommand}"
+                                    Style="{StaticResource SecondaryControlStyle}"
+                                    FontSize="14" Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
 
-                        <Button Text="&#x23EE;"
-                                Command="{Binding PreviousCommand}"
-                                BackgroundColor="Transparent"
-                                TextColor="{StaticResource TextPrimary}"
-                                FontSize="28"
-                                HeightRequest="56"
-                                WidthRequest="56"
-                                CornerRadius="28"/>
+                            <Button Text="{x:Static helpers:FontIcons.StepBackward}"
+                                    Command="{Binding PreviousCommand}"
+                                    Style="{StaticResource ControlButtonStyle}"
+                                    HeightRequest="44" WidthRequest="44" FontSize="18"/>
 
-                        <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
-                                Command="{Binding PlayPauseCommand}"
-                                BackgroundColor="{StaticResource AccentColor}"
-                                TextColor="{StaticResource TextPrimary}"
-                                FontSize="32"
-                                HeightRequest="72"
-                                WidthRequest="72"
-                                CornerRadius="36">
-                            <Button.Shadow>
-                                <Shadow Brush="{StaticResource AccentColor}" Offset="0,4" Radius="16" Opacity="0.5"/>
-                            </Button.Shadow>
-                        </Button>
+                            <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
+                                    FontFamily="FontAwesome"
+                                    Command="{Binding PlayPauseCommand}"
+                                    BackgroundColor="{StaticResource AccentColor}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="24"
+                                    HeightRequest="60"
+                                    WidthRequest="60"
+                                    CornerRadius="30">
+                                <Button.Shadow>
+                                    <Shadow Brush="{StaticResource AccentColor}" Offset="0,4" Radius="12" Opacity="0.4"/>
+                                </Button.Shadow>
+                            </Button>
 
-                        <Button Text="&#x23ED;"
-                                Command="{Binding NextCommand}"
-                                BackgroundColor="Transparent"
-                                TextColor="{StaticResource TextPrimary}"
-                                FontSize="28"
-                                HeightRequest="56"
-                                WidthRequest="56"
-                                CornerRadius="28"/>
+                            <Button Text="{x:Static helpers:FontIcons.StepBackward}"
+                                    Command="{Binding NextCommand}"
+                                    Style="{StaticResource ControlButtonStyle}"
+                                    HeightRequest="44" WidthRequest="44" FontSize="18"
+                                    Rotation="180"/>
 
-                        <Button Text="&#x1F501;"
-                                Command="{Binding ToggleRepeatCommand}"
-                                BackgroundColor="Transparent"
-                                TextColor="{StaticResource TextSecondary}"
-                                FontSize="20"
-                                HeightRequest="48"
-                                WidthRequest="48"
-                                CornerRadius="24"
-                                Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
-                    </HorizontalStackLayout>
+                            <Button Text="{x:Static helpers:FontIcons.Repeat}"
+                                    Command="{Binding ToggleRepeatCommand}"
+                                    Style="{StaticResource SecondaryControlStyle}"
+                                    FontSize="14" Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+                        </HorizontalStackLayout>
 
-                    <!-- Volume Control -->
-                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="16,16,16,0">
-                        <Button Grid.Column="0"
-                                Text="{Binding IsMuted, Converter={StaticResource BoolToMuteConverter}}"
-                                Command="{Binding ToggleMuteCommand}"
-                                BackgroundColor="Transparent"
-                                TextColor="{StaticResource TextSecondary}"
-                                FontSize="20"
-                                HeightRequest="44"
-                                WidthRequest="44"
-                                CornerRadius="22"/>
+                        <!-- Volume Control -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" Margin="12,8,12,0">
+                            <Button Grid.Column="0"
+                                    Text="{Binding IsMuted, Converter={StaticResource BoolToMuteConverter}}"
+                                    FontFamily="FontAwesome"
+                                    Command="{Binding ToggleMuteCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{StaticResource TextSecondary}"
+                                    FontSize="18"
+                                    HeightRequest="36"
+                                    WidthRequest="36"
+                                    CornerRadius="18"/>
 
-                        <Slider Grid.Column="1"
-                                Minimum="0"
-                                Maximum="1"
-                                Value="{Binding Volume}"
-                                MinimumTrackColor="{StaticResource AccentColor}"
-                                MaximumTrackColor="{StaticResource Gray700}"
-                                ThumbColor="{StaticResource AccentColor}"
-                                Margin="8,0"/>
+                            <Slider Grid.Column="1"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Value="{Binding Volume}"
+                                    MinimumTrackColor="{StaticResource AccentColor}"
+                                    MaximumTrackColor="{StaticResource Gray700}"
+                                    ThumbColor="{StaticResource AccentColor}"
+                                    Margin="4,0"/>
 
-                        <Label Grid.Column="2"
-                               Text="&#x1F50A;"
-                               FontSize="20"
-                               TextColor="{StaticResource TextSecondary}"
-                               VerticalOptions="Center"/>
-                    </Grid>
+                            <Label Grid.Column="2"
+                                   Text="{x:Static helpers:FontIcons.VolumeUp}"
+                                   FontFamily="FontAwesome"
+                                   FontSize="16"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center"/>
+                        </Grid>
 
-                </VerticalStackLayout>
+                        <!-- Sleep Timer -->
+                        <VerticalStackLayout Spacing="6" Margin="0,8,0,0">
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                                <Label Text="Sleep Timer:"
+                                       TextColor="{StaticResource TextMuted}"
+                                       VerticalOptions="Center"
+                                       FontSize="11"/>
+                                <Button Text="Off"
+                                        Command="{Binding SetSleepTimerCommand}"
+                                        CommandParameter="{x:Int32 0}"
+                                        Style="{StaticResource SecondaryControlStyle}"
+                                        WidthRequest="36" FontSize="10" Padding="0"/>
+                                <Button Text="15m"
+                                        Command="{Binding SetSleepTimerCommand}"
+                                        CommandParameter="{x:Int32 15}"
+                                        Style="{StaticResource SecondaryControlStyle}"
+                                        WidthRequest="36" FontSize="10" Padding="0"/>
+                                <Button Text="30m"
+                                        Command="{Binding SetSleepTimerCommand}"
+                                        CommandParameter="{x:Int32 30}"
+                                        Style="{StaticResource SecondaryControlStyle}"
+                                        WidthRequest="36" FontSize="10" Padding="0"/>
+                                <Button Text="60m"
+                                        Command="{Binding SetSleepTimerCommand}"
+                                        CommandParameter="{x:Int32 60}"
+                                        Style="{StaticResource SecondaryControlStyle}"
+                                        WidthRequest="36" FontSize="10" Padding="0"/>
+                                <Button Text="Custom"
+                                        Command="{Binding ToggleCustomTimerCommand}"
+                                        Style="{StaticResource SecondaryControlStyle}"
+                                        WidthRequest="50" FontSize="10" Padding="0"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Custom Timer Input -->
+                            <Grid IsVisible="{Binding IsCustomTimerVisible}"
+                                  HorizontalOptions="Center"
+                                  ColumnDefinitions="Auto,80,Auto"
+                                  ColumnSpacing="8">
+                                <Label Grid.Column="0"
+                                       Text="Minutes:"
+                                       TextColor="{StaticResource TextMuted}"
+                                       FontSize="12"
+                                       VerticalOptions="Center"/>
+                                <Entry Grid.Column="1"
+                                       Text="{Binding CustomTimerMinutes}"
+                                       Keyboard="Numeric"
+                                       Placeholder="e.g. 45"
+                                       PlaceholderColor="{StaticResource TextMuted}"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       BackgroundColor="{StaticResource CardBackground}"
+                                       FontSize="14"
+                                       HorizontalTextAlignment="Center"
+                                       ReturnCommand="{Binding SetCustomTimerCommand}"/>
+                                <Button Grid.Column="2"
+                                        Text="Set"
+                                        Command="{Binding SetCustomTimerCommand}"
+                                        BackgroundColor="{StaticResource AccentColor}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="12"
+                                        HeightRequest="36"
+                                        WidthRequest="50"
+                                        CornerRadius="8"
+                                        Padding="0"/>
+                            </Grid>
+
+                            <Label Text="{Binding SleepTimerMinutes, StringFormat='Timer active: {0}m remaining'}"
+                                   IsVisible="{Binding IsSleepTimerActive}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource AccentColor}"
+                                   FontSize="11"
+                                   FontAttributes="Italic"/>
+                        </VerticalStackLayout>
+
+                        <!-- Playback Speed Control -->
+                        <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
+                               CornerRadius="8" Padding="12" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
+                                <Label Grid.Column="0" Text="Speed:"
+                                       TextColor="{StaticResource TextSecondary}" FontSize="12" VerticalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding PlaybackSpeedText}"
+                                       TextColor="{StaticResource AccentColor}" FontSize="14"
+                                       FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Button Grid.Column="2" Text="&#xf068;" FontFamily="FontAwesome"
+                                        Command="{Binding DecreaseSpeedCommand}"
+                                        BackgroundColor="{StaticResource SurfaceBackground}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"/>
+                                <Button Grid.Column="3" Text="1x"
+                                        Command="{Binding ResetSpeedCommand}"
+                                        BackgroundColor="{StaticResource SurfaceBackground}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="11" HeightRequest="32" WidthRequest="40" CornerRadius="8" Padding="0"/>
+                                <Button Grid.Column="4" Text="&#xf067;" FontFamily="FontAwesome"
+                                        Command="{Binding IncreaseSpeedCommand}"
+                                        BackgroundColor="{StaticResource SurfaceBackground}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"/>
+                            </Grid>
+                        </Frame>
+
+                        <!-- A-B Repeat Control -->
+                        <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
+                               CornerRadius="8" Padding="12" Margin="0,4,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                                <Label Grid.Column="0" Text="A-B:"
+                                       TextColor="{StaticResource TextSecondary}" FontSize="12" VerticalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding ABRepeatStatus}"
+                                       TextColor="{StaticResource TextPrimary}" FontSize="12"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Button Grid.Column="2" Text="A⟷B"
+                                        Command="{Binding ToggleABRepeatCommand}"
+                                        BackgroundColor="{Binding IsABRepeatEnabled, Converter={StaticResource BoolToColorConverter}}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="10" HeightRequest="32" WidthRequest="50" CornerRadius="8" Padding="0"/>
+                                <Button Grid.Column="3" Text="&#xf00d;" FontFamily="FontAwesome"
+                                        Command="{Binding ClearABRepeatCommand}"
+                                        BackgroundColor="{StaticResource SurfaceBackground}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"
+                                        IsVisible="{Binding RepeatPointA, Converter={StaticResource IsNotNullConverter}}"/>
+                            </Grid>
+                        </Frame>
+
+                    </VerticalStackLayout>
+                </Grid>
             </ScrollView>
         </Grid>
 
         <!-- Fullscreen Mode Layout -->
         <Grid x:Name="FullscreenContainer"
               IsVisible="{Binding IsFullScreen}"
-              BackgroundColor="Black"
-              RowDefinitions="*,Auto"
+              BackgroundColor="Transparent"
               ZIndex="50">
 
             <!-- Video/Audio Display Area (Fullscreen) -->
-            <Grid Grid.Row="0">
-                <!-- Video placeholder for fullscreen - actual MediaElement overlays this -->
+            <Grid>
+                <!-- Video placeholder for fullscreen - actual MediaElement sits below the controls but above the background -->
                 <BoxView IsVisible="{Binding ShowVideoPlayer}"
-                         Color="Black"/>
+                         Color="Transparent"
+                         HorizontalOptions="Fill"
+                         VerticalOptions="Fill"/>
 
                 <!-- Audio Visualization Fullscreen -->
                 <Grid IsVisible="{Binding ShowVideoPlayer, Converter={StaticResource InverseBoolConverter}}"
@@ -291,7 +485,8 @@
                             <Ellipse WidthRequest="280" HeightRequest="280" Fill="#106366F1"/>
                             <Ellipse WidthRequest="220" HeightRequest="220" Fill="#206366F1" HorizontalOptions="Center" VerticalOptions="Center"/>
                             <Ellipse WidthRequest="160" HeightRequest="160" Fill="#406366F1" HorizontalOptions="Center" VerticalOptions="Center"/>
-                            <Label Text="&#x1F3B5;"
+                            <Label Text="{x:Static helpers:FontIcons.Music}"
+                                   FontFamily="FontAwesome"
                                    FontSize="100"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"/>
@@ -309,26 +504,43 @@
                     </VerticalStackLayout>
                 </Grid>
 
-                <!-- Exit Fullscreen Button -->
-                <Button Text="&#x2716;"
-                        Command="{Binding ToggleFullScreenCommand}"
-                        BackgroundColor="#60000000"
-                        TextColor="White"
-                        FontSize="20"
-                        HeightRequest="48"
-                        WidthRequest="48"
-                        CornerRadius="24"
-                        HorizontalOptions="End"
-                        VerticalOptions="Start"
-                        Margin="16"
-                        ZIndex="300"/>
+                <!-- Exit Fullscreen and Aspect Toggle Button -->
+                <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="16" Spacing="12" ZIndex="300">
+                    <Button Command="{Binding ToggleAspectCommand}"
+                            BackgroundColor="#60000000"
+                            TextColor="White"
+                            FontSize="14"
+                            HeightRequest="48"
+                            WidthRequest="80"
+                            CornerRadius="24">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
+                                <Setter Property="Text" Value="Fit" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
+                                <Setter Property="Text" Value="Fill" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    
+                    <Button Text="{x:Static helpers:FontIcons.Close}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding ToggleFullScreenCommand}"
+                            BackgroundColor="#60000000"
+                            TextColor="White"
+                            FontSize="20"
+                            HeightRequest="48"
+                            WidthRequest="48"
+                            CornerRadius="24"/>
+                </HorizontalStackLayout>
             </Grid>
 
             <!-- Fullscreen Controls Overlay -->
-            <Grid Grid.Row="1"
+            <Grid VerticalOptions="End"
                   BackgroundColor="#90000000"
-                  Padding="24,16"
-                  RowDefinitions="Auto,Auto">
+                  Padding="24,32"
+                  RowDefinitions="Auto,Auto"
+                  ZIndex="300">
 
                 <!-- Progress -->
                 <Grid Grid.Row="0" ColumnDefinitions="60,*,60">
@@ -356,7 +568,8 @@
 
                 <!-- Controls -->
                 <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center" Spacing="24" Margin="0,12,0,0">
-                    <Button Text="&#x23EE;"
+                    <Button Text="{x:Static helpers:FontIcons.StepBackward}"
+                            FontFamily="FontAwesome"
                             Command="{Binding PreviousCommand}"
                             BackgroundColor="Transparent"
                             TextColor="White"
@@ -365,6 +578,7 @@
                             WidthRequest="56"/>
 
                     <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
+                            FontFamily="FontAwesome"
                             Command="{Binding PlayPauseCommand}"
                             BackgroundColor="{StaticResource AccentColor}"
                             TextColor="White"
@@ -373,7 +587,8 @@
                             WidthRequest="64"
                             CornerRadius="32"/>
 
-                    <Button Text="&#x23ED;"
+                    <Button Text="{x:Static helpers:FontIcons.StepForward}"
+                            FontFamily="FontAwesome"
                             Command="{Binding NextCommand}"
                             BackgroundColor="Transparent"
                             TextColor="White"

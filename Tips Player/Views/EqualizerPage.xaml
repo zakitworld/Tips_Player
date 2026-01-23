@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.EqualizerPage"
+             x:DataType="viewmodels:EqualizerViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,16">
+            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
+                <Label Text="Equalizer" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                <Label Text="Enabled" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" FontSize="14"/>
+                <Switch IsToggled="{Binding IsEnabled}" OnColor="{StaticResource AccentColor}" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="16,0,16,24">
+            <VerticalStackLayout Spacing="16" Opacity="{Binding IsEnabled, Converter={StaticResource BoolToOpacityConverter}}">
+
+                <!-- Presets Section -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Presets" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Start">
+                            <BindableLayout.ItemsSource>
+                                <x:Array Type="{x:Type models:EqualizerPreset}">
+                                    <!-- Presets will be bound from ViewModel -->
+                                </x:Array>
+                            </BindableLayout.ItemsSource>
+                        </FlexLayout>
+                        <CollectionView ItemsSource="{Binding Presets}" HeightRequest="100" SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:EqualizerPreset">
+                                    <Frame BackgroundColor="{StaticResource SurfaceBackground}"
+                                           BorderColor="Transparent"
+                                           CornerRadius="8"
+                                           Padding="12,8"
+                                           WidthRequest="90">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EqualizerViewModel}}, Path=SelectPresetCommand}"
+                                                                  CommandParameter="{Binding .}"/>
+                                        </Frame.GestureRecognizers>
+                                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                            <Label Text="{Binding Icon}"
+                                                   FontFamily="FontAwesome"
+                                                   FontSize="20"
+                                                   TextColor="{StaticResource AccentColor}"
+                                                   HorizontalOptions="Center"/>
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="11"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   HorizontalTextAlignment="Center"
+                                                   MaxLines="1"
+                                                   LineBreakMode="TailTruncation"/>
+                                        </VerticalStackLayout>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- 10-Band Equalizer -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Equalizer Bands" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding CurrentPreset.Name}"
+                                   FontSize="14"
+                                   TextColor="{StaticResource AccentColor}"/>
+                        </Grid>
+
+                        <!-- EQ Bands -->
+                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*,*,*" ColumnSpacing="4" HeightRequest="200">
+                            <!-- Band 1: 32Hz -->
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band32Hz}"
+                                        Rotation="270"
+                                        HeightRequest="120"
+                                        WidthRequest="40"
+                                        HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}"
+                                        MaximumTrackColor="{StaticResource Gray700}"
+                                        ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="32" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 2: 64Hz -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band64Hz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="64" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 3: 125Hz -->
+                            <VerticalStackLayout Grid.Column="2" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band125Hz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="125" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 4: 250Hz -->
+                            <VerticalStackLayout Grid.Column="3" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band250Hz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="250" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 5: 500Hz -->
+                            <VerticalStackLayout Grid.Column="4" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band500Hz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="500" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 6: 1kHz -->
+                            <VerticalStackLayout Grid.Column="5" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band1kHz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="1K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 7: 2kHz -->
+                            <VerticalStackLayout Grid.Column="6" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band2kHz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="2K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 8: 4kHz -->
+                            <VerticalStackLayout Grid.Column="7" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band4kHz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="4K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 9: 8kHz -->
+                            <VerticalStackLayout Grid.Column="8" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band8kHz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="8K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <!-- Band 10: 16kHz -->
+                            <VerticalStackLayout Grid.Column="9" Spacing="4">
+                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band16kHz}"
+                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
+                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
+                                <Label Text="16K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Buttons -->
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                            <Button Text="Reset" Command="{Binding ResetToFlatCommand}"
+                                    BackgroundColor="{StaticResource SurfaceBackground}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="14" HeightRequest="40" CornerRadius="8" Padding="16,0"/>
+                            <Button Text="Save Preset" Command="{Binding ShowSavePresetDialogCommand}"
+                                    BackgroundColor="{StaticResource AccentColor}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="14" HeightRequest="40" CornerRadius="8" Padding="16,0"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Audio Effects -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Audio Effects" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+
+                        <!-- Bass Boost -->
+                        <Grid ColumnDefinitions="*,Auto,120">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Bass Boost" TextColor="{StaticResource TextPrimary}" FontSize="14"/>
+                                <Label Text="Enhance low frequencies" TextColor="{StaticResource TextMuted}" FontSize="12"/>
+                            </VerticalStackLayout>
+                            <Switch Grid.Column="1" IsToggled="{Binding BassBoostEnabled}" OnColor="{StaticResource AccentColor}" VerticalOptions="Center"/>
+                            <Slider Grid.Column="2" Minimum="0" Maximum="100" Value="{Binding BassBoostStrength}"
+                                    IsEnabled="{Binding BassBoostEnabled}"
+                                    MinimumTrackColor="{StaticResource AccentColor}"
+                                    MaximumTrackColor="{StaticResource Gray700}"
+                                    ThumbColor="{StaticResource AccentColor}"/>
+                        </Grid>
+
+                        <!-- Virtualizer -->
+                        <Grid ColumnDefinitions="*,Auto,120">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Virtualizer" TextColor="{StaticResource TextPrimary}" FontSize="14"/>
+                                <Label Text="Surround sound effect" TextColor="{StaticResource TextMuted}" FontSize="12"/>
+                            </VerticalStackLayout>
+                            <Switch Grid.Column="1" IsToggled="{Binding VirtualizerEnabled}" OnColor="{StaticResource AccentColor}" VerticalOptions="Center"/>
+                            <Slider Grid.Column="2" Minimum="0" Maximum="100" Value="{Binding VirtualizerStrength}"
+                                    IsEnabled="{Binding VirtualizerEnabled}"
+                                    MinimumTrackColor="{StaticResource AccentColor}"
+                                    MaximumTrackColor="{StaticResource Gray700}"
+                                    ThumbColor="{StaticResource AccentColor}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Custom Presets -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16"
+                       IsVisible="{Binding CustomPresets.Count, Converter={StaticResource IsNotNullConverter}}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Custom Presets" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        <CollectionView ItemsSource="{Binding CustomPresets}" HeightRequest="60" SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:EqualizerPreset">
+                                    <Frame BackgroundColor="{StaticResource SurfaceBackground}"
+                                           BorderColor="Transparent" CornerRadius="8" Padding="12,8">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <Label Text="{Binding Name}" VerticalOptions="Center" TextColor="{StaticResource TextPrimary}">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EqualizerViewModel}}, Path=SelectPresetCommand}"
+                                                                          CommandParameter="{Binding .}"/>
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                            <Button Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesome" FontSize="12"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EqualizerViewModel}}, Path=DeleteCustomPresetCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
+                                                    HeightRequest="24" WidthRequest="24" Padding="0"/>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Save Preset Dialog Overlay -->
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsCustomPresetDialogVisible}"
+              BackgroundColor="#80000000">
+            <Frame BackgroundColor="{StaticResource CardBackground}"
+                   CornerRadius="16" Padding="24"
+                   VerticalOptions="Center" HorizontalOptions="Center"
+                   WidthRequest="300">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Save Custom Preset" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Entry Text="{Binding NewPresetName}" Placeholder="Preset name"
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           TextColor="{StaticResource TextPrimary}"
+                           BackgroundColor="{StaticResource SurfaceBackground}"/>
+                    <HorizontalStackLayout HorizontalOptions="End" Spacing="12">
+                        <Button Text="Cancel" Command="{Binding HideSavePresetDialogCommand}"
+                                BackgroundColor="{StaticResource SurfaceBackground}"
+                                TextColor="{StaticResource TextPrimary}" CornerRadius="8"/>
+                        <Button Text="Save" Command="{Binding SaveCustomPresetCommand}"
+                                BackgroundColor="{StaticResource AccentColor}"
+                                TextColor="{StaticResource TextPrimary}" CornerRadius="8"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

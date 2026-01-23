@@ -11,5 +11,6 @@ public partial class AppShell : Shell
         // Register routes for navigation
         Routing.RegisterRoute(nameof(PlayerPage), typeof(PlayerPage));
         Routing.RegisterRoute(nameof(LibraryPage), typeof(LibraryPage));
+        Routing.RegisterRoute(nameof(CarModePage), typeof(CarModePage));
     }
 }

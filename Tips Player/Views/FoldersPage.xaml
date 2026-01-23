@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.FoldersPage"
+             x:DataType="viewmodels:FoldersViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Main Content -->
+        <Grid Grid.Row="0">
+
+            <!-- Folders List View -->
+            <Grid IsVisible="{Binding IsFolderDetailVisible, Converter={StaticResource InverseBoolConverter}}"
+                  RowDefinitions="Auto,Auto,*">
+
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                        <Image Source="app_logo.png"
+                               HeightRequest="32"
+                               WidthRequest="32"
+                               VerticalOptions="Center"/>
+                        <Label Text="Folders"
+                               Style="{StaticResource PageTitleStyle}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="Add Files"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource PrimaryActionButtonStyle}"/>
+                </Grid>
+
+                <SearchBar Grid.Row="1"
+                           Text="{Binding SearchText}"
+                           Placeholder="Search folders..."
+                           Margin="16,0,16,16"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           BackgroundColor="{StaticResource CardBackground}"
+                           CancelButtonColor="{StaticResource AccentColor}"/>
+
+                <!-- Folders List -->
+                <Grid Grid.Row="2">
+
+                    <!-- Empty State -->
+                    <VerticalStackLayout IsVisible="{Binding HasItems, Converter={StaticResource InverseBoolConverter}}"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center"
+                                         Spacing="16"
+                                         Padding="40">
+                        <Label Text="{x:Static helpers:FontIcons.Folder}"
+                               FontFamily="FontAwesome"
+                               FontSize="80"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="Center"/>
+                        <Label Text="No folders yet"
+                               Style="{StaticResource PageTitleStyle}"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Text="Add media files to see their folders here"
+                               Style="{StaticResource EmptyStateTextStyle}"/>
+                        <Button Text="Browse Files"
+                                Command="{Binding AddFilesCommand}"
+                                Style="{StaticResource PrimaryActionButtonStyle}"
+                                HorizontalOptions="Center"
+                                Margin="0,16,0,0"/>
+                    </VerticalStackLayout>
+
+                    <CollectionView ItemsSource="{Binding FilteredFolders}"
+                                    IsVisible="{Binding HasItems}"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedFolder}"
+                                    Margin="16,0">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Folder">
+                                <Frame Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FoldersViewModel}}, Path=OpenFolderCommand}"
+                                                              CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="56,*,Auto" ColumnSpacing="12">
+
+                                        <!-- Folder Icon -->
+                                        <Frame Grid.Column="0"
+                                               BackgroundColor="{StaticResource SurfaceBackground}"
+                                               CornerRadius="8"
+                                               Padding="0"
+                                               HasShadow="False"
+                                               HeightRequest="56"
+                                               WidthRequest="56">
+                                            <Label Text="{x:Static helpers:FontIcons.Folder}"
+                                                   FontFamily="FontAwesome"
+                                                   FontSize="28"
+                                                   TextColor="#FFB74D"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"/>
+                                        </Frame>
+
+                                        <!-- Folder Info -->
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             VerticalOptions="Center"
+                                                             Spacing="4">
+                                            <Label Text="{Binding Name}"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                            <Label Text="{Binding Subtitle}"
+                                                   TextColor="{StaticResource TextSecondary}"
+                                                   FontSize="14"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Chevron -->
+                                        <Label Grid.Column="2"
+                                               Text="{x:Static helpers:FontIcons.ChevronRight}"
+                                               FontFamily="FontAwesome"
+                                               FontSize="16"
+                                               TextColor="{StaticResource TextMuted}"
+                                               VerticalOptions="Center"/>
+
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+
+                </Grid>
+
+            </Grid>
+
+            <!-- Folder Detail View -->
+            <Grid IsVisible="{Binding IsFolderDetailVisible}" RowDefinitions="Auto,Auto,*">
+
+                <!-- Header with Back Button -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="16,40,16,16">
+                    <Button Grid.Column="0"
+                            Text="{x:Static helpers:FontIcons.ChevronLeft}"
+                            FontFamily="FontAwesome"
+                            FontSize="20"
+                            Command="{Binding CloseFolderDetailCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TextPrimary}"
+                            Padding="12"/>
+
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="{Binding CurrentFolder.Name}"
+                               Style="{StaticResource PageTitleStyle}"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Text="{Binding CurrentFolder.Subtitle}"
+                               TextColor="{StaticResource TextMuted}"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Play All Button -->
+                <HorizontalStackLayout Grid.Row="1"
+                                       Spacing="12"
+                                       HorizontalOptions="Center"
+                                       Margin="0,0,0,16">
+                    <Button Text="{x:Static helpers:FontIcons.Play}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding PlayAllCommand}"
+                            Style="{StaticResource PlayButtonStyle}"
+                            HeightRequest="50"
+                            WidthRequest="50"
+                            CornerRadius="25"
+                            FontSize="20"/>
+                </HorizontalStackLayout>
+
+                <!-- Items List -->
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding CurrentFolder.Items}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedItem}"
+                                Margin="16,0">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <Frame Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FoldersViewModel}}, Path=PlayItemCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="12">
+
+                                    <!-- Media Icon -->
+                                    <Frame Grid.Column="0"
+                                           BackgroundColor="{StaticResource SurfaceBackground}"
+                                           CornerRadius="8"
+                                           Padding="0"
+                                           HasShadow="False"
+                                           HeightRequest="48"
+                                           WidthRequest="48">
+                                        <Label Text="{Binding MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
+                                               FontFamily="FontAwesome"
+                                               FontSize="22"
+                                               TextColor="{StaticResource AccentColor}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Frame>
+
+                                    <!-- Track Info -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         VerticalOptions="Center"
+                                                         Spacing="2">
+                                        <Label Text="{Binding Title}"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                        <Label Text="{Binding DisplaySubtitle}"
+                                               TextColor="{StaticResource TextSecondary}"
+                                               FontSize="13"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Duration & Favorite -->
+                                    <HorizontalStackLayout Grid.Column="2"
+                                                           Spacing="8"
+                                                           VerticalOptions="Center">
+                                        <Label Text="{Binding DurationFormatted}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="12"
+                                               VerticalOptions="Center"/>
+
+                                        <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteIconConverter}}"
+                                                FontFamily="FontAwesome"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FoldersViewModel}}, Path=ToggleFavoriteAsyncCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteColorConverter}}"
+                                                FontSize="16"
+                                                Padding="0"
+                                                HeightRequest="28"
+                                                WidthRequest="28"/>
+                                    </HorizontalStackLayout>
+
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- Mini Player Bar -->
+        <controls:MiniPlayerBar x:Name="MiniPlayerBar" Grid.Row="1"/>
+
+    </Grid>
+
+</ContentPage>

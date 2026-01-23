@@ -18,7 +18,7 @@ public partial class PlayerPage : ContentPage
         SetupViewModel(viewModel);
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
@@ -34,6 +34,7 @@ public partial class PlayerPage : ContentPage
 
         if (_viewModel != null)
         {
+            await _viewModel.InitializeAsync();
             _viewModel.SetMediaElement(MediaElement);
             UpdateMediaElementLayout();
         }
@@ -54,30 +55,59 @@ public partial class PlayerPage : ContentPage
         }
     }
 
+    private bool _isUpdatingLayout;
     private void UpdateMediaElementLayout()
     {
-        if (_viewModel == null) return;
+        if (_viewModel == null || _isUpdatingLayout || Width <= 0) return;
+        _isUpdatingLayout = true;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
             if (_viewModel.IsFullScreen)
             {
-                // Fullscreen: Make MediaElement fill the screen (minus controls area)
+                // Fullscreen: Make MediaElement fill the entire screen
                 MediaElement.HorizontalOptions = LayoutOptions.Fill;
                 MediaElement.VerticalOptions = LayoutOptions.Fill;
-                MediaElement.Margin = new Thickness(0, 0, 0, 120);
+                MediaElement.Margin = new Thickness(0); // Fill entire window
                 MediaElement.HeightRequest = -1; // Auto
-                MediaElement.ZIndex = 100;
+                MediaElement.ZIndex = 11;
             }
             else
             {
                 // Normal: Position MediaElement within the border container
+                bool isDesktop = Width > 850;
                 MediaElement.HorizontalOptions = LayoutOptions.Fill;
-                MediaElement.VerticalOptions = LayoutOptions.Start;
-                MediaElement.Margin = new Thickness(24, 76, 24, 0);
-                MediaElement.HeightRequest = 350;
-                MediaElement.ZIndex = 100;
+                MediaElement.ZIndex = 11;
+
+                if (isDesktop)
+                {
+                    // Desktop: Media on left, controls on right (400 width)
+                    // Margin: Header (72) + side padding (24)
+                    var newMargin = new Thickness(24, 72, 424, 24);
+                    if (MediaElement.VerticalOptions != LayoutOptions.Fill ||
+                        MediaElement.Margin != newMargin ||
+                        MediaElement.HeightRequest != -1)
+                    {
+                        MediaElement.VerticalOptions = LayoutOptions.Fill;
+                        MediaElement.Margin = newMargin;
+                        MediaElement.HeightRequest = -1;
+                    }
+                }
+                else
+                {
+                    // Mobile: Vertical stack
+                    var newMargin = new Thickness(24, 72, 24, 0);
+                    if (MediaElement.VerticalOptions != LayoutOptions.Start ||
+                        MediaElement.Margin != newMargin ||
+                        MediaElement.HeightRequest != 320)
+                    {
+                        MediaElement.VerticalOptions = LayoutOptions.Start;
+                        MediaElement.Margin = newMargin;
+                        MediaElement.HeightRequest = 320;
+                    }
+                }
             }
+            _isUpdatingLayout = false;
         });
     }
 

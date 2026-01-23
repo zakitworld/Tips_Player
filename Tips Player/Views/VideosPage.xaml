@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.VideosPage"
+             x:DataType="viewmodels:VideosViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Main Content -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,*">
+
+            <VerticalStackLayout Grid.Row="0" Spacing="0">
+                <Grid ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                        <Image Source="app_logo.png"
+                               HeightRequest="32"
+                               WidthRequest="32"
+                               VerticalOptions="Center"/>
+                        <Label Text="Videos"
+                               Style="{StaticResource PageTitleStyle}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="Add Files"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource PrimaryActionButtonStyle}"/>
+                </Grid>
+
+                <SearchBar Text="{Binding SearchText}"
+                           Placeholder="Search videos..."
+                           Margin="16,0,16,16"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           BackgroundColor="{StaticResource CardBackground}"
+                           CancelButtonColor="{StaticResource AccentColor}"/>
+            </VerticalStackLayout>
+
+            <!-- Videos Content -->
+            <Grid Grid.Row="1">
+
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding HasItems, Converter={StaticResource InverseBoolConverter}}"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="16"
+                                     Padding="40">
+                    <Label Text="{x:Static helpers:FontIcons.Video}"
+                           FontFamily="FontAwesome"
+                           FontSize="80"
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="No videos yet"
+                           Style="{StaticResource PageTitleStyle}"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="Add some video files to get started"
+                           Style="{StaticResource EmptyStateTextStyle}"/>
+                    <Button Text="Browse Files"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource PrimaryActionButtonStyle}"
+                            HorizontalOptions="Center"
+                            Margin="0,16,0,0"/>
+                </VerticalStackLayout>
+
+                <!-- Videos Grid -->
+                <CollectionView ItemsSource="{Binding FilteredItems}"
+                                IsVisible="{Binding HasItems}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedItem}"
+                                Margin="16,0">
+
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical"
+                                         Span="2"
+                                         HorizontalItemSpacing="12"
+                                         VerticalItemSpacing="12"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <Frame Style="{StaticResource MediaItemCardStyle}" Padding="0">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:VideosViewModel}}, Path=PlayItemCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+
+                                <Grid RowDefinitions="120,Auto">
+                                    <!-- Video Thumbnail -->
+                                    <Frame Grid.Row="0"
+                                           BackgroundColor="{StaticResource SurfaceBackground}"
+                                           CornerRadius="8"
+                                           Padding="0"
+                                           HasShadow="False">
+                                        <Grid>
+                                            <Label Text="{x:Static helpers:FontIcons.Video}"
+                                                   FontFamily="FontAwesome"
+                                                   FontSize="48"
+                                                   TextColor="{StaticResource TextMuted}"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"/>
+                                            <!-- Play overlay -->
+                                            <Frame BackgroundColor="#80000000"
+                                                   CornerRadius="24"
+                                                   Padding="0"
+                                                   HasShadow="False"
+                                                   HeightRequest="48"
+                                                   WidthRequest="48"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center">
+                                                <Label Text="{x:Static helpers:FontIcons.Play}"
+                                                       FontFamily="FontAwesome"
+                                                       FontSize="20"
+                                                       TextColor="White"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"/>
+                                            </Frame>
+                                            <!-- Duration badge -->
+                                            <Frame BackgroundColor="#CC000000"
+                                                   CornerRadius="4"
+                                                   Padding="6,2"
+                                                   HasShadow="False"
+                                                   HorizontalOptions="End"
+                                                   VerticalOptions="End"
+                                                   Margin="8">
+                                                <Label Text="{Binding DurationFormatted}"
+                                                       FontSize="10"
+                                                       TextColor="White"/>
+                                            </Frame>
+                                        </Grid>
+                                    </Frame>
+
+                                    <!-- Video Info -->
+                                    <VerticalStackLayout Grid.Row="1" Padding="12,8" Spacing="2">
+                                        <Label Text="{Binding Title}"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="2"/>
+                                        <Label Text="{Binding FolderName}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="12"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- Mini Player Bar -->
+        <controls:MiniPlayerBar x:Name="MiniPlayerBar" Grid.Row="1"/>
+
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.PlaylistsPage"
+             x:DataType="viewmodels:PlaylistsViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Main Content -->
+        <Grid Grid.Row="0">
+
+            <!-- Playlists List View -->
+            <Grid IsVisible="{Binding IsPlaylistDetailVisible, Converter={StaticResource InverseBoolConverter}}"
+                  RowDefinitions="Auto,*">
+
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,16">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                        <Image Source="app_logo.png"
+                               HeightRequest="32"
+                               WidthRequest="32"
+                               VerticalOptions="Center"/>
+                        <Label Text="Playlists"
+                               Style="{StaticResource PageTitleStyle}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Grid>
+
+                <!-- Smart Playlists Grid -->
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding SmartPlaylists}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedPlaylist}"
+                                Margin="16,0">
+
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical"
+                                         Span="2"
+                                         HorizontalItemSpacing="12"
+                                         VerticalItemSpacing="12"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:SmartPlaylist">
+                            <Frame Style="{StaticResource MediaItemCardStyle}">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PlaylistsViewModel}}, Path=OpenPlaylistCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+
+                                <Grid RowDefinitions="80,Auto" RowSpacing="12">
+                                    <!-- Playlist Icon -->
+                                    <Frame Grid.Row="0"
+                                           BackgroundColor="{StaticResource SurfaceBackground}"
+                                           CornerRadius="12"
+                                           Padding="0"
+                                           HasShadow="False">
+                                        <Label Text="{Binding Icon}"
+                                               FontFamily="FontAwesome"
+                                               FontSize="40"
+                                               TextColor="{StaticResource AccentColor}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Frame>
+
+                                    <!-- Playlist Info -->
+                                    <VerticalStackLayout Grid.Row="1" Spacing="4">
+                                        <Label Text="{Binding Name}"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                        <Label Text="{Binding Subtitle}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="12"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+            <!-- Playlist Detail View -->
+            <Grid IsVisible="{Binding IsPlaylistDetailVisible}" RowDefinitions="Auto,Auto,*">
+
+                <!-- Header with Back Button -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="16,40,16,16">
+                    <Button Grid.Column="0"
+                            Text="{x:Static helpers:FontIcons.ChevronLeft}"
+                            FontFamily="FontAwesome"
+                            FontSize="20"
+                            Command="{Binding ClosePlaylistDetailCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TextPrimary}"
+                            Padding="12"/>
+
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="{Binding CurrentPlaylist.Name}"
+                               Style="{StaticResource PageTitleStyle}"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Text="{Binding CurrentPlaylist.Subtitle}"
+                               TextColor="{StaticResource TextMuted}"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Play All / Shuffle Buttons -->
+                <HorizontalStackLayout Grid.Row="1"
+                                       Spacing="12"
+                                       HorizontalOptions="Center"
+                                       Margin="0,0,0,16">
+                    <Button Text="{x:Static helpers:FontIcons.Play}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding PlayAllCommand}"
+                            Style="{StaticResource PlayButtonStyle}"
+                            HeightRequest="50"
+                            WidthRequest="50"
+                            CornerRadius="25"
+                            FontSize="20"/>
+                    <Button Text="{x:Static helpers:FontIcons.Shuffle}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding ShufflePlayCommand}"
+                            Style="{StaticResource ControlButtonStyle}"
+                            BackgroundColor="{StaticResource CardBackground}"/>
+                </HorizontalStackLayout>
+
+                <!-- Songs List -->
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding CurrentPlaylist.Items}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedItem}"
+                                Margin="16,0">
+
+                    <!-- Empty State -->
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout VerticalOptions="Center"
+                                             HorizontalOptions="Center"
+                                             Spacing="16"
+                                             Padding="40">
+                            <Label Text="{x:Static helpers:FontIcons.Music}"
+                                   FontFamily="FontAwesome"
+                                   FontSize="60"
+                                   TextColor="{StaticResource TextMuted}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="No songs in this playlist"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="16"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <Frame Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PlaylistsViewModel}}, Path=PlayItemCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="12">
+
+                                    <!-- Media Icon -->
+                                    <Frame Grid.Column="0"
+                                           BackgroundColor="{StaticResource SurfaceBackground}"
+                                           CornerRadius="8"
+                                           Padding="0"
+                                           HasShadow="False"
+                                           HeightRequest="48"
+                                           WidthRequest="48">
+                                        <Label Text="{x:Static helpers:FontIcons.Music}"
+                                               FontFamily="FontAwesome"
+                                               FontSize="22"
+                                               TextColor="{StaticResource AccentColor}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Frame>
+
+                                    <!-- Track Info -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         VerticalOptions="Center"
+                                                         Spacing="2">
+                                        <Label Text="{Binding Title}"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                        <Label Text="{Binding Artist}"
+                                               TextColor="{StaticResource TextSecondary}"
+                                               FontSize="13"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Duration & Favorite -->
+                                    <HorizontalStackLayout Grid.Column="2"
+                                                           Spacing="8"
+                                                           VerticalOptions="Center">
+                                        <Label Text="{Binding DurationFormatted}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="12"
+                                               VerticalOptions="Center"/>
+
+                                        <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteIconConverter}}"
+                                                FontFamily="FontAwesome"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PlaylistsViewModel}}, Path=ToggleFavoriteAsyncCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteColorConverter}}"
+                                                FontSize="16"
+                                                Padding="0"
+                                                HeightRequest="28"
+                                                WidthRequest="28"/>
+                                    </HorizontalStackLayout>
+
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- Mini Player Bar -->
+        <controls:MiniPlayerBar x:Name="MiniPlayerBar" Grid.Row="1"/>
+
+    </Grid>
+
+</ContentPage>

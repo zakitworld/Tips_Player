@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.SettingsPage"
+             x:DataType="viewmodels:SettingsViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <Style x:Key="SettingsSectionHeaderStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{StaticResource AccentColor}"/>
+            <Setter Property="Margin" Value="0,16,0,8"/>
+        </Style>
+
+        <Style x:Key="SettingsItemFrameStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
+            <Setter Property="BorderColor" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="HasShadow" Value="False"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style x:Key="SettingsLabelStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="VerticalOptions" Value="Center"/>
+        </Style>
+
+        <Style x:Key="SettingsDescriptionStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextColor" Value="{StaticResource TextMuted}"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*" Padding="24,40,24,8">
+            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                <Image Source="app_logo.png"
+                       HeightRequest="32"
+                       WidthRequest="32"
+                       VerticalOptions="Center"/>
+                <Label Text="Settings"
+                       Style="{StaticResource PageTitleStyle}"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Settings Content -->
+        <ScrollView Grid.Row="1" Padding="16,0,16,24">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- PLAYBACK SECTION -->
+                <Label Text="PLAYBACK" Style="{StaticResource SettingsSectionHeaderStyle}"/>
+
+                <!-- Volume -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="Default Volume"
+                               Style="{StaticResource SettingsLabelStyle}"/>
+                        <Label Grid.Row="1" Grid.Column="0"
+                               Text="{Binding Volume, StringFormat='{0:P0}'}"
+                               Style="{StaticResource SettingsDescriptionStyle}"/>
+                        <Slider Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+                                Minimum="0" Maximum="1"
+                                Value="{Binding Volume}"
+                                MinimumTrackColor="{StaticResource AccentColor}"
+                                MaximumTrackColor="{StaticResource Gray700}"
+                                ThumbColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Auto-play Next -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Auto-play Next Track"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Automatically play the next track when current ends"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding AutoPlayNext}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Shuffle -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Shuffle by Default"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Enable shuffle mode when starting playback"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsShuffleEnabled}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Repeat -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Repeat by Default"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Enable repeat mode when starting playback"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsRepeatEnabled}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Remember Playback Position -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Remember Playback Position"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Resume from where you left off"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding RememberPlaybackPosition}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Default Sleep Timer -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Default Sleep Timer"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Set a default duration for sleep timer"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Picker Grid.Column="1"
+                                ItemsSource="{Binding SleepTimerOptions}"
+                                SelectedItem="{Binding DefaultSleepTimerMinutes}"
+                                TextColor="{StaticResource TextPrimary}"
+                                BackgroundColor="{StaticResource SurfaceBackground}"
+                                WidthRequest="100"
+                                VerticalOptions="Center">
+                            <Picker.ItemDisplayBinding>
+                                <Binding StringFormat="{}{0} min"/>
+                            </Picker.ItemDisplayBinding>
+                        </Picker>
+                    </Grid>
+                </Frame>
+
+                <!-- VIDEO SECTION -->
+                <Label Text="VIDEO" Style="{StaticResource SettingsSectionHeaderStyle}"/>
+
+                <!-- Default Video Aspect -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Default Video Aspect"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="How videos should be displayed by default"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Picker Grid.Column="1"
+                                ItemsSource="{Binding VideoAspectOptions}"
+                                SelectedItem="{Binding SelectedVideoAspect}"
+                                TextColor="{StaticResource TextPrimary}"
+                                BackgroundColor="{StaticResource SurfaceBackground}"
+                                WidthRequest="100"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Auto Rotate Video -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Auto-rotate Video"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Automatically rotate based on video orientation"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding AutoRotateVideo}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- LIBRARY SECTION -->
+                <Label Text="LIBRARY" Style="{StaticResource SettingsSectionHeaderStyle}"/>
+
+                <!-- Show File Extensions -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Show File Extensions"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Display .mp3, .mp4, etc. in titles"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding ShowFileExtensions}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Sort Order -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Default Sort Order"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="How to sort media in library views"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Picker Grid.Column="1"
+                                ItemsSource="{Binding SortOrderOptions}"
+                                SelectedItem="{Binding SelectedSortOrder}"
+                                TextColor="{StaticResource TextPrimary}"
+                                BackgroundColor="{StaticResource SurfaceBackground}"
+                                WidthRequest="120"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Group by Album -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Group by Album"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Group songs by album in artist views"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding GroupByAlbum}"
+                                OnColor="{StaticResource AccentColor}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Library Stats -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Library Statistics"
+                               Style="{StaticResource SettingsLabelStyle}"/>
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="4">
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="13">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding TotalSongs}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                                        <Span Text=" Songs"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Grid.Row="0" Grid.Column="1"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="13">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding TotalVideos}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                                        <Span Text=" Videos"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Grid.Row="1" Grid.Column="0"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="13">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding TotalArtists}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                                        <Span Text=" Artists"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Grid.Row="1" Grid.Column="1"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="13">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding TotalAlbums}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                                        <Span Text=" Albums"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Clear Library Button -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Clear Library"
+                                   Style="{StaticResource SettingsLabelStyle}"
+                                   TextColor="#EF4444"/>
+                            <Label Text="Remove all media from your library"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1"
+                                Text="Clear"
+                                Command="{Binding ClearLibraryCommand}"
+                                BackgroundColor="#EF4444"
+                                TextColor="White"
+                                FontSize="13"
+                                HeightRequest="36"
+                                CornerRadius="8"
+                                Padding="16,0"/>
+                    </Grid>
+                </Frame>
+
+                <!-- ABOUT SECTION -->
+                <Label Text="ABOUT" Style="{StaticResource SettingsSectionHeaderStyle}"/>
+
+                <!-- App Info -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                        <Image Grid.Column="0"
+                               Source="app_logo.png"
+                               HeightRequest="60"
+                               WidthRequest="60"
+                               VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding AppName}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label TextColor="{StaticResource TextMuted}" FontSize="13">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Version "/>
+                                        <Span Text="{Binding AppVersion}"/>
+                                        <Span Text=" ("/>
+                                        <Span Text="{Binding AppBuild}"/>
+                                        <Span Text=")"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Text="A beautiful media player for all your music and videos"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   FontSize="12"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Frame>
+
+                <!-- Rate App -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding RateAppCommand}"/>
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Text="&#xf005;"
+                               FontFamily="FontAwesome"
+                               FontSize="20"
+                               TextColor="{StaticResource AccentColor}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="Rate Tips Player"
+                               Style="{StaticResource SettingsLabelStyle}"/>
+                        <Label Grid.Column="2"
+                               Text="{x:Static helpers:FontIcons.ChevronRight}"
+                               FontFamily="FontAwesome"
+                               FontSize="14"
+                               TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Send Feedback -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SendFeedbackCommand}"/>
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Text="&#xf0e0;"
+                               FontFamily="FontAwesome"
+                               FontSize="20"
+                               TextColor="{StaticResource AccentColor}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="Send Feedback"
+                               Style="{StaticResource SettingsLabelStyle}"/>
+                        <Label Grid.Column="2"
+                               Text="{x:Static helpers:FontIcons.ChevronRight}"
+                               FontFamily="FontAwesome"
+                               FontSize="14"
+                               TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Reset Settings -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}" Margin="0,16,0,0">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Reset All Settings"
+                                   Style="{StaticResource SettingsLabelStyle}"
+                                   TextColor="#F97316"/>
+                            <Label Text="Restore all settings to default values"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1"
+                                Text="Reset"
+                                Command="{Binding ResetSettingsCommand}"
+                                BackgroundColor="#F97316"
+                                TextColor="White"
+                                FontSize="13"
+                                HeightRequest="36"
+                                CornerRadius="8"
+                                Padding="16,0"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Footer -->
+                <Label Text="Made with love for music lovers"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource TextMuted}"
+                       FontSize="12"
+                       Margin="0,24,0,16"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

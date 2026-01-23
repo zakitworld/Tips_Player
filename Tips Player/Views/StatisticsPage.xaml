@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.StatisticsPage"
+             x:DataType="viewmodels:StatisticsViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,16">
+            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
+                <Label Text="Statistics" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+            <Picker Grid.Column="1"
+                    ItemsSource="{Binding Periods}"
+                    SelectedItem="{Binding SelectedPeriod}"
+                    TextColor="{StaticResource TextPrimary}"
+                    BackgroundColor="{StaticResource CardBackground}"
+                    WidthRequest="120"/>
+        </Grid>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="16,0,16,24">
+            <VerticalStackLayout Spacing="16">
+
+                <!-- Overview Cards -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+
+                    <!-- Total Listening Time -->
+                    <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
+                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="&#xf017;" FontFamily="FontAwesome" FontSize="24" TextColor="{StaticResource AccentColor}"/>
+                            <Label Text="{Binding Stats.TotalListeningTimeFormatted}" FontSize="20" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Total Listening" FontSize="12" TextColor="{StaticResource TextMuted}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Tracks Played -->
+                    <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
+                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="24"
+                                   TextColor="{StaticResource AccentColor}"/>
+                            <Label Text="{Binding Stats.TotalTracksPlayed}" FontSize="20" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Tracks Played" FontSize="12" TextColor="{StaticResource TextMuted}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Sessions -->
+                    <Frame Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
+                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="&#xf073;" FontFamily="FontAwesome" FontSize="24" TextColor="{StaticResource AccentColor}"/>
+                            <Label Text="{Binding Stats.TotalSessions}" FontSize="20" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Days Active" FontSize="12" TextColor="{StaticResource TextMuted}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Top Artists Count -->
+                    <Frame Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
+                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{x:Static helpers:FontIcons.Artist}" FontFamily="FontAwesome" FontSize="24"
+                                   TextColor="{StaticResource AccentColor}"/>
+                            <Label Text="{Binding TopArtists.Count}" FontSize="20" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Artists Listened" FontSize="12" TextColor="{StaticResource TextMuted}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                </Grid>
+
+                <!-- Top Tracks -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Top Tracks" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+
+                        <CollectionView ItemsSource="{Binding TopTracks}" SelectionMode="None">
+                            <CollectionView.EmptyView>
+                                <Label Text="No listening data yet" TextColor="{StaticResource TextMuted}"
+                                       HorizontalOptions="Center" Margin="0,20"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:TrackStats">
+                                    <Grid ColumnDefinitions="32,*,Auto" ColumnSpacing="12" Padding="0,8">
+                                        <Frame Grid.Column="0" BackgroundColor="{StaticResource SurfaceBackground}"
+                                               CornerRadius="16" Padding="0" HasShadow="False"
+                                               HeightRequest="32" WidthRequest="32">
+                                            <Label Text="{Binding Rank}" FontSize="14" FontAttributes="Bold"
+                                                   TextColor="{StaticResource AccentColor}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Frame>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                            <Label Text="{Binding TrackTitle}" FontSize="14" FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   LineBreakMode="TailTruncation" MaxLines="1"/>
+                                            <Label Text="{Binding ArtistName}" FontSize="12"
+                                                   TextColor="{StaticResource TextSecondary}"
+                                                   LineBreakMode="TailTruncation" MaxLines="1"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                            <Label FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"
+                                                   HorizontalTextAlignment="End">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding PlayCount}"/>
+                                                        <Span Text=" plays"/>
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Top Artists -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Top Artists" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+
+                        <CollectionView ItemsSource="{Binding TopArtists}" SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="12"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.EmptyView>
+                                <Label Text="No listening data yet" TextColor="{StaticResource TextMuted}"
+                                       HorizontalOptions="Center" Margin="0,20"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:ArtistStats">
+                                    <VerticalStackLayout Spacing="8" WidthRequest="100">
+                                        <Grid>
+                                            <Frame BackgroundColor="{StaticResource SurfaceBackground}"
+                                                   CornerRadius="35" Padding="0" HasShadow="False"
+                                                   HeightRequest="70" WidthRequest="70" HorizontalOptions="Center">
+                                                <Label Text="{x:Static helpers:FontIcons.Artist}" FontFamily="FontAwesome"
+                                                       FontSize="28" TextColor="{StaticResource AccentColor}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            </Frame>
+                                            <Frame BackgroundColor="{StaticResource AccentColor}" CornerRadius="10"
+                                                   Padding="4,2" HasShadow="False" HeightRequest="20" WidthRequest="20"
+                                                   HorizontalOptions="End" VerticalOptions="End" Margin="10,0">
+                                                <Label Text="{Binding Rank}" FontSize="10" FontAttributes="Bold"
+                                                       TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            </Frame>
+                                        </Grid>
+                                        <Label Text="{Binding ArtistName}" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"
+                                               LineBreakMode="TailTruncation" MaxLines="1"/>
+                                        <Label FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding PlayCount}"/>
+                                                    <Span Text=" plays"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Top Albums -->
+                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Top Albums" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+
+                        <CollectionView ItemsSource="{Binding TopAlbums}" SelectionMode="None">
+                            <CollectionView.EmptyView>
+                                <Label Text="No album data yet" TextColor="{StaticResource TextMuted}"
+                                       HorizontalOptions="Center" Margin="0,20"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:AlbumStats">
+                                    <Grid ColumnDefinitions="32,44,*,Auto" ColumnSpacing="12" Padding="0,8">
+                                        <Label Grid.Column="0" Text="{Binding Rank}" FontSize="14" FontAttributes="Bold"
+                                               TextColor="{StaticResource AccentColor}"
+                                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        <Frame Grid.Column="1" BackgroundColor="{StaticResource SurfaceBackground}"
+                                               CornerRadius="6" Padding="0" HasShadow="False"
+                                               HeightRequest="44" WidthRequest="44">
+                                            <Label Text="{x:Static helpers:FontIcons.Album}" FontFamily="FontAwesome"
+                                                   FontSize="18" TextColor="{StaticResource AccentColor}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Frame>
+                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="2">
+                                            <Label Text="{Binding AlbumName}" FontSize="14" FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   LineBreakMode="TailTruncation" MaxLines="1"/>
+                                            <Label Text="{Binding ArtistName}" FontSize="12"
+                                                   TextColor="{StaticResource TextSecondary}"
+                                                   LineBreakMode="TailTruncation" MaxLines="1"/>
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="3" FontSize="12" TextColor="{StaticResource TextMuted}"
+                                               VerticalOptions="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding PlayCount}"/>
+                                                    <Span Text=" plays"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Reset Stats -->
+                <Button Text="Reset Statistics"
+                        Command="{Binding ResetStatsCommand}"
+                        BackgroundColor="#EF4444"
+                        TextColor="White"
+                        FontSize="14"
+                        HeightRequest="44"
+                        CornerRadius="8"
+                        Margin="0,8,0,0"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

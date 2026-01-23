@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.LyricsPage"
+             x:DataType="viewmodels:LyricsViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
+                <Label Text="Lyrics" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                <!-- Font Size Controls -->
+                <Button Text="&#xf068;" FontFamily="FontAwesome"
+                        Command="{Binding DecreaseFontSizeCommand}"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        TextColor="{StaticResource TextPrimary}"
+                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"/>
+                <Button Text="&#xf067;" FontFamily="FontAwesome"
+                        Command="{Binding IncreaseFontSizeCommand}"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        TextColor="{StaticResource TextPrimary}"
+                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Current Track Info -->
+        <Frame Grid.Row="1" BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
+               CornerRadius="12" Padding="16" Margin="16,8,16,8"
+               IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}}">
+            <Grid ColumnDefinitions="48,*" ColumnSpacing="12">
+                <Frame Grid.Column="0" BackgroundColor="{StaticResource SurfaceBackground}"
+                       CornerRadius="8" Padding="0" HasShadow="False" HeightRequest="48" WidthRequest="48">
+                    <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="20"
+                           TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Frame>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                    <Label Text="{Binding CurrentMedia.Title}" FontSize="16" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
+                    <Label Text="{Binding CurrentMedia.Artist}" FontSize="14"
+                           TextColor="{StaticResource TextSecondary}" LineBreakMode="TailTruncation" MaxLines="1"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
+
+        <!-- Lyrics Content -->
+        <Grid Grid.Row="2">
+
+            <!-- Loading State -->
+            <VerticalStackLayout IsVisible="{Binding IsLoading}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource AccentColor}" HeightRequest="40"/>
+                <Label Text="Loading lyrics..." FontSize="16" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- No Media State -->
+            <VerticalStackLayout IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}, ConverterParameter=Invert}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="40">
+                <VerticalStackLayout.Triggers>
+                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsLoading}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </VerticalStackLayout.Triggers>
+                <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="60"
+                       TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                <Label Text="No track playing" FontSize="20" FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"/>
+                <Label Text="Play a song to see lyrics" FontSize="14"
+                       TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- No Lyrics State -->
+            <VerticalStackLayout IsVisible="{Binding HasLyrics, Converter={StaticResource InverseBoolConverter}}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="40">
+                <VerticalStackLayout.Triggers>
+                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsLoading}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentMedia}" Value="{x:Null}">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </VerticalStackLayout.Triggers>
+                <Label Text="{x:Static helpers:FontIcons.Font}" FontFamily="FontAwesome" FontSize="60"
+                       TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                <Label Text="No lyrics available" FontSize="20" FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"/>
+                <Label Text="Lyrics not found for this track" FontSize="14"
+                       TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Synced Lyrics View -->
+            <CollectionView ItemsSource="{Binding CurrentLyrics.Lines}"
+                            IsVisible="{Binding HasLyrics}"
+                            SelectionMode="None"
+                            Margin="16,0">
+                <CollectionView.Triggers>
+                    <DataTrigger TargetType="CollectionView" Binding="{Binding ShowPlainText}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                    <DataTrigger TargetType="CollectionView" Binding="{Binding CurrentLyrics.IsSynced}" Value="False">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </CollectionView.Triggers>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:LyricLine">
+                        <Frame BackgroundColor="Transparent" BorderColor="Transparent" Padding="8,12">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LyricsViewModel}}, Path=SeekToLineCommand}"
+                                                      CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
+                            <Label Text="{Binding Text}"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LyricsViewModel}}, Path=FontSize}"
+                                   HorizontalTextAlignment="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsActive}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource AccentColor}"/>
+                                        <Setter Property="FontAttributes" Value="Bold"/>
+                                        <Setter Property="Scale" Value="1.1"/>
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsPast}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Plain Text View -->
+            <ScrollView IsVisible="{Binding ShowPlainText}"
+                        Margin="16,0">
+                <ScrollView.Triggers>
+                    <DataTrigger TargetType="ScrollView" Binding="{Binding HasLyrics}" Value="False">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </ScrollView.Triggers>
+                <Label Text="{Binding CurrentLyrics.PlainText}"
+                       FontSize="{Binding FontSize}"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalTextAlignment="Center"
+                       Padding="16"/>
+            </ScrollView>
+
+            <!-- Non-Synced Plain Text (when no synced lyrics) -->
+            <ScrollView Margin="16,0">
+                <ScrollView.Triggers>
+                    <DataTrigger TargetType="ScrollView" Binding="{Binding HasLyrics}" Value="False">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                    <DataTrigger TargetType="ScrollView" Binding="{Binding ShowPlainText}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                    <DataTrigger TargetType="ScrollView" Binding="{Binding CurrentLyrics.IsSynced}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </ScrollView.Triggers>
+                <Label Text="{Binding CurrentLyrics.PlainText}"
+                       FontSize="{Binding FontSize}"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalTextAlignment="Center"
+                       Padding="16"/>
+            </ScrollView>
+
+        </Grid>
+
+        <!-- Bottom Controls -->
+        <Frame Grid.Row="3" BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
+               CornerRadius="12" Padding="16" Margin="16,8,16,16"
+               IsVisible="{Binding HasLyrics}">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="24">
+                <!-- Toggle Synced/Plain -->
+                <Button Command="{Binding ToggleViewCommand}"
+                        BackgroundColor="{StaticResource SurfaceBackground}"
+                        TextColor="{StaticResource TextPrimary}"
+                        FontSize="12" HeightRequest="40" CornerRadius="8" Padding="16,0">
+                    <Button.Text>
+                        <Binding Path="ShowPlainText">
+                            <Binding.Converter>
+                                <helpers:BoolToTextConverter TrueText="Show Synced" FalseText="Show Plain"/>
+                            </Binding.Converter>
+                        </Binding>
+                    </Button.Text>
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding CurrentLyrics.IsSynced}" Value="False">
+                            <Setter Property="IsVisible" Value="False"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- Auto Scroll Toggle -->
+                <Button Command="{Binding ToggleAutoScrollCommand}"
+                        BackgroundColor="{StaticResource SurfaceBackground}"
+                        TextColor="{StaticResource TextPrimary}"
+                        FontSize="12" HeightRequest="40" CornerRadius="8" Padding="16,0">
+                    <Button.Text>
+                        <Binding Path="AutoScroll">
+                            <Binding.Converter>
+                                <helpers:BoolToTextConverter TrueText="Auto-Scroll: On" FalseText="Auto-Scroll: Off"/>
+                            </Binding.Converter>
+                        </Binding>
+                    </Button.Text>
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding CurrentLyrics.IsSynced}" Value="False">
+                            <Setter Property="IsVisible" Value="False"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </HorizontalStackLayout>
+        </Frame>
+
+    </Grid>
+
+</ContentPage>

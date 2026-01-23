@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.SongsPage"
+             x:DataType="viewmodels:SongsViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Main Content -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,*">
+
+            <VerticalStackLayout Grid.Row="0" Spacing="0">
+                <Grid ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                        <Image Source="app_logo.png"
+                               HeightRequest="32"
+                               WidthRequest="32"
+                               VerticalOptions="Center"/>
+                        <Label Text="Songs"
+                               Style="{StaticResource PageTitleStyle}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="Add Files"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource PrimaryActionButtonStyle}"/>
+                </Grid>
+
+                <SearchBar Text="{Binding SearchText}"
+                           Placeholder="Search songs..."
+                           Margin="16,0,16,16"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           BackgroundColor="{StaticResource CardBackground}"
+                           CancelButtonColor="{StaticResource AccentColor}"/>
+            </VerticalStackLayout>
+
+            <!-- Library Content -->
+            <Grid Grid.Row="1">
+
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding HasItems, Converter={StaticResource InverseBoolConverter}}"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="16"
+                                     Padding="40">
+                    <Label Text="{x:Static helpers:FontIcons.Music}"
+                           FontFamily="FontAwesome"
+                           FontSize="80"
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="No songs yet"
+                           Style="{StaticResource PageTitleStyle}"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="Add some audio files to get started"
+                           Style="{StaticResource EmptyStateTextStyle}"/>
+                    <Button Text="Browse Files"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource PrimaryActionButtonStyle}"
+                            HorizontalOptions="Center"
+                            Margin="0,16,0,0"/>
+                </VerticalStackLayout>
+
+                <!-- Songs List -->
+                <CollectionView ItemsSource="{Binding FilteredItems}"
+                                IsVisible="{Binding HasItems}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedItem}"
+                                Margin="16,0">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MediaItem">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="Delete"
+                                                   BackgroundColor="#EF4444"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SongsViewModel}}, Path=RemoveItemAsyncCommand}"
+                                                   CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <Frame Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SongsViewModel}}, Path=PlayItemCommand}"
+                                                              CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="56,*,Auto" ColumnSpacing="12">
+
+                                        <!-- Media Icon -->
+                                        <Frame Grid.Column="0"
+                                               BackgroundColor="{StaticResource SurfaceBackground}"
+                                               CornerRadius="8"
+                                               Padding="0"
+                                               HasShadow="False"
+                                               HeightRequest="56"
+                                               WidthRequest="56">
+                                            <Label Text="{x:Static helpers:FontIcons.Music}"
+                                                   FontFamily="FontAwesome"
+                                                   FontSize="28"
+                                                   TextColor="{StaticResource AccentColor}"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"/>
+                                        </Frame>
+
+                                        <!-- Track Info -->
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             VerticalOptions="Center"
+                                                             Spacing="4">
+                                            <Label Text="{Binding Title}"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                            <Label Text="{Binding AlbumDisplay}"
+                                                   TextColor="{StaticResource TextSecondary}"
+                                                   FontSize="14"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Duration & Favorite -->
+                                        <HorizontalStackLayout Grid.Column="2"
+                                                               Spacing="12"
+                                                               VerticalOptions="Center">
+                                            <Label Text="{Binding DurationFormatted}"
+                                                   TextColor="{StaticResource TextMuted}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center"/>
+
+                                            <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteIconConverter}}"
+                                                    FontFamily="FontAwesome"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SongsViewModel}}, Path=ToggleFavoriteAsyncCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteColorConverter}}"
+                                                    FontSize="18"
+                                                    Padding="0"
+                                                    HeightRequest="32"
+                                                    WidthRequest="32"/>
+                                        </HorizontalStackLayout>
+
+                                    </Grid>
+                                </Frame>
+
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- Mini Player Bar -->
+        <controls:MiniPlayerBar x:Name="MiniPlayerBar" Grid.Row="1"/>
+
+    </Grid>
+
+</ContentPage>

@@ -40,6 +40,7 @@
     <Style x:Key="ControlButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent"/>
         <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontFamily" Value="FontAwesome"/>
         <Setter Property="FontSize" Value="24"/>
         <Setter Property="HeightRequest" Value="50"/>
         <Setter Property="WidthRequest" Value="50"/>
@@ -51,6 +52,7 @@
     <Style x:Key="PlayButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource AccentColor}"/>
         <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontFamily" Value="FontAwesome"/>
         <Setter Property="FontSize" Value="28"/>
         <Setter Property="HeightRequest" Value="70"/>
         <Setter Property="WidthRequest" Value="70"/>
@@ -68,6 +70,7 @@
     <Style x:Key="SecondaryControlStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent"/>
         <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="FontFamily" Value="FontAwesome"/>
         <Setter Property="FontSize" Value="18"/>
         <Setter Property="HeightRequest" Value="44"/>
         <Setter Property="WidthRequest" Value="44"/>

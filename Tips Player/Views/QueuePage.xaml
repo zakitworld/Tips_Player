@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.QueuePage"
+             x:DataType="viewmodels:QueueViewModel"
+             Style="{StaticResource PlayerPageStyle}"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
+                <Label Text="Queue" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                <Button Text="{x:Static helpers:FontIcons.Shuffle}"
+                        FontFamily="FontAwesome"
+                        Command="{Binding ShuffleQueueCommand}"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        TextColor="{StaticResource TextPrimary}"
+                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"/>
+                <Button Text="{x:Static helpers:FontIcons.Trash}"
+                        FontFamily="FontAwesome"
+                        Command="{Binding ClearQueueCommand}"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        TextColor="{StaticResource TextPrimary}"
+                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Now Playing -->
+        <Frame Grid.Row="1" BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
+               CornerRadius="12" Padding="16" Margin="16,8,16,16"
+               IsVisible="{Binding CurrentlyPlaying, Converter={StaticResource IsNotNullConverter}}">
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="12">
+                <Frame Grid.Column="0" BackgroundColor="{StaticResource AccentColor}" CornerRadius="8" Padding="0" HasShadow="False"
+                       HeightRequest="56" WidthRequest="56">
+                    <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="24"
+                           TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Frame>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                    <Label Text="NOW PLAYING" FontSize="10" TextColor="{StaticResource AccentColor}" FontAttributes="Bold"/>
+                    <Label Text="{Binding CurrentlyPlaying.Title}" FontSize="16" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
+                    <Label Text="{Binding CurrentlyPlaying.Artist}" FontSize="14"
+                           TextColor="{StaticResource TextSecondary}" LineBreakMode="TailTruncation" MaxLines="1"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
+
+        <!-- Queue List -->
+        <Grid Grid.Row="2">
+
+            <!-- Empty State -->
+            <VerticalStackLayout IsVisible="{Binding HasItems, Converter={StaticResource InverseBoolConverter}}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="40">
+                <Label Text="{x:Static helpers:FontIcons.List}" FontFamily="FontAwesome" FontSize="60"
+                       TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                <Label Text="Queue is empty" FontSize="20" FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"/>
+                <Label Text="Add songs to start playing" FontSize="14"
+                       TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Queue Items -->
+            <CollectionView ItemsSource="{Binding QueueItems}"
+                            IsVisible="{Binding HasItems}"
+                            SelectionMode="None"
+                            Margin="16,0">
+
+                <CollectionView.Header>
+                    <Label Text="UP NEXT" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextMuted}" Margin="0,0,0,8"/>
+                </CollectionView.Header>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:QueueItem">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Remove" BackgroundColor="#EF4444"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:QueueViewModel}}, Path=RemoveFromQueueCommand}"
+                                               CommandParameter="{Binding .}"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Frame BackgroundColor="{StaticResource CardBackground}"
+                                   BorderColor="Transparent" CornerRadius="8" Padding="12" Margin="0,4">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame" Binding="{Binding IsCurrentlyPlaying}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource SurfaceBackground}"/>
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:QueueViewModel}}, Path=PlayItemCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="32,*,Auto,Auto" ColumnSpacing="12">
+
+                                    <!-- Position -->
+                                    <Label Grid.Column="0" Text="{Binding Position}"
+                                           FontSize="14" TextColor="{StaticResource TextMuted}"
+                                           VerticalOptions="Center" HorizontalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsCurrentlyPlaying}" Value="True">
+                                                <Setter Property="Text" Value="{x:Static helpers:FontIcons.Play}"/>
+                                                <Setter Property="FontFamily" Value="FontAwesome"/>
+                                                <Setter Property="TextColor" Value="{StaticResource AccentColor}"/>
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <!-- Track Info -->
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Media.Title}" FontSize="15" FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               LineBreakMode="TailTruncation" MaxLines="1">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsCurrentlyPlaying}" Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource AccentColor}"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                        <Label Text="{Binding Media.Artist}" FontSize="13"
+                                               TextColor="{StaticResource TextSecondary}"
+                                               LineBreakMode="TailTruncation" MaxLines="1"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Duration -->
+                                    <Label Grid.Column="2" Text="{Binding Media.DurationFormatted}"
+                                           FontSize="12" TextColor="{StaticResource TextMuted}"
+                                           VerticalOptions="Center"/>
+
+                                    <!-- Reorder Buttons -->
+                                    <VerticalStackLayout Grid.Column="3" VerticalOptions="Center" Spacing="4"
+                                                         IsVisible="{Binding IsCurrentlyPlaying, Converter={StaticResource InverseBoolConverter}}">
+                                        <Button Text="&#xf077;" FontFamily="FontAwesome" FontSize="10"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:QueueViewModel}}, Path=MoveUpCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
+                                                HeightRequest="24" WidthRequest="24" Padding="0"/>
+                                        <Button Text="&#xf078;" FontFamily="FontAwesome" FontSize="10"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:QueueViewModel}}, Path=MoveDownCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
+                                                HeightRequest="24" WidthRequest="24" Padding="0"/>
+                                    </VerticalStackLayout>
+
+                                </Grid>
+                            </Frame>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

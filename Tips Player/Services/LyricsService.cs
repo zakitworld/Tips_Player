@@ -1,0 +1,178 @@
+using System.Text.Json;
+using Tips_Player.Models;
+using Tips_Player.Services.Interfaces;
+
+namespace Tips_Player.Services;
+
+public class LyricsService : ILyricsService
+{
+    private const string LyricsCacheFolder = "lyrics_cache";
+    private readonly string _cacheDirectory;
+
+    public LyricsService()
+    {
+        _cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, LyricsCacheFolder);
+        if (!Directory.Exists(_cacheDirectory))
+        {
+            Directory.CreateDirectory(_cacheDirectory);
+        }
+    }
+
+    public async Task<Lyrics?> GetLyricsAsync(string title, string artist)
+    {
+        // First check cache
+        var cachedLyrics = await GetCachedLyricsAsync(title, artist);
+        if (cachedLyrics != null)
+        {
+            return cachedLyrics;
+        }
+
+        // Try to fetch from online sources (placeholder for API integration)
+        // In a real implementation, you would call lyrics APIs like:
+        // - Musixmatch API
+        // - Genius API
+        // - LyricsOvh API
+
+        // For now, return null - user can add lyrics manually
+        return null;
+    }
+
+    public async Task<Lyrics?> GetLyricsFromFileAsync(string filePath)
+    {
+        try
+        {
+            // Check for .lrc file with same name
+            var lrcPath = Path.ChangeExtension(filePath, ".lrc");
+            if (File.Exists(lrcPath))
+            {
+                var content = await File.ReadAllTextAsync(lrcPath);
+                return Lyrics.Parse(content);
+            }
+
+            // Check for .txt file with same name
+            var txtPath = Path.ChangeExtension(filePath, ".txt");
+            if (File.Exists(txtPath))
+            {
+                var content = await File.ReadAllTextAsync(txtPath);
+                return new Lyrics
+                {
+                    PlainText = content,
+                    IsSynced = false
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error reading lyrics file: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    public async Task SaveLyricsAsync(MediaItem media, Lyrics lyrics)
+    {
+        try
+        {
+            var fileName = GetCacheFileName(media.Title, media.Artist);
+            var filePath = Path.Combine(_cacheDirectory, fileName);
+
+            var data = new LyricsData
+            {
+                Title = lyrics.Title,
+                Artist = lyrics.Artist,
+                Source = lyrics.Source,
+                IsSynced = lyrics.IsSynced,
+                PlainText = lyrics.PlainText,
+                Lines = lyrics.Lines.Select(l => new LyricLineData
+                {
+                    TimestampMs = (long)l.Timestamp.TotalMilliseconds,
+                    Text = l.Text
+                }).ToList()
+            };
+
+            var json = JsonSerializer.Serialize(data);
+            await File.WriteAllTextAsync(filePath, json);
+
+            // Update media item
+            media.HasLyrics = true;
+            media.Lyrics = lyrics.PlainText;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error saving lyrics: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> HasCachedLyricsAsync(MediaItem media)
+    {
+        var fileName = GetCacheFileName(media.Title, media.Artist);
+        var filePath = Path.Combine(_cacheDirectory, fileName);
+        return await Task.FromResult(File.Exists(filePath));
+    }
+
+    private async Task<Lyrics?> GetCachedLyricsAsync(string title, string artist)
+    {
+        try
+        {
+            var fileName = GetCacheFileName(title, artist);
+            var filePath = Path.Combine(_cacheDirectory, fileName);
+
+            if (!File.Exists(filePath)) return null;
+
+            var json = await File.ReadAllTextAsync(filePath);
+            var data = JsonSerializer.Deserialize<LyricsData>(json);
+
+            if (data == null) return null;
+
+            var lyrics = new Lyrics
+            {
+                Title = data.Title,
+                Artist = data.Artist,
+                Source = data.Source,
+                IsSynced = data.IsSynced,
+                PlainText = data.PlainText,
+                Lines = data.Lines.Select(l => new LyricLine
+                {
+                    Timestamp = TimeSpan.FromMilliseconds(l.TimestampMs),
+                    Text = l.Text
+                }).ToList()
+            };
+
+            return lyrics;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading cached lyrics: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    private static string GetCacheFileName(string title, string artist)
+    {
+        var safeName = $"{SanitizeFileName(artist)}_{SanitizeFileName(title)}.json";
+        return safeName;
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars();
+        return string.Join("_", name.Split(invalid, StringSplitOptions.RemoveEmptyEntries)).ToLowerInvariant();
+    }
+
+    private class LyricsData
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Artist { get; set; } = string.Empty;
+        public string Source { get; set; } = string.Empty;
+        public bool IsSynced { get; set; }
+        public string PlainText { get; set; } = string.Empty;
+        public List<LyricLineData> Lines { get; set; } = [];
+    }
+
+    private class LyricLineData
+    {
+        public long TimestampMs { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+}

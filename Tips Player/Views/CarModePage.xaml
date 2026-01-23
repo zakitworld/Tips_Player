@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Tips_Player.Views.CarModePage"
+             x:DataType="viewmodels:CarModeViewModel"
+             BackgroundColor="#0A0A0F"
+             ios:Page.UseSafeArea="True"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="#0A0A0F" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" Padding="24">
+
+        <!-- Exit Button -->
+        <Button Grid.Row="0"
+                Text="{x:Static helpers:FontIcons.Close}"
+                FontFamily="FontAwesome"
+                FontSize="24"
+                Command="{Binding ExitCarModeCommand}"
+                BackgroundColor="Transparent"
+                TextColor="#666666"
+                HeightRequest="60" WidthRequest="60"
+                HorizontalOptions="End" VerticalOptions="Start"/>
+
+        <!-- Track Info -->
+        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+
+            <!-- Album Art Placeholder -->
+            <Frame BackgroundColor="#1A1A24"
+                   CornerRadius="24"
+                   Padding="0"
+                   HasShadow="False"
+                   HeightRequest="200"
+                   WidthRequest="200"
+                   HorizontalOptions="Center">
+                <Label Text="{x:Static helpers:FontIcons.Music}"
+                       FontFamily="FontAwesome"
+                       FontSize="80"
+                       TextColor="{StaticResource AccentColor}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <!-- Title -->
+            <Label Text="{Binding CurrentMedia.Title, FallbackValue='No track playing'}"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="TailTruncation"
+                   MaxLines="2"/>
+
+            <!-- Artist -->
+            <Label Text="{Binding CurrentMedia.Artist, FallbackValue=''}"
+                   FontSize="24"
+                   TextColor="#888888"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="TailTruncation"
+                   MaxLines="1"/>
+
+        </VerticalStackLayout>
+
+        <!-- Progress Bar -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,16" RowSpacing="12" Margin="0,20">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+                <Label Text="{Binding PositionFormatted}" FontSize="20" TextColor="#888888"/>
+                <Label Grid.Column="2" Text="{Binding DurationFormatted}" FontSize="20" TextColor="#888888"/>
+            </Grid>
+            <ProgressBar Grid.Row="1"
+                         Progress="{Binding ProgressPercent, Converter={StaticResource PercentToProgressConverter}}"
+                         ProgressColor="{StaticResource AccentColor}"
+                         BackgroundColor="#333333"
+                         HeightRequest="16"
+                         ScaleY="2"/>
+        </Grid>
+
+        <!-- Main Controls -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,*,*" ColumnSpacing="24" Margin="0,20">
+
+            <!-- Previous -->
+            <Button Grid.Column="0"
+                    Text="{x:Static helpers:FontIcons.StepBackward}"
+                    FontFamily="FontAwesome"
+                    FontSize="48"
+                    Command="{Binding PreviousTrackCommand}"
+                    BackgroundColor="#1A1A24"
+                    TextColor="White"
+                    HeightRequest="120"
+                    CornerRadius="24"/>
+
+            <!-- Play/Pause -->
+            <Button Grid.Column="1"
+                    Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
+                    FontFamily="FontAwesome"
+                    FontSize="56"
+                    Command="{Binding PlayPauseCommand}"
+                    BackgroundColor="{StaticResource AccentColor}"
+                    TextColor="White"
+                    HeightRequest="140"
+                    CornerRadius="28">
+                <Button.Shadow>
+                    <Shadow Brush="{StaticResource AccentBrush}"
+                            Offset="0,8"
+                            Radius="24"
+                            Opacity="0.5"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Next -->
+            <Button Grid.Column="2"
+                    Text="{x:Static helpers:FontIcons.StepForward}"
+                    FontFamily="FontAwesome"
+                    FontSize="48"
+                    Command="{Binding NextTrackCommand}"
+                    BackgroundColor="#1A1A24"
+                    TextColor="White"
+                    HeightRequest="120"
+                    CornerRadius="24"/>
+
+        </Grid>
+
+        <!-- Car Mode Label -->
+        <HorizontalStackLayout Grid.Row="4" HorizontalOptions="Center" Spacing="8" Margin="0,20,0,0">
+            <Label Text="&#xf1b9;" FontFamily="FontAwesome" FontSize="18" TextColor="#666666"/>
+            <Label Text="CAR MODE" FontSize="14" FontAttributes="Bold" TextColor="#666666" LetterSpacing="2"/>
+        </HorizontalStackLayout>
+
+    </Grid>
+
+</ContentPage>
