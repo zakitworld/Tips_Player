@@ -12,10 +12,6 @@
              Shell.NavBarIsVisible="False"
              Shell.TabBarIsVisible="False">
 
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="#0A0A0F" StatusBarStyle="LightContent" />
-    </ContentPage.Behaviors>
-
     <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" Padding="24">
 
         <!-- Exit Button -->

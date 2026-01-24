@@ -12,10 +12,6 @@
              ios:Page.UseSafeArea="True"
              Shell.NavBarIsVisible="False">
 
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
-    </ContentPage.Behaviors>
-
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Header -->
@@ -69,13 +65,8 @@
             </VerticalStackLayout>
 
             <!-- No Media State -->
-            <VerticalStackLayout IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}, ConverterParameter=Invert}"
+            <VerticalStackLayout IsVisible="{Binding ShowNoMediaState}"
                                  VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="40">
-                <VerticalStackLayout.Triggers>
-                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsLoading}" Value="True">
-                        <Setter Property="IsVisible" Value="False"/>
-                    </DataTrigger>
-                </VerticalStackLayout.Triggers>
                 <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="60"
                        TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
                 <Label Text="No track playing" FontSize="20" FontAttributes="Bold"
@@ -85,16 +76,8 @@
             </VerticalStackLayout>
 
             <!-- No Lyrics State -->
-            <VerticalStackLayout IsVisible="{Binding HasLyrics, Converter={StaticResource InverseBoolConverter}}"
+            <VerticalStackLayout IsVisible="{Binding ShowNoLyricsState}"
                                  VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="40">
-                <VerticalStackLayout.Triggers>
-                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsLoading}" Value="True">
-                        <Setter Property="IsVisible" Value="False"/>
-                    </DataTrigger>
-                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentMedia}" Value="{x:Null}">
-                        <Setter Property="IsVisible" Value="False"/>
-                    </DataTrigger>
-                </VerticalStackLayout.Triggers>
                 <Label Text="{x:Static helpers:FontIcons.Font}" FontFamily="FontAwesome" FontSize="60"
                        TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
                 <Label Text="No lyrics available" FontSize="20" FontAttributes="Bold"
@@ -105,7 +88,7 @@
 
             <!-- Synced Lyrics View -->
             <CollectionView ItemsSource="{Binding CurrentLyrics.Lines}"
-                            IsVisible="{Binding HasLyrics}"
+                            IsVisible="{Binding ShowLyricsContent}"
                             SelectionMode="None"
                             Margin="16,0">
                 <CollectionView.Triggers>
@@ -144,10 +127,10 @@
             </CollectionView>
 
             <!-- Plain Text View -->
-            <ScrollView IsVisible="{Binding ShowPlainText}"
+            <ScrollView IsVisible="{Binding ShowLyricsContent}"
                         Margin="16,0">
                 <ScrollView.Triggers>
-                    <DataTrigger TargetType="ScrollView" Binding="{Binding HasLyrics}" Value="False">
+                    <DataTrigger TargetType="ScrollView" Binding="{Binding ShowPlainText}" Value="False">
                         <Setter Property="IsVisible" Value="False"/>
                     </DataTrigger>
                 </ScrollView.Triggers>
@@ -159,11 +142,9 @@
             </ScrollView>
 
             <!-- Non-Synced Plain Text (when no synced lyrics) -->
-            <ScrollView Margin="16,0">
+            <ScrollView IsVisible="{Binding ShowLyricsContent}"
+                        Margin="16,0">
                 <ScrollView.Triggers>
-                    <DataTrigger TargetType="ScrollView" Binding="{Binding HasLyrics}" Value="False">
-                        <Setter Property="IsVisible" Value="False"/>
-                    </DataTrigger>
                     <DataTrigger TargetType="ScrollView" Binding="{Binding ShowPlainText}" Value="True">
                         <Setter Property="IsVisible" Value="False"/>
                     </DataTrigger>
@@ -183,7 +164,7 @@
         <!-- Bottom Controls -->
         <Frame Grid.Row="3" BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
                CornerRadius="12" Padding="16" Margin="16,8,16,16"
-               IsVisible="{Binding HasLyrics}">
+               IsVisible="{Binding ShowLyricsContent}">
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="24">
                 <!-- Toggle Synced/Plain -->
                 <Button Command="{Binding ToggleViewCommand}"

@@ -11,10 +11,6 @@
              ios:Page.UseSafeArea="True"
              Shell.NavBarIsVisible="False">
 
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
-    </ContentPage.Behaviors>
-
     <ContentPage.Resources>
         <Style x:Key="SettingsSectionHeaderStyle" TargetType="Label">
             <Setter Property="FontSize" Value="14"/>
@@ -333,6 +329,90 @@
                                 HeightRequest="36"
                                 CornerRadius="8"
                                 Padding="16,0"/>
+                    </Grid>
+                </Frame>
+
+                <!-- TOOLS SECTION -->
+                <Label Text="TOOLS" Style="{StaticResource SettingsSectionHeaderStyle}"/>
+
+                <!-- Listening Statistics -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToStatisticsCommand}"/>
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Text="&#xf201;"
+                               FontFamily="FontAwesome"
+                               FontSize="20"
+                               TextColor="{StaticResource AccentColor}"
+                               VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="Listening Statistics"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="View your listening history and top tracks"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2"
+                               Text="{x:Static helpers:FontIcons.ChevronRight}"
+                               FontFamily="FontAwesome"
+                               FontSize="14"
+                               TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Car Mode -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToCarModeCommand}"/>
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Text="&#xf1b9;"
+                               FontFamily="FontAwesome"
+                               FontSize="20"
+                               TextColor="{StaticResource AccentColor}"
+                               VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="Car Mode"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Large controls for safe driving"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2"
+                               Text="{x:Static helpers:FontIcons.ChevronRight}"
+                               FontFamily="FontAwesome"
+                               FontSize="14"
+                               TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Equalizer -->
+                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToEqualizerCommand}"/>
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Text="&#xf3f3;"
+                               FontFamily="FontAwesome"
+                               FontSize="20"
+                               TextColor="{StaticResource AccentColor}"
+                               VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="Equalizer"
+                                   Style="{StaticResource SettingsLabelStyle}"/>
+                            <Label Text="Adjust audio with presets and custom EQ"
+                                   Style="{StaticResource SettingsDescriptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2"
+                               Text="{x:Static helpers:FontIcons.ChevronRight}"
+                               FontFamily="FontAwesome"
+                               FontSize="14"
+                               TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center"/>
                     </Grid>
                 </Frame>
 

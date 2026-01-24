@@ -610,4 +610,22 @@ public partial class PlayerViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync("CarModePage");
     }
+
+    [RelayCommand]
+    private static async Task NavigateToQueueAsync()
+    {
+        await Shell.Current.GoToAsync("QueuePage");
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToLyricsAsync()
+    {
+        await Shell.Current.GoToAsync("LyricsPage");
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToEqualizerAsync()
+    {
+        await Shell.Current.GoToAsync("EqualizerPage");
+    }
 }

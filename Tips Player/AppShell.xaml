@@ -17,66 +17,25 @@
     <TabBar>
         <ShellContent
             Title="Player"
+            Icon="{x:Null}"
             ContentTemplate="{DataTemplate views:PlayerPage}"
             Route="PlayerPage" />
 
         <ShellContent
-            Title="Songs"
-            ContentTemplate="{DataTemplate views:SongsPage}"
-            Route="SongsPage" />
-
-        <ShellContent
-            Title="Videos"
-            ContentTemplate="{DataTemplate views:VideosPage}"
-            Route="VideosPage" />
-
-        <ShellContent
-            Title="Playlists"
-            ContentTemplate="{DataTemplate views:PlaylistsPage}"
-            Route="PlaylistsPage" />
-
-        <ShellContent
-            Title="Folders"
-            ContentTemplate="{DataTemplate views:FoldersPage}"
-            Route="FoldersPage" />
-
-        <ShellContent
-            Title="Artists"
-            ContentTemplate="{DataTemplate views:ArtistsPage}"
-            Route="ArtistsPage" />
-
-        <ShellContent
-            Title="Albums"
-            ContentTemplate="{DataTemplate views:AlbumsPage}"
-            Route="AlbumsPage" />
+            Title="Library"
+            Icon="{x:Null}"
+            ContentTemplate="{DataTemplate views:LibraryPage}"
+            Route="LibraryPage" />
 
         <ShellContent
             Title="Search"
+            Icon="{x:Null}"
             ContentTemplate="{DataTemplate views:SearchPage}"
             Route="SearchPage" />
 
         <ShellContent
-            Title="Lyrics"
-            ContentTemplate="{DataTemplate views:LyricsPage}"
-            Route="LyricsPage" />
-
-        <ShellContent
-            Title="Equalizer"
-            ContentTemplate="{DataTemplate views:EqualizerPage}"
-            Route="EqualizerPage" />
-
-        <ShellContent
-            Title="Queue"
-            ContentTemplate="{DataTemplate views:QueuePage}"
-            Route="QueuePage" />
-
-        <ShellContent
-            Title="Stats"
-            ContentTemplate="{DataTemplate views:StatisticsPage}"
-            Route="StatisticsPage" />
-
-        <ShellContent
             Title="Settings"
+            Icon="{x:Null}"
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="SettingsPage" />
     </TabBar>

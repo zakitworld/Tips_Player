@@ -12,10 +12,6 @@
              ios:Page.UseSafeArea="True"
              Shell.TabBarIsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}">
     
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
-    </ContentPage.Behaviors>
-
     <Grid x:Name="RootGrid">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="DisplayStates">
@@ -84,17 +80,50 @@
                            TextColor="{StaticResource TextPrimary}"
                            VerticalOptions="Center"/>
                 </HorizontalStackLayout>
-                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                <HorizontalStackLayout Grid.Column="1" Spacing="6">
+                    <!-- Queue Button -->
+                    <Button Text="{x:Static helpers:FontIcons.List}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding NavigateToQueueCommand}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="16"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            CornerRadius="20"
+                            Padding="0"/>
+                    <!-- Lyrics Button -->
+                    <Button Text="{x:Static helpers:FontIcons.Font}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding NavigateToLyricsCommand}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="16"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            CornerRadius="20"
+                            Padding="0"/>
+                    <!-- Equalizer Button -->
+                    <Button Text="&#xf3f3;"
+                            FontFamily="FontAwesome"
+                            Command="{Binding NavigateToEqualizerCommand}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="16"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            CornerRadius="20"
+                            Padding="0"/>
                     <!-- Car Mode Button -->
                     <Button Text="&#xf1b9;"
                             FontFamily="FontAwesome"
                             Command="{Binding EnterCarModeCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="18"
-                            HeightRequest="44"
-                            WidthRequest="44"
-                            CornerRadius="22"
+                            FontSize="16"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            CornerRadius="20"
                             Padding="0"/>
                     <!-- Add Files Button -->
                     <Button Text="{x:Static helpers:FontIcons.Plus}"
@@ -102,10 +131,10 @@
                             Command="{Binding AddFilesCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="20"
-                            HeightRequest="44"
-                            WidthRequest="44"
-                            CornerRadius="22"
+                            FontSize="18"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            CornerRadius="20"
                             Padding="0"/>
                 </HorizontalStackLayout>
             </Grid>

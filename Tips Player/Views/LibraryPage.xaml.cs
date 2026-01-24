@@ -5,7 +5,6 @@ namespace Tips_Player.Views;
 public partial class LibraryPage : ContentPage
 {
     private LibraryViewModel? _viewModel;
-    private PlayerViewModel? _playerViewModel;
 
     public LibraryPage()
     {
@@ -13,38 +12,29 @@ public partial class LibraryPage : ContentPage
     }
 
     // Constructor for DI (when resolved through service provider)
-    public LibraryPage(LibraryViewModel viewModel, PlayerViewModel playerViewModel) : this()
+    public LibraryPage(LibraryViewModel viewModel) : this()
     {
-        SetupViewModels(viewModel, playerViewModel);
+        _viewModel = viewModel;
+        BindingContext = viewModel;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        // If ViewModels weren't injected, get them from the service provider
-        if (_viewModel == null || _playerViewModel == null)
+        // If ViewModel wasn't injected, get it from the service provider
+        if (_viewModel == null)
         {
             var libraryVm = Handler?.MauiContext?.Services.GetService<LibraryViewModel>();
-            var playerVm = Handler?.MauiContext?.Services.GetService<PlayerViewModel>();
 
-            if (libraryVm != null && playerVm != null)
+            if (libraryVm != null)
             {
-                SetupViewModels(libraryVm, playerVm);
+                _viewModel = libraryVm;
+                BindingContext = libraryVm;
             }
         }
 
-        // Update mini player binding
-        if (_playerViewModel != null && MiniPlayerBar != null)
-        {
-            MiniPlayerBar.BindingContext = _playerViewModel;
-        }
-    }
-
-    private void SetupViewModels(LibraryViewModel viewModel, PlayerViewModel playerViewModel)
-    {
-        _viewModel = viewModel;
-        _playerViewModel = playerViewModel;
-        BindingContext = viewModel;
+        // Refresh stats when page appears
+        _viewModel?.RefreshStats();
     }
 }

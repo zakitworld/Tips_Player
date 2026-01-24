@@ -284,4 +284,22 @@ public partial class SettingsViewModel : BaseViewModel
             // Handle error silently
         }
     }
+
+    [RelayCommand]
+    private static async Task NavigateToStatisticsAsync()
+    {
+        await Shell.Current.GoToAsync("StatisticsPage");
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToCarModeAsync()
+    {
+        await Shell.Current.GoToAsync("CarModePage");
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToEqualizerAsync()
+    {
+        await Shell.Current.GoToAsync("EqualizerPage");
+    }
 }

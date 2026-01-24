@@ -12,10 +12,6 @@
              ios:Page.UseSafeArea="True"
              Shell.NavBarIsVisible="False">
 
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource PageBackground}" StatusBarStyle="LightContent" />
-    </ContentPage.Behaviors>
-
     <Grid RowDefinitions="Auto,*">
 
         <!-- Header with Search -->

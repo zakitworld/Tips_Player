@@ -21,6 +21,29 @@ public partial class LibraryViewModel : BaseViewModel
     [ObservableProperty]
     private string _searchText = string.Empty;
 
+    // Stats for hub cards
+    [ObservableProperty]
+    private int _songsCount;
+
+    [ObservableProperty]
+    private int _videosCount;
+
+    [ObservableProperty]
+    private int _artistsCount;
+
+    [ObservableProperty]
+    private int _albumsCount;
+
+    [ObservableProperty]
+    private int _playlistsCount;
+
+    [ObservableProperty]
+    private int _foldersCount;
+
+    // Recent items for quick access
+    [ObservableProperty]
+    private ObservableCollection<MediaItem> _recentItems = [];
+
     public ObservableCollection<MediaItem> MediaItems => _libraryService.MediaItems;
 
     [ObservableProperty]
@@ -36,11 +59,41 @@ public partial class LibraryViewModel : BaseViewModel
         MediaItems.CollectionChanged += (s, e) =>
         {
             HasItems = MediaItems.Count > 0;
+            UpdateStats();
             ApplySearch();
         };
 
         HasItems = MediaItems.Count > 0;
+        UpdateStats();
         ApplySearch();
+    }
+
+    public void RefreshStats()
+    {
+        UpdateStats();
+    }
+
+    private void UpdateStats()
+    {
+        SongsCount = _libraryService.Songs.Count;
+        VideosCount = _libraryService.Videos.Count;
+        ArtistsCount = _libraryService.Artists.Count;
+        AlbumsCount = _libraryService.Albums.Count;
+        PlaylistsCount = _libraryService.SmartPlaylists.Count;
+        FoldersCount = _libraryService.Folders.Count;
+
+        // Get recent items (last 5 played)
+        var recent = MediaItems
+            .Where(m => m.LastPlayedDate.HasValue)
+            .OrderByDescending(m => m.LastPlayedDate)
+            .Take(5)
+            .ToList();
+
+        RecentItems.Clear();
+        foreach (var item in recent)
+        {
+            RecentItems.Add(item);
+        }
     }
 
     [RelayCommand]
@@ -51,6 +104,7 @@ public partial class LibraryViewModel : BaseViewModel
         {
             var files = await _filePickerService.PickMediaFilesAsync();
             await _libraryService.AddItemsAsync(files);
+            UpdateStats();
         }
         finally
         {
@@ -81,6 +135,7 @@ public partial class LibraryViewModel : BaseViewModel
         if (item != null)
         {
             await _libraryService.RemoveItemAsync(item);
+            UpdateStats();
         }
     }
 
@@ -88,6 +143,7 @@ public partial class LibraryViewModel : BaseViewModel
     private async Task ClearLibraryAsync()
     {
         await _libraryService.ClearLibraryAsync();
+        UpdateStats();
     }
 
     [RelayCommand]
@@ -98,6 +154,43 @@ public partial class LibraryViewModel : BaseViewModel
             item.IsFavorite = !item.IsFavorite;
             await _libraryService.SaveLibraryAsync();
         }
+    }
+
+    // Navigation commands
+    [RelayCommand]
+    private static async Task NavigateToSongsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(Views.SongsPage));
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToVideosAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(Views.VideosPage));
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToArtistsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(Views.ArtistsPage));
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToAlbumsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(Views.AlbumsPage));
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToPlaylistsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(Views.PlaylistsPage));
+    }
+
+    [RelayCommand]
+    private static async Task NavigateToFoldersAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(Views.FoldersPage));
     }
 
     partial void OnSearchTextChanged(string value)

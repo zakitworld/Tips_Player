@@ -38,6 +38,11 @@ public partial class LyricsViewModel : ObservableObject
     [ObservableProperty]
     private int _fontSize = 18;
 
+    // Computed properties for visibility states
+    public bool ShowNoMediaState => !IsLoading && CurrentMedia == null;
+    public bool ShowNoLyricsState => !IsLoading && CurrentMedia != null && !HasLyrics;
+    public bool ShowLyricsContent => !IsLoading && CurrentMedia != null && HasLyrics;
+
     public LyricsViewModel(ILyricsService lyricsService, IMediaPlayerService mediaPlayerService)
     {
         _lyricsService = lyricsService;
@@ -161,11 +166,39 @@ public partial class LyricsViewModel : ObservableObject
         StopSyncTimer();
     }
 
-    public void OnAppearing()
+    public async void OnAppearing()
     {
-        if (CurrentLyrics?.IsSynced == true)
+        // Sync with current playing media in case we navigated here after playback started
+        var serviceMedia = _mediaPlayerService.CurrentMedia;
+        if (CurrentMedia != serviceMedia)
+        {
+            CurrentMedia = serviceMedia;
+            await LoadLyricsAsync();
+        }
+        else if (CurrentLyrics?.IsSynced == true)
         {
             StartSyncTimer();
         }
+    }
+
+    partial void OnIsLoadingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowNoMediaState));
+        OnPropertyChanged(nameof(ShowNoLyricsState));
+        OnPropertyChanged(nameof(ShowLyricsContent));
+    }
+
+    partial void OnCurrentMediaChanged(MediaItem? value)
+    {
+        OnPropertyChanged(nameof(ShowNoMediaState));
+        OnPropertyChanged(nameof(ShowNoLyricsState));
+        OnPropertyChanged(nameof(ShowLyricsContent));
+    }
+
+    partial void OnHasLyricsChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowNoMediaState));
+        OnPropertyChanged(nameof(ShowNoLyricsState));
+        OnPropertyChanged(nameof(ShowLyricsContent));
     }
 }
