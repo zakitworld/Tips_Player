@@ -60,6 +60,45 @@
                                IsVisible="{Binding ShowVideoPlayer}"
                                ZIndex="10"/>
 
+        <!-- Video Controls Overlay (Normal Mode) - positioned above MediaElement -->
+        <HorizontalStackLayout x:Name="NormalVideoControls"
+                               HorizontalOptions="Start"
+                               VerticalOptions="Start"
+                               Margin="36,84,0,0"
+                               Spacing="8"
+                               ZIndex="20"
+                               IsVisible="False">
+            <Button Command="{Binding ToggleAspectCommand}"
+                    BackgroundColor="#40000000"
+                    TextColor="{StaticResource TextPrimary}"
+                    FontSize="14"
+                    HeightRequest="40"
+                    WidthRequest="60"
+                    CornerRadius="20"
+                    TextTransform="None"
+                    ToolTipProperties.Text="Toggle Aspect Ratio">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
+                        <Setter Property="Text" Value="Fit" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
+                        <Setter Property="Text" Value="Fill" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <Button Text="{x:Static helpers:FontIcons.Expand}"
+                    FontFamily="FontAwesome"
+                    Command="{Binding ToggleFullScreenCommand}"
+                    BackgroundColor="#40000000"
+                    TextColor="{StaticResource TextPrimary}"
+                    FontSize="18"
+                    HeightRequest="40"
+                    WidthRequest="40"
+                    CornerRadius="20"
+                    ToolTipProperties.Text="Fullscreen"/>
+        </HorizontalStackLayout>
+
         <!-- Normal Mode Layout -->
         <Grid IsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}"
               RowDefinitions="Auto,*">
@@ -91,7 +130,8 @@
                             HeightRequest="40"
                             WidthRequest="40"
                             CornerRadius="20"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Queue"/>
                     <!-- Lyrics Button -->
                     <Button Text="{x:Static helpers:FontIcons.Font}"
                             FontFamily="FontAwesome"
@@ -102,7 +142,8 @@
                             HeightRequest="40"
                             WidthRequest="40"
                             CornerRadius="20"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Lyrics"/>
                     <!-- Equalizer Button -->
                     <Button Text="&#xf3f3;"
                             FontFamily="FontAwesome"
@@ -113,7 +154,8 @@
                             HeightRequest="40"
                             WidthRequest="40"
                             CornerRadius="20"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Equalizer"/>
                     <!-- Car Mode Button -->
                     <Button Text="&#xf1b9;"
                             FontFamily="FontAwesome"
@@ -124,7 +166,8 @@
                             HeightRequest="40"
                             WidthRequest="40"
                             CornerRadius="20"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Car Mode"/>
                     <!-- Add Files Button -->
                     <Button Text="{x:Static helpers:FontIcons.Plus}"
                             FontFamily="FontAwesome"
@@ -135,7 +178,8 @@
                             HeightRequest="40"
                             WidthRequest="40"
                             CornerRadius="20"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Add Files"/>
                 </HorizontalStackLayout>
             </Grid>
 
@@ -154,6 +198,11 @@
                         </Border.Shadow>
 
                         <Grid>
+                            <!-- Double-tap to enter fullscreen -->
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding ToggleFullScreenCommand}"/>
+                            </Grid.GestureRecognizers>
+
                             <!-- Video placeholder - actual MediaElement is above -->
                             <BoxView IsVisible="{Binding ShowVideoPlayer}"
                                      Color="Transparent"/>
@@ -209,36 +258,6 @@
                                 </Grid>
                             </Grid>
 
-                            <!-- Video Controls (Top Right) -->
-                            <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="12" Spacing="8" ZIndex="200">
-                                <Button Command="{Binding ToggleAspectCommand}"
-                                        BackgroundColor="#40000000"
-                                        TextColor="{StaticResource TextPrimary}"
-                                        FontSize="14"
-                                        HeightRequest="40"
-                                        WidthRequest="60"
-                                        CornerRadius="20"
-                                        TextTransform="None">
-                                    <Button.Triggers>
-                                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
-                                            <Setter Property="Text" Value="Fit" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
-                                            <Setter Property="Text" Value="Fill" />
-                                        </DataTrigger>
-                                    </Button.Triggers>
-                                </Button>
-
-                                <Button Text="{x:Static helpers:FontIcons.Expand}"
-                                        FontFamily="FontAwesome"
-                                        Command="{Binding ToggleFullScreenCommand}"
-                                        BackgroundColor="#40000000"
-                                        TextColor="{StaticResource TextPrimary}"
-                                        FontSize="18"
-                                        HeightRequest="40"
-                                        WidthRequest="40"
-                                        CornerRadius="20"/>
-                            </HorizontalStackLayout>
                         </Grid>
                     </Border>
 
@@ -291,12 +310,14 @@
                             <Button Text="{x:Static helpers:FontIcons.Shuffle}"
                                     Command="{Binding ToggleShuffleCommand}"
                                     Style="{StaticResource SecondaryControlStyle}"
-                                    FontSize="14" Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                    FontSize="14" Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"
+                                    ToolTipProperties.Text="Shuffle"/>
 
                             <Button Text="{x:Static helpers:FontIcons.StepBackward}"
                                     Command="{Binding PreviousCommand}"
                                     Style="{StaticResource ControlButtonStyle}"
-                                    HeightRequest="44" WidthRequest="44" FontSize="18"/>
+                                    HeightRequest="44" WidthRequest="44" FontSize="18"
+                                    ToolTipProperties.Text="Previous"/>
 
                             <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
                                     FontFamily="FontAwesome"
@@ -306,7 +327,8 @@
                                     FontSize="24"
                                     HeightRequest="60"
                                     WidthRequest="60"
-                                    CornerRadius="30">
+                                    CornerRadius="30"
+                                    ToolTipProperties.Text="Play/Pause">
                                 <Button.Shadow>
                                     <Shadow Brush="{StaticResource AccentColor}" Offset="0,4" Radius="12" Opacity="0.4"/>
                                 </Button.Shadow>
@@ -316,12 +338,14 @@
                                     Command="{Binding NextCommand}"
                                     Style="{StaticResource ControlButtonStyle}"
                                     HeightRequest="44" WidthRequest="44" FontSize="18"
-                                    Rotation="180"/>
+                                    Rotation="180"
+                                    ToolTipProperties.Text="Next"/>
 
                             <Button Text="{x:Static helpers:FontIcons.Repeat}"
                                     Command="{Binding ToggleRepeatCommand}"
                                     Style="{StaticResource SecondaryControlStyle}"
-                                    FontSize="14" Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                    FontSize="14" Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"
+                                    ToolTipProperties.Text="Repeat"/>
                         </HorizontalStackLayout>
 
                         <!-- Volume Control -->
@@ -335,7 +359,8 @@
                                     FontSize="18"
                                     HeightRequest="36"
                                     WidthRequest="36"
-                                    CornerRadius="18"/>
+                                    CornerRadius="18"
+                                    ToolTipProperties.Text="Mute/Unmute"/>
 
                             <Slider Grid.Column="1"
                                     Minimum="0"
@@ -440,17 +465,20 @@
                                         Command="{Binding DecreaseSpeedCommand}"
                                         BackgroundColor="{StaticResource SurfaceBackground}"
                                         TextColor="{StaticResource TextPrimary}"
-                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"/>
+                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"
+                                        ToolTipProperties.Text="Decrease Speed"/>
                                 <Button Grid.Column="3" Text="1x"
                                         Command="{Binding ResetSpeedCommand}"
                                         BackgroundColor="{StaticResource SurfaceBackground}"
                                         TextColor="{StaticResource TextPrimary}"
-                                        FontSize="11" HeightRequest="32" WidthRequest="40" CornerRadius="8" Padding="0"/>
+                                        FontSize="11" HeightRequest="32" WidthRequest="40" CornerRadius="8" Padding="0"
+                                        ToolTipProperties.Text="Reset Speed"/>
                                 <Button Grid.Column="4" Text="&#xf067;" FontFamily="FontAwesome"
                                         Command="{Binding IncreaseSpeedCommand}"
                                         BackgroundColor="{StaticResource SurfaceBackground}"
                                         TextColor="{StaticResource TextPrimary}"
-                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"/>
+                                        FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"
+                                        ToolTipProperties.Text="Increase Speed"/>
                             </Grid>
                         </Border>
 
@@ -467,13 +495,15 @@
                                         Command="{Binding ToggleABRepeatCommand}"
                                         BackgroundColor="{Binding IsABRepeatEnabled, Converter={StaticResource BoolToColorConverter}}"
                                         TextColor="{StaticResource TextPrimary}"
-                                        FontSize="10" HeightRequest="32" WidthRequest="50" CornerRadius="8" Padding="0"/>
+                                        FontSize="10" HeightRequest="32" WidthRequest="50" CornerRadius="8" Padding="0"
+                                        ToolTipProperties.Text="Set A-B Loop Points"/>
                                 <Button Grid.Column="3" Text="&#xf00d;" FontFamily="FontAwesome"
                                         Command="{Binding ClearABRepeatCommand}"
                                         BackgroundColor="{StaticResource SurfaceBackground}"
                                         TextColor="{StaticResource TextPrimary}"
                                         FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"
-                                        IsVisible="{Binding RepeatPointA, Converter={StaticResource IsNotNullConverter}}"/>
+                                        IsVisible="{Binding RepeatPointA, Converter={StaticResource IsNotNullConverter}}"
+                                        ToolTipProperties.Text="Clear A-B Loop"/>
                             </Grid>
                         </Border>
 
@@ -489,7 +519,13 @@
               ZIndex="50">
 
             <!-- Video/Audio Display Area (Fullscreen) -->
-            <Grid>
+            <Grid x:Name="FullscreenVideoArea">
+                <!-- Tap to show controls, double-tap to exit fullscreen -->
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnFullscreenVideoTapped"/>
+                    <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding ToggleFullScreenCommand}"/>
+                </Grid.GestureRecognizers>
+
                 <!-- Video placeholder for fullscreen - actual MediaElement sits below the controls but above the background -->
                 <BoxView IsVisible="{Binding ShowVideoPlayer}"
                          Color="Transparent"
@@ -534,14 +570,17 @@
                 </Grid>
 
                 <!-- Exit Fullscreen and Aspect Toggle Button -->
-                <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="16" Spacing="12" ZIndex="300">
+                <HorizontalStackLayout x:Name="FullscreenTopControls"
+                                       HorizontalOptions="End" VerticalOptions="Start" Margin="16" Spacing="12" ZIndex="300"
+                                       Opacity="{Binding FullscreenControlsOpacity}">
                     <Button Command="{Binding ToggleAspectCommand}"
                             BackgroundColor="#60000000"
                             TextColor="White"
                             FontSize="14"
                             HeightRequest="48"
                             WidthRequest="80"
-                            CornerRadius="24">
+                            CornerRadius="24"
+                            ToolTipProperties.Text="Toggle Aspect Ratio">
                         <Button.Triggers>
                             <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
                                 <Setter Property="Text" Value="Fit" />
@@ -551,7 +590,7 @@
                             </DataTrigger>
                         </Button.Triggers>
                     </Button>
-                    
+
                     <Button Text="{x:Static helpers:FontIcons.Close}"
                             FontFamily="FontAwesome"
                             Command="{Binding ToggleFullScreenCommand}"
@@ -560,16 +599,19 @@
                             FontSize="20"
                             HeightRequest="48"
                             WidthRequest="48"
-                            CornerRadius="24"/>
+                            CornerRadius="24"
+                            ToolTipProperties.Text="Exit Fullscreen"/>
                 </HorizontalStackLayout>
             </Grid>
 
             <!-- Fullscreen Controls Overlay -->
-            <Grid VerticalOptions="End"
+            <Grid x:Name="FullscreenBottomControls"
+                  VerticalOptions="End"
                   BackgroundColor="#90000000"
                   Padding="24,32"
                   RowDefinitions="Auto,Auto"
-                  ZIndex="300">
+                  ZIndex="300"
+                  Opacity="{Binding FullscreenControlsOpacity}">
 
                 <!-- Progress -->
                 <Grid Grid.Row="0" ColumnDefinitions="60,*,60">
@@ -604,7 +646,8 @@
                             TextColor="White"
                             FontSize="28"
                             HeightRequest="56"
-                            WidthRequest="56"/>
+                            WidthRequest="56"
+                            ToolTipProperties.Text="Previous"/>
 
                     <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
                             FontFamily="FontAwesome"
@@ -614,7 +657,8 @@
                             FontSize="32"
                             HeightRequest="64"
                             WidthRequest="64"
-                            CornerRadius="32"/>
+                            CornerRadius="32"
+                            ToolTipProperties.Text="Play/Pause"/>
 
                     <Button Text="{x:Static helpers:FontIcons.StepForward}"
                             FontFamily="FontAwesome"
@@ -623,7 +667,8 @@
                             TextColor="White"
                             FontSize="28"
                             HeightRequest="56"
-                            WidthRequest="56"/>
+                            WidthRequest="56"
+                            ToolTipProperties.Text="Next"/>
                 </HorizontalStackLayout>
             </Grid>
         </Grid>

@@ -239,7 +239,8 @@
                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EqualizerViewModel}}, Path=DeleteCustomPresetCommand}"
                                                     CommandParameter="{Binding .}"
                                                     BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
-                                                    HeightRequest="24" WidthRequest="24" Padding="0"/>
+                                                    HeightRequest="24" WidthRequest="24" Padding="0"
+                                                    ToolTipProperties.Text="Delete Preset"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

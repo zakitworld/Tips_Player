@@ -37,6 +37,7 @@ public partial class PlayerPage : ContentPage
             await _viewModel.InitializeAsync();
             _viewModel.SetMediaElement(MediaElement);
             UpdateMediaElementLayout();
+            UpdateVideoControlsVisibility();
         }
     }
 
@@ -52,6 +53,47 @@ public partial class PlayerPage : ContentPage
         if (e.PropertyName == nameof(PlayerViewModel.IsFullScreen))
         {
             UpdateMediaElementLayout();
+            UpdateVideoControlsVisibility();
+        }
+        else if (e.PropertyName == nameof(PlayerViewModel.ShowVideoPlayer))
+        {
+            UpdateVideoControlsVisibility();
+        }
+    }
+
+    private void UpdateVideoControlsVisibility()
+    {
+        if (_viewModel == null) return;
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            // Show video controls only when playing video AND not in fullscreen
+            bool shouldShow = _viewModel.ShowVideoPlayer && !_viewModel.IsFullScreen;
+            NormalVideoControls.IsVisible = shouldShow;
+
+            if (shouldShow)
+            {
+                UpdateVideoControlsPosition();
+            }
+        });
+    }
+
+    private void UpdateVideoControlsPosition()
+    {
+        bool isDesktop = Width > 850;
+        if (isDesktop)
+        {
+            // Desktop: Position at top-right of video area (video ends at Width - 424)
+            // Video area: left=24, top=72, right=Width-424
+            // Controls at top-right of video: right margin = 424 + 12 (padding)
+            NormalVideoControls.HorizontalOptions = LayoutOptions.End;
+            NormalVideoControls.Margin = new Thickness(0, 84, 436, 0);
+        }
+        else
+        {
+            // Mobile: Position at top-right of video area
+            NormalVideoControls.HorizontalOptions = LayoutOptions.End;
+            NormalVideoControls.Margin = new Thickness(0, 84, 36, 0);
         }
     }
 
@@ -115,6 +157,7 @@ public partial class PlayerPage : ContentPage
     {
         base.OnSizeAllocated(width, height);
         UpdateMediaElementLayout();
+        UpdateVideoControlsVisibility();
     }
 
     private void OnMediaOpened(object? sender, EventArgs e)
@@ -142,15 +185,31 @@ public partial class PlayerPage : ContentPage
     private void OnSliderDragStarted(object? sender, EventArgs e)
     {
         _viewModel?.OnSliderDragStarted();
+        // Keep controls visible while seeking
+        if (_viewModel?.IsFullScreen == true)
+        {
+            _viewModel?.ShowFullscreenControls();
+        }
     }
 
     private void OnSliderDragCompleted(object? sender, EventArgs e)
     {
         _viewModel?.OnSliderDragCompleted();
+        // Reset auto-hide timer after seeking
+        if (_viewModel?.IsFullScreen == true)
+        {
+            _viewModel?.ShowFullscreenControls();
+        }
     }
 
     private void OnSliderValueChanged(object? sender, ValueChangedEventArgs e)
     {
         _viewModel?.OnSliderValueChanged(e.NewValue);
+    }
+
+    // Called when user taps on fullscreen video area to show controls
+    private void OnFullscreenVideoTapped(object? sender, TappedEventArgs e)
+    {
+        _viewModel?.ShowFullscreenControls();
     }
 }

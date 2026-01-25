@@ -30,7 +30,8 @@
                     HeightRequest="44"
                     WidthRequest="44"
                     CornerRadius="22"
-                    Padding="0"/>
+                    Padding="0"
+                    ToolTipProperties.Text="Add Files"/>
         </Grid>
 
         <!-- Content -->

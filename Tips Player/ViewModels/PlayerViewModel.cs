@@ -52,6 +52,9 @@ public partial class PlayerViewModel : BaseViewModel
     private bool _isFullScreen;
 
     [ObservableProperty]
+    private double _fullscreenControlsOpacity = 1.0;
+
+    [ObservableProperty]
     private double _sliderPosition;
 
     [ObservableProperty]
@@ -97,6 +100,7 @@ public partial class PlayerViewModel : BaseViewModel
     private int _crossfadeDuration = 5; // seconds
 
     private System.Timers.Timer? _sleepTimer;
+    private System.Timers.Timer? _controlsHideTimer;
 
     public string CurrentPositionFormatted => CurrentPosition.TotalHours >= 1
         ? CurrentPosition.ToString(@"hh\:mm\:ss")
@@ -306,6 +310,43 @@ public partial class PlayerViewModel : BaseViewModel
     private void ToggleFullScreen()
     {
         IsFullScreen = !IsFullScreen;
+        if (IsFullScreen)
+        {
+            // Show controls initially, then start auto-hide timer
+            ShowFullscreenControls();
+        }
+        else
+        {
+            // Stop timer when exiting fullscreen
+            _controlsHideTimer?.Stop();
+            FullscreenControlsOpacity = 1.0;
+        }
+    }
+
+    public void ShowFullscreenControls()
+    {
+        FullscreenControlsOpacity = 1.0;
+        ResetControlsHideTimer();
+    }
+
+    private void ResetControlsHideTimer()
+    {
+        _controlsHideTimer?.Stop();
+        _controlsHideTimer?.Dispose();
+
+        _controlsHideTimer = new System.Timers.Timer(3000); // 3 seconds
+        _controlsHideTimer.AutoReset = false;
+        _controlsHideTimer.Elapsed += (s, e) =>
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (IsFullScreen && IsPlaying)
+                {
+                    FullscreenControlsOpacity = 0;
+                }
+            });
+        };
+        _controlsHideTimer.Start();
     }
 
     [RelayCommand]

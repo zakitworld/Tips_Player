@@ -38,7 +38,8 @@
                         BackgroundColor="Transparent"
                         TextColor="{StaticResource TextMuted}"
                         FontSize="16" HeightRequest="40" WidthRequest="40"
-                        IsVisible="{Binding SearchQuery.Length, Converter={StaticResource IsNotNullConverter}}"/>
+                        IsVisible="{Binding SearchQuery.Length, Converter={StaticResource IsNotNullConverter}}"
+                        ToolTipProperties.Text="Clear Search"/>
             </Grid>
         </VerticalStackLayout>
 

@@ -34,28 +34,33 @@
             <Button Text="&#x1F500;"
                     Command="{Binding ToggleShuffleCommand}"
                     Style="{StaticResource SecondaryControlStyle}"
-                    Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+                    Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"
+                    ToolTipProperties.Text="Shuffle"/>
 
             <!-- Previous -->
             <Button Text="&#x23EE;"
                     Command="{Binding PreviousCommand}"
-                    Style="{StaticResource ControlButtonStyle}"/>
+                    Style="{StaticResource ControlButtonStyle}"
+                    ToolTipProperties.Text="Previous"/>
 
             <!-- Play/Pause -->
             <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
                     Command="{Binding PlayPauseCommand}"
-                    Style="{StaticResource PlayButtonStyle}"/>
+                    Style="{StaticResource PlayButtonStyle}"
+                    ToolTipProperties.Text="Play/Pause"/>
 
             <!-- Next -->
             <Button Text="&#x23ED;"
                     Command="{Binding NextCommand}"
-                    Style="{StaticResource ControlButtonStyle}"/>
+                    Style="{StaticResource ControlButtonStyle}"
+                    ToolTipProperties.Text="Next"/>
 
             <!-- Repeat -->
             <Button Text="&#x1F501;"
                     Command="{Binding ToggleRepeatCommand}"
                     Style="{StaticResource SecondaryControlStyle}"
-                    Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"/>
+                    Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"
+                    ToolTipProperties.Text="Repeat"/>
 
         </HorizontalStackLayout>
 
@@ -64,7 +69,8 @@
             <Button Grid.Column="0"
                     Text="{Binding IsMuted, Converter={StaticResource BoolToMuteConverter}}"
                     Command="{Binding ToggleMuteCommand}"
-                    Style="{StaticResource SecondaryControlStyle}"/>
+                    Style="{StaticResource SecondaryControlStyle}"
+                    ToolTipProperties.Text="Mute/Unmute"/>
 
             <Slider Grid.Column="1"
                     Minimum="0"

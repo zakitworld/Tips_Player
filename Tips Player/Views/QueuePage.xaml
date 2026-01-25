@@ -26,13 +26,15 @@
                         Command="{Binding ShuffleQueueCommand}"
                         BackgroundColor="{StaticResource CardBackground}"
                         TextColor="{StaticResource TextPrimary}"
-                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"/>
+                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"
+                        ToolTipProperties.Text="Shuffle Queue"/>
                 <Button Text="{x:Static helpers:FontIcons.Trash}"
                         FontFamily="FontAwesome"
                         Command="{Binding ClearQueueCommand}"
                         BackgroundColor="{StaticResource CardBackground}"
                         TextColor="{StaticResource TextPrimary}"
-                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"/>
+                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"
+                        ToolTipProperties.Text="Clear Queue"/>
             </HorizontalStackLayout>
         </Grid>
 
@@ -147,12 +149,14 @@
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:QueueViewModel}}, Path=MoveUpCommand}"
                                                 CommandParameter="{Binding .}"
                                                 BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
-                                                HeightRequest="24" WidthRequest="24" Padding="0"/>
+                                                HeightRequest="24" WidthRequest="24" Padding="0"
+                                                ToolTipProperties.Text="Move Up"/>
                                         <Button Text="&#xf078;" FontFamily="FontAwesome" FontSize="10"
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:QueueViewModel}}, Path=MoveDownCommand}"
                                                 CommandParameter="{Binding .}"
                                                 BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
-                                                HeightRequest="24" WidthRequest="24" Padding="0"/>
+                                                HeightRequest="24" WidthRequest="24" Padding="0"
+                                                ToolTipProperties.Text="Move Down"/>
                                     </VerticalStackLayout>
 
                                 </Grid>

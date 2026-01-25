@@ -23,7 +23,8 @@
                 BackgroundColor="Transparent"
                 TextColor="#666666"
                 HeightRequest="60" WidthRequest="60"
-                HorizontalOptions="End" VerticalOptions="Start"/>
+                HorizontalOptions="End" VerticalOptions="Start"
+                ToolTipProperties.Text="Exit Car Mode"/>
 
         <!-- Track Info -->
         <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
@@ -89,7 +90,8 @@
                     BackgroundColor="#1A1A24"
                     TextColor="White"
                     HeightRequest="120"
-                    CornerRadius="24"/>
+                    CornerRadius="24"
+                    ToolTipProperties.Text="Previous"/>
 
             <!-- Play/Pause -->
             <Button Grid.Column="1"
@@ -100,7 +102,8 @@
                     BackgroundColor="{StaticResource AccentColor}"
                     TextColor="White"
                     HeightRequest="140"
-                    CornerRadius="28">
+                    CornerRadius="28"
+                    ToolTipProperties.Text="Play/Pause">
                 <Button.Shadow>
                     <Shadow Brush="{StaticResource AccentBrush}"
                             Offset="0,8"
@@ -118,7 +121,8 @@
                     BackgroundColor="#1A1A24"
                     TextColor="White"
                     HeightRequest="120"
-                    CornerRadius="24"/>
+                    CornerRadius="24"
+                    ToolTipProperties.Text="Next"/>
 
         </Grid>
 

@@ -26,12 +26,14 @@
                         Command="{Binding DecreaseFontSizeCommand}"
                         BackgroundColor="{StaticResource CardBackground}"
                         TextColor="{StaticResource TextPrimary}"
-                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"/>
+                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"
+                        ToolTipProperties.Text="Decrease Font Size"/>
                 <Button Text="&#xf067;" FontFamily="FontAwesome"
                         Command="{Binding IncreaseFontSizeCommand}"
                         BackgroundColor="{StaticResource CardBackground}"
                         TextColor="{StaticResource TextPrimary}"
-                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"/>
+                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"
+                        ToolTipProperties.Text="Increase Font Size"/>
             </HorizontalStackLayout>
         </Grid>
 
