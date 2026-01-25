@@ -10,7 +10,7 @@
              x:Class="Tips_Player.Views.VideosPage"
              x:DataType="viewmodels:VideosViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="*,Auto">
@@ -86,19 +86,19 @@
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:MediaItem">
-                            <Frame Style="{StaticResource MediaItemCardStyle}" Padding="0">
-                                <Frame.GestureRecognizers>
+                            <Border Style="{StaticResource MediaItemCardStyle}" Padding="0">
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:VideosViewModel}}, Path=PlayItemCommand}"
                                                           CommandParameter="{Binding .}"/>
-                                </Frame.GestureRecognizers>
+                                </Border.GestureRecognizers>
 
                                 <Grid RowDefinitions="120,Auto">
                                     <!-- Video Thumbnail -->
-                                    <Frame Grid.Row="0"
-                                           BackgroundColor="{StaticResource SurfaceBackground}"
-                                           CornerRadius="8"
-                                           Padding="0"
-                                           HasShadow="False">
+                                    <Border Grid.Row="0"
+                                           Background="{StaticResource SurfaceBackground}"
+                                           StrokeShape="RoundRectangle 8"
+                                           Stroke="Transparent"
+                                           Padding="0">
                                         <Grid>
                                             <Label Text="{x:Static helpers:FontIcons.Video}"
                                                    FontFamily="FontAwesome"
@@ -107,10 +107,10 @@
                                                    HorizontalOptions="Center"
                                                    VerticalOptions="Center"/>
                                             <!-- Play overlay -->
-                                            <Frame BackgroundColor="#80000000"
-                                                   CornerRadius="24"
+                                            <Border Background="#80000000"
+                                                   StrokeShape="RoundRectangle 24"
+                                                   Stroke="Transparent"
                                                    Padding="0"
-                                                   HasShadow="False"
                                                    HeightRequest="48"
                                                    WidthRequest="48"
                                                    HorizontalOptions="Center"
@@ -121,21 +121,21 @@
                                                        TextColor="White"
                                                        HorizontalOptions="Center"
                                                        VerticalOptions="Center"/>
-                                            </Frame>
+                                            </Border>
                                             <!-- Duration badge -->
-                                            <Frame BackgroundColor="#CC000000"
-                                                   CornerRadius="4"
+                                            <Border Background="#CC000000"
+                                                   StrokeShape="RoundRectangle 4"
+                                                   Stroke="Transparent"
                                                    Padding="6,2"
-                                                   HasShadow="False"
                                                    HorizontalOptions="End"
                                                    VerticalOptions="End"
                                                    Margin="8">
                                                 <Label Text="{Binding DurationFormatted}"
                                                        FontSize="10"
                                                        TextColor="White"/>
-                                            </Frame>
+                                            </Border>
                                         </Grid>
-                                    </Frame>
+                                    </Border>
 
                                     <!-- Video Info -->
                                     <VerticalStackLayout Grid.Row="1" Padding="12,8" Spacing="2">
@@ -152,7 +152,7 @@
                                                MaxLines="1"/>
                                     </VerticalStackLayout>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
 

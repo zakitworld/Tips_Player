@@ -8,7 +8,7 @@
              x:Class="Tips_Player.Views.CarModePage"
              x:DataType="viewmodels:CarModeViewModel"
              BackgroundColor="#0A0A0F"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False"
              Shell.TabBarIsVisible="False">
 
@@ -29,10 +29,10 @@
         <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
 
             <!-- Album Art Placeholder -->
-            <Frame BackgroundColor="#1A1A24"
-                   CornerRadius="24"
+            <Border Background="#1A1A24"
+                   StrokeShape="RoundRectangle 24"
+                   Stroke="Transparent"
                    Padding="0"
-                   HasShadow="False"
                    HeightRequest="200"
                    WidthRequest="200"
                    HorizontalOptions="Center">
@@ -42,7 +42,7 @@
                        TextColor="{StaticResource AccentColor}"
                        HorizontalOptions="Center"
                        VerticalOptions="Center"/>
-            </Frame>
+            </Border>
 
             <!-- Title -->
             <Label Text="{Binding CurrentMedia.Title, FallbackValue='No track playing'}"

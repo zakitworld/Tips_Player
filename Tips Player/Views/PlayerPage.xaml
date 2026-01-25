@@ -9,7 +9,7 @@
              x:DataType="viewmodels:PlayerViewModel"
              BackgroundColor="{StaticResource PageBackground}"
              Shell.NavBarIsVisible="False"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.TabBarIsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}">
     
     <Grid x:Name="RootGrid">
@@ -428,8 +428,8 @@
                         </VerticalStackLayout>
 
                         <!-- Playback Speed Control -->
-                        <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                               CornerRadius="8" Padding="12" Margin="0,8,0,0">
+                        <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                               StrokeShape="RoundRectangle 8" Padding="12" Margin="0,8,0,0">
                             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
                                 <Label Grid.Column="0" Text="Speed:"
                                        TextColor="{StaticResource TextSecondary}" FontSize="12" VerticalOptions="Center"/>
@@ -452,11 +452,11 @@
                                         TextColor="{StaticResource TextPrimary}"
                                         FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"/>
                             </Grid>
-                        </Frame>
+                        </Border>
 
                         <!-- A-B Repeat Control -->
-                        <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                               CornerRadius="8" Padding="12" Margin="0,4,0,0">
+                        <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                               StrokeShape="RoundRectangle 8" Padding="12" Margin="0,4,0,0">
                             <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
                                 <Label Grid.Column="0" Text="A-B:"
                                        TextColor="{StaticResource TextSecondary}" FontSize="12" VerticalOptions="Center"/>
@@ -475,7 +475,7 @@
                                         FontSize="12" HeightRequest="32" WidthRequest="32" CornerRadius="16" Padding="0"
                                         IsVisible="{Binding RepeatPointA, Converter={StaticResource IsNotNullConverter}}"/>
                             </Grid>
-                        </Frame>
+                        </Border>
 
                     </VerticalStackLayout>
                 </Grid>

@@ -7,13 +7,11 @@
              x:DataType="viewmodels:PlayerViewModel"
              IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}, FallbackValue=False}">
 
-    <Border BackgroundColor="#CC1A1A1D"
+    <Border Background="#CC1A1A1D"
             Stroke="#33FAFAFA"
             StrokeThickness="1"
-            Padding="12">
-        <Border.StrokeShape>
-            <RoundRectangle CornerRadius="0"/>
-        </Border.StrokeShape>
+            Padding="12"
+            StrokeShape="RoundRectangle 0">
         <Border.Shadow>
             <Shadow Brush="Black" Offset="0,-4" Radius="20" Opacity="0.3"/>
         </Border.Shadow>
@@ -25,11 +23,11 @@
         <Grid ColumnDefinitions="50,*,Auto,Auto" ColumnSpacing="12">
 
             <!-- Album Art / Media Icon -->
-            <Frame Grid.Column="0"
-                   BackgroundColor="{StaticResource SurfaceBackground}"
-                   CornerRadius="6"
+            <Border Grid.Column="0"
+                   Background="{StaticResource SurfaceBackground}"
+                   StrokeShape="RoundRectangle 6"
+                   Stroke="Transparent"
                    Padding="0"
-                   HasShadow="False"
                    HeightRequest="50"
                    WidthRequest="50">
                 <Label Text="{Binding CurrentMedia.MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
@@ -37,7 +35,7 @@
                        FontSize="24"
                        HorizontalOptions="Center"
                        VerticalOptions="Center"/>
-            </Frame>
+            </Border>
 
             <!-- Track Info -->
             <VerticalStackLayout Grid.Column="1"

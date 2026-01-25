@@ -9,7 +9,7 @@
              x:Class="Tips_Player.Views.LibraryPage"
              x:DataType="viewmodels:LibraryViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
@@ -43,11 +43,11 @@
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="12">
 
                     <!-- Songs Card -->
-                    <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="16" Padding="0" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToSongsCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Grid RowDefinitions="*,Auto" HeightRequest="120">
                             <Grid Grid.Row="0" BackgroundColor="#1a6366F1" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Music}"
@@ -69,14 +69,14 @@
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
-                    </Frame>
+                    </Border>
 
                     <!-- Videos Card -->
-                    <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="16" Padding="0" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border Grid.Row="0" Grid.Column="1" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToVideosCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Grid RowDefinitions="*,Auto" HeightRequest="120">
                             <Grid Grid.Row="0" BackgroundColor="#1aF472B6" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Video}"
@@ -98,14 +98,14 @@
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
-                    </Frame>
+                    </Border>
 
                     <!-- Artists Card -->
-                    <Frame Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="16" Padding="0" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToArtistsCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Grid RowDefinitions="*,Auto" HeightRequest="120">
                             <Grid Grid.Row="0" BackgroundColor="#1a22D3EE" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Artist}"
@@ -127,14 +127,14 @@
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
-                    </Frame>
+                    </Border>
 
                     <!-- Albums Card -->
-                    <Frame Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="16" Padding="0" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToAlbumsCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Grid RowDefinitions="*,Auto" HeightRequest="120">
                             <Grid Grid.Row="0" BackgroundColor="#1aA78BFA" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Album}"
@@ -156,14 +156,14 @@
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
-                    </Frame>
+                    </Border>
 
                     <!-- Playlists Card -->
-                    <Frame Grid.Row="2" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="16" Padding="0" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToPlaylistsCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Grid RowDefinitions="*,Auto" HeightRequest="120">
                             <Grid Grid.Row="0" BackgroundColor="#1aFBBF24" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Playlist}"
@@ -185,14 +185,14 @@
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
-                    </Frame>
+                    </Border>
 
                     <!-- Folders Card -->
-                    <Frame Grid.Row="2" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="16" Padding="0" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border Grid.Row="2" Grid.Column="1" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToFoldersCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Grid RowDefinitions="*,Auto" HeightRequest="120">
                             <Grid Grid.Row="0" BackgroundColor="#1a4ADE80" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Folder}"
@@ -214,7 +214,7 @@
                                 </Label>
                             </VerticalStackLayout>
                         </Grid>
-                    </Frame>
+                    </Border>
 
                 </Grid>
 
@@ -230,21 +230,21 @@
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:MediaItem">
-                                <Frame BackgroundColor="{StaticResource CardBackground}"
-                                       BorderColor="Transparent" CornerRadius="12" Padding="0"
-                                       WidthRequest="130" HasShadow="False">
-                                    <Frame.GestureRecognizers>
+                                <Border Background="{StaticResource CardBackground}"
+                                       Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="0"
+                                       WidthRequest="130">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=PlayItemCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
                                     <Grid RowDefinitions="*,Auto">
-                                        <Frame Grid.Row="0" BackgroundColor="{StaticResource SurfaceBackground}"
-                                               CornerRadius="12,12,0,0" Padding="0" HasShadow="False" HeightRequest="100">
+                                        <Border Grid.Row="0" Background="{StaticResource SurfaceBackground}"
+                                               StrokeShape="RoundRectangle 12,12,0,0" Stroke="Transparent" Padding="0" HeightRequest="100">
                                             <Label Text="{Binding MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
                                                    FontFamily="FontAwesome" FontSize="32"
                                                    TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <VerticalStackLayout Grid.Row="1" Padding="8" Spacing="2">
                                             <Label Text="{Binding Title}" FontSize="12" FontAttributes="Bold"
                                                    TextColor="{StaticResource TextPrimary}"
@@ -254,7 +254,7 @@
                                                    LineBreakMode="TailTruncation" MaxLines="1"/>
                                         </VerticalStackLayout>
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

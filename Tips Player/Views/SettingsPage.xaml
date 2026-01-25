@@ -8,7 +8,7 @@
              x:Class="Tips_Player.Views.SettingsPage"
              x:DataType="viewmodels:SettingsViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <ContentPage.Resources>
@@ -19,12 +19,10 @@
             <Setter Property="Margin" Value="0,16,0,8"/>
         </Style>
 
-        <Style x:Key="SettingsItemFrameStyle" TargetType="Frame">
-            <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
-            <Setter Property="BorderColor" Value="Transparent"/>
-            <Setter Property="CornerRadius" Value="12"/>
+        <Style x:Key="SettingsItemFrameStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="Stroke" Value="Transparent"/>
             <Setter Property="Padding" Value="16,12"/>
-            <Setter Property="HasShadow" Value="False"/>
             <Setter Property="Margin" Value="0,4"/>
         </Style>
 
@@ -63,7 +61,7 @@
                 <Label Text="PLAYBACK" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Volume -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto">
                         <Label Grid.Row="0" Grid.Column="0"
                                Text="Default Volume"
@@ -79,10 +77,10 @@
                                 ThumbColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Auto-play Next -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Auto-play Next Track"
@@ -95,10 +93,10 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Shuffle -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Shuffle by Default"
@@ -111,10 +109,10 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Repeat -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Repeat by Default"
@@ -127,10 +125,10 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Remember Playback Position -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Remember Playback Position"
@@ -143,10 +141,10 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Default Sleep Timer -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Default Sleep Timer"
@@ -166,13 +164,13 @@
                             </Picker.ItemDisplayBinding>
                         </Picker>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- VIDEO SECTION -->
                 <Label Text="VIDEO" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Default Video Aspect -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Default Video Aspect"
@@ -188,10 +186,10 @@
                                 WidthRequest="100"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Auto Rotate Video -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Auto-rotate Video"
@@ -204,13 +202,13 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- LIBRARY SECTION -->
                 <Label Text="LIBRARY" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Show File Extensions -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Show File Extensions"
@@ -223,10 +221,10 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Sort Order -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Default Sort Order"
@@ -242,10 +240,10 @@
                                 WidthRequest="120"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Group by Album -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Group by Album"
@@ -258,10 +256,10 @@
                                 OnColor="{StaticResource AccentColor}"
                                 VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Library Stats -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Library Statistics"
                                Style="{StaticResource SettingsLabelStyle}"/>
@@ -308,10 +306,10 @@
                             </Label>
                         </Grid>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Clear Library Button -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Clear Library"
@@ -330,16 +328,16 @@
                                 CornerRadius="8"
                                 Padding="16,0"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- TOOLS SECTION -->
                 <Label Text="TOOLS" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Listening Statistics -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
-                    <Frame.GestureRecognizers>
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding NavigateToStatisticsCommand}"/>
-                    </Frame.GestureRecognizers>
+                    </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Label Grid.Column="0"
                                Text="&#xf201;"
@@ -360,13 +358,13 @@
                                TextColor="{StaticResource TextMuted}"
                                VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Car Mode -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
-                    <Frame.GestureRecognizers>
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding NavigateToCarModeCommand}"/>
-                    </Frame.GestureRecognizers>
+                    </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Label Grid.Column="0"
                                Text="&#xf1b9;"
@@ -387,13 +385,13 @@
                                TextColor="{StaticResource TextMuted}"
                                VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Equalizer -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
-                    <Frame.GestureRecognizers>
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding NavigateToEqualizerCommand}"/>
-                    </Frame.GestureRecognizers>
+                    </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Label Grid.Column="0"
                                Text="&#xf3f3;"
@@ -414,13 +412,13 @@
                                TextColor="{StaticResource TextMuted}"
                                VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- ABOUT SECTION -->
                 <Label Text="ABOUT" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- App Info -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
                         <Image Grid.Column="0"
                                Source="app_logo.png"
@@ -448,13 +446,13 @@
                                    FontSize="12"/>
                         </VerticalStackLayout>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Rate App -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
-                    <Frame.GestureRecognizers>
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding RateAppCommand}"/>
-                    </Frame.GestureRecognizers>
+                    </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Label Grid.Column="0"
                                Text="&#xf005;"
@@ -472,13 +470,13 @@
                                TextColor="{StaticResource TextMuted}"
                                VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Send Feedback -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}">
-                    <Frame.GestureRecognizers>
+                <Border Style="{StaticResource SettingsItemFrameStyle}">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding SendFeedbackCommand}"/>
-                    </Frame.GestureRecognizers>
+                    </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Label Grid.Column="0"
                                Text="&#xf0e0;"
@@ -496,10 +494,10 @@
                                TextColor="{StaticResource TextMuted}"
                                VerticalOptions="Center"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Reset Settings -->
-                <Frame Style="{StaticResource SettingsItemFrameStyle}" Margin="0,16,0,0">
+                <Border Style="{StaticResource SettingsItemFrameStyle}" Margin="0,16,0,0">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                             <Label Text="Reset All Settings"
@@ -518,7 +516,7 @@
                                 CornerRadius="8"
                                 Padding="16,0"/>
                     </Grid>
-                </Frame>
+                </Border>
 
                 <!-- Footer -->
                 <Label Text="Made with love for music lovers"

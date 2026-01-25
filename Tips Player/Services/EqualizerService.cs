@@ -9,7 +9,20 @@ public class EqualizerService : IEqualizerService
     private const string SettingsFileName = "equalizer.json";
     private readonly string _settingsPath;
 
-    public bool IsEnabled { get; set; }
+    private bool _isEnabled;
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            if (_isEnabled != value)
+            {
+                _isEnabled = value;
+                EnabledChanged?.Invoke(this, value);
+                SaveSettings();
+            }
+        }
+    }
     public EqualizerPreset CurrentPreset { get; set; } = EqualizerPreset.Flat;
     public AudioEffect AudioEffects { get; } = new();
     public List<EqualizerPreset> Presets { get; } = EqualizerPreset.GetAllPresets();
@@ -79,7 +92,7 @@ public class EqualizerService : IEqualizerService
 
             if (data != null)
             {
-                IsEnabled = data.IsEnabled;
+                _isEnabled = data.IsEnabled;
                 CurrentPreset.SetBands(data.CurrentBands);
                 CurrentPreset.Name = data.CurrentPresetName;
 

@@ -10,7 +10,7 @@
              x:Class="Tips_Player.Views.SongsPage"
              x:DataType="viewmodels:SongsViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="*,Auto">
@@ -89,20 +89,19 @@
                                     </SwipeItems>
                                 </SwipeView.RightItems>
 
-                                <Frame Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
-                                    <Frame.GestureRecognizers>
+                                <Border Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SongsViewModel}}, Path=PlayItemCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
 
                                     <Grid ColumnDefinitions="56,*,Auto" ColumnSpacing="12">
 
                                         <!-- Media Icon -->
-                                        <Frame Grid.Column="0"
-                                               BackgroundColor="{StaticResource SurfaceBackground}"
+                                        <Border Grid.Column="0"
+                                               Background="{StaticResource SurfaceBackground}"
                                                CornerRadius="8"
                                                Padding="0"
-                                               HasShadow="False"
                                                HeightRequest="56"
                                                WidthRequest="56">
                                             <Label Text="{x:Static helpers:FontIcons.Music}"
@@ -111,7 +110,7 @@
                                                    TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center"
                                                    VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
 
                                         <!-- Track Info -->
                                         <VerticalStackLayout Grid.Column="1"
@@ -152,7 +151,7 @@
                                         </HorizontalStackLayout>
 
                                     </Grid>
-                                </Frame>
+                                </Border>
 
                             </SwipeView>
                         </DataTemplate>

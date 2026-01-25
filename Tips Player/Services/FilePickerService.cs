@@ -1,5 +1,6 @@
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
+using Microsoft.Maui.ApplicationModel;
 
 namespace Tips_Player.Services;
 
@@ -20,6 +21,7 @@ public class FilePickerService : IFilePickerService
 
     public async Task<IEnumerable<MediaItem>> PickMediaFilesAsync()
     {
+        await RequestPermissionsAsync();
         try
         {
             var options = new PickOptions
@@ -39,6 +41,7 @@ public class FilePickerService : IFilePickerService
 
     public async Task<MediaItem?> PickSingleMediaFileAsync()
     {
+        await RequestPermissionsAsync();
         try
         {
             var options = new PickOptions
@@ -53,6 +56,26 @@ public class FilePickerService : IFilePickerService
         catch (Exception)
         {
             return null;
+        }
+    }
+
+    private static async Task RequestPermissionsAsync()
+    {
+        // Request storage read permission
+        var status = await Permissions.CheckStatusAsync<Permissions.StorageRead>();
+        if (status != PermissionStatus.Granted)
+        {
+            status = await Permissions.RequestAsync<Permissions.StorageRead>();
+        }
+
+        // For Android 13+ (API 33+), also request media permission
+        if (DeviceInfo.Platform == DevicePlatform.Android && DeviceInfo.Version >= new Version(13, 0))
+        {
+            var mediaStatus = await Permissions.CheckStatusAsync<Permissions.Media>();
+            if (mediaStatus != PermissionStatus.Granted)
+            {
+                await Permissions.RequestAsync<Permissions.Media>();
+            }
         }
     }
 

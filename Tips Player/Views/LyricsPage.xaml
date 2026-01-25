@@ -9,7 +9,7 @@
              x:Class="Tips_Player.Views.LyricsPage"
              x:DataType="viewmodels:LyricsViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto">
@@ -36,15 +36,15 @@
         </Grid>
 
         <!-- Current Track Info -->
-        <Frame Grid.Row="1" BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-               CornerRadius="12" Padding="16" Margin="16,8,16,8"
+        <Border Grid.Row="1" Background="{StaticResource CardBackground}" Stroke="Transparent"
+               StrokeShape="RoundRectangle 12" Padding="16" Margin="16,8,16,8"
                IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}}">
             <Grid ColumnDefinitions="48,*" ColumnSpacing="12">
-                <Frame Grid.Column="0" BackgroundColor="{StaticResource SurfaceBackground}"
-                       CornerRadius="8" Padding="0" HasShadow="False" HeightRequest="48" WidthRequest="48">
+                <Border Grid.Column="0" Background="{StaticResource SurfaceBackground}"
+                       StrokeShape="RoundRectangle 8" Stroke="Transparent" Padding="0" HeightRequest="48" WidthRequest="48">
                     <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="20"
                            TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" VerticalOptions="Center"/>
-                </Frame>
+                </Border>
                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                     <Label Text="{Binding CurrentMedia.Title}" FontSize="16" FontAttributes="Bold"
                            TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
@@ -52,7 +52,7 @@
                            TextColor="{StaticResource TextSecondary}" LineBreakMode="TailTruncation" MaxLines="1"/>
                 </VerticalStackLayout>
             </Grid>
-        </Frame>
+        </Border>
 
         <!-- Lyrics Content -->
         <Grid Grid.Row="2">
@@ -101,11 +101,11 @@
                 </CollectionView.Triggers>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:LyricLine">
-                        <Frame BackgroundColor="Transparent" BorderColor="Transparent" Padding="8,12">
-                            <Frame.GestureRecognizers>
+                        <Border Background="Transparent" Stroke="Transparent" Padding="8,12">
+                            <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LyricsViewModel}}, Path=SeekToLineCommand}"
                                                       CommandParameter="{Binding .}"/>
-                            </Frame.GestureRecognizers>
+                            </Border.GestureRecognizers>
                             <Label Text="{Binding Text}"
                                    TextColor="{StaticResource TextMuted}"
                                    FontSize="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LyricsViewModel}}, Path=FontSize}"
@@ -121,7 +121,7 @@
                                     </DataTrigger>
                                 </Label.Triggers>
                             </Label>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
@@ -162,8 +162,8 @@
         </Grid>
 
         <!-- Bottom Controls -->
-        <Frame Grid.Row="3" BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-               CornerRadius="12" Padding="16" Margin="16,8,16,16"
+        <Border Grid.Row="3" Background="{StaticResource CardBackground}" Stroke="Transparent"
+               StrokeShape="RoundRectangle 12" Padding="16" Margin="16,8,16,16"
                IsVisible="{Binding ShowLyricsContent}">
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="24">
                 <!-- Toggle Synced/Plain -->
@@ -204,7 +204,7 @@
                     </Button.Triggers>
                 </Button>
             </HorizontalStackLayout>
-        </Frame>
+        </Border>
 
     </Grid>
 

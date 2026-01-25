@@ -9,7 +9,7 @@
              x:Class="Tips_Player.Views.SearchPage"
              x:DataType="viewmodels:SearchViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
@@ -59,18 +59,18 @@
                     <CollectionView ItemsSource="{Binding SearchHistory}" SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                                       CornerRadius="8" Padding="12" Margin="0,4">
-                                    <Frame.GestureRecognizers>
+                                <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8" Padding="12" Margin="0,4">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=UseHistoryItemCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="12">
                                         <Label Text="{x:Static helpers:FontIcons.History}" FontFamily="FontAwesome"
                                                FontSize="16" TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
                                         <Label Text="{Binding .}" FontSize="15" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
                                     </HorizontalStackLayout>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -98,19 +98,19 @@
                     <CollectionView ItemsSource="{Binding SongResults}" SelectionMode="None" HeightRequest="200">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:MediaItem">
-                                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                                       CornerRadius="8" Padding="12" Margin="0,4">
-                                    <Frame.GestureRecognizers>
+                                <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8" Padding="12" Margin="0,4">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=PlaySongCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
                                     <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="12">
-                                        <Frame Grid.Column="0" BackgroundColor="{StaticResource SurfaceBackground}"
-                                               CornerRadius="6" Padding="0" HasShadow="False" HeightRequest="44" WidthRequest="44">
+                                        <Border Grid.Column="0" Background="{StaticResource SurfaceBackground}"
+                                                StrokeShape="RoundRectangle 6" Stroke="Transparent" Padding="0" HeightRequest="44" WidthRequest="44">
                                             <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome"
                                                    FontSize="18" TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding Title}" FontSize="14" FontAttributes="Bold"
                                                    TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
@@ -120,7 +120,7 @@
                                         <Label Grid.Column="2" Text="{Binding DurationFormatted}"
                                                FontSize="11" TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -135,20 +135,20 @@
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:Artist">
-                                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                                       CornerRadius="8" Padding="16" WidthRequest="120">
-                                    <Frame.GestureRecognizers>
+                                <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8" Padding="16" WidthRequest="120">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=OpenArtistCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
                                     <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                                        <Frame BackgroundColor="{StaticResource SurfaceBackground}" CornerRadius="30"
-                                               Padding="0" HasShadow="False" HeightRequest="60" WidthRequest="60"
-                                               HorizontalOptions="Center">
+                                        <Border Background="{StaticResource SurfaceBackground}" StrokeShape="RoundRectangle 30"
+                                                Stroke="Transparent" Padding="0" HeightRequest="60" WidthRequest="60"
+                                                HorizontalOptions="Center">
                                             <Label Text="{x:Static helpers:FontIcons.Artist}" FontFamily="FontAwesome"
                                                    FontSize="24" TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold"
                                                TextColor="{StaticResource TextPrimary}"
                                                HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="1"/>
@@ -161,7 +161,7 @@
                                             </Label.FormattedText>
                                         </Label>
                                     </VerticalStackLayout>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -176,25 +176,25 @@
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:Album">
-                                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                                       CornerRadius="8" Padding="12" WidthRequest="140">
-                                    <Frame.GestureRecognizers>
+                                <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8" Padding="12" WidthRequest="140">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=OpenAlbumCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
                                     <VerticalStackLayout Spacing="8">
-                                        <Frame BackgroundColor="{StaticResource SurfaceBackground}" CornerRadius="8"
-                                               Padding="0" HasShadow="False" HeightRequest="100">
+                                        <Border Background="{StaticResource SurfaceBackground}" StrokeShape="RoundRectangle 8"
+                                                Stroke="Transparent" Padding="0" HeightRequest="100">
                                             <Label Text="{x:Static helpers:FontIcons.Album}" FontFamily="FontAwesome"
                                                    FontSize="36" TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold"
                                                TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
                                         <Label Text="{Binding ArtistName}" FontSize="11"
                                                TextColor="{StaticResource TextMuted}" LineBreakMode="TailTruncation" MaxLines="1"/>
                                     </VerticalStackLayout>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -206,19 +206,19 @@
                     <CollectionView ItemsSource="{Binding VideoResults}" SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:MediaItem">
-                                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent"
-                                       CornerRadius="8" Padding="12" Margin="0,4">
-                                    <Frame.GestureRecognizers>
+                                <Border Background="{StaticResource CardBackground}" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8" Padding="12" Margin="0,4">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=PlayVideoCommand}"
                                                               CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
+                                    </Border.GestureRecognizers>
                                     <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="12">
-                                        <Frame Grid.Column="0" BackgroundColor="{StaticResource SurfaceBackground}"
-                                               CornerRadius="6" Padding="0" HasShadow="False" HeightRequest="44" WidthRequest="44">
+                                        <Border Grid.Column="0" Background="{StaticResource SurfaceBackground}"
+                                                StrokeShape="RoundRectangle 6" Stroke="Transparent" Padding="0" HeightRequest="44" WidthRequest="44">
                                             <Label Text="{x:Static helpers:FontIcons.Video}" FontFamily="FontAwesome"
                                                    FontSize="18" TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding Title}" FontSize="14" FontAttributes="Bold"
                                                    TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
@@ -228,7 +228,7 @@
                                         <Label Grid.Column="2" Text="{Binding DurationFormatted}"
                                                FontSize="11" TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

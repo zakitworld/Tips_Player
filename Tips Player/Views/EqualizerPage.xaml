@@ -9,7 +9,7 @@
              x:Class="Tips_Player.Views.EqualizerPage"
              x:DataType="viewmodels:EqualizerViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
@@ -31,7 +31,7 @@
             <VerticalStackLayout Spacing="16" Opacity="{Binding IsEnabled, Converter={StaticResource BoolToOpacityConverter}}">
 
                 <!-- Presets Section -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Presets" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Start">
@@ -47,15 +47,15 @@
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:EqualizerPreset">
-                                    <Frame BackgroundColor="{StaticResource SurfaceBackground}"
-                                           BorderColor="Transparent"
-                                           CornerRadius="8"
+                                    <Border Background="{StaticResource SurfaceBackground}"
+                                           Stroke="Transparent"
+                                           StrokeShape="RoundRectangle 8"
                                            Padding="12,8"
                                            WidthRequest="90">
-                                        <Frame.GestureRecognizers>
+                                        <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EqualizerViewModel}}, Path=SelectPresetCommand}"
                                                                   CommandParameter="{Binding .}"/>
-                                        </Frame.GestureRecognizers>
+                                        </Border.GestureRecognizers>
                                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                                             <Label Text="{Binding Icon}"
                                                    FontFamily="FontAwesome"
@@ -69,15 +69,15 @@
                                                    MaxLines="1"
                                                    LineBreakMode="TailTruncation"/>
                                         </VerticalStackLayout>
-                                    </Frame>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- 10-Band Equalizer -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                     <VerticalStackLayout Spacing="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Text="Equalizer Bands" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -178,10 +178,10 @@
                                     FontSize="14" HeightRequest="40" CornerRadius="8" Padding="16,0"/>
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Audio Effects -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                     <VerticalStackLayout Spacing="16">
                         <Label Text="Audio Effects" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
 
@@ -213,10 +213,10 @@
                                     ThumbColor="{StaticResource AccentColor}"/>
                         </Grid>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Custom Presets -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16"
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16"
                        IsVisible="{Binding CustomPresets.Count, Converter={StaticResource IsNotNullConverter}}">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Custom Presets" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -226,8 +226,8 @@
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:EqualizerPreset">
-                                    <Frame BackgroundColor="{StaticResource SurfaceBackground}"
-                                           BorderColor="Transparent" CornerRadius="8" Padding="12,8">
+                                    <Border Background="{StaticResource SurfaceBackground}"
+                                           Stroke="Transparent" StrokeShape="RoundRectangle 8" Padding="12,8">
                                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                             <Label Text="{Binding Name}" VerticalOptions="Center" TextColor="{StaticResource TextPrimary}">
                                                 <Label.GestureRecognizers>
@@ -241,12 +241,12 @@
                                                     BackgroundColor="Transparent" TextColor="{StaticResource TextMuted}"
                                                     HeightRequest="24" WidthRequest="24" Padding="0"/>
                                         </Grid>
-                                    </Frame>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
             </VerticalStackLayout>
         </ScrollView>
@@ -254,8 +254,8 @@
         <!-- Save Preset Dialog Overlay -->
         <Grid Grid.RowSpan="2" IsVisible="{Binding IsCustomPresetDialogVisible}"
               BackgroundColor="#80000000">
-            <Frame BackgroundColor="{StaticResource CardBackground}"
-                   CornerRadius="16" Padding="24"
+            <Border Background="{StaticResource CardBackground}"
+                   StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="24"
                    VerticalOptions="Center" HorizontalOptions="Center"
                    WidthRequest="300">
                 <VerticalStackLayout Spacing="16">
@@ -273,7 +273,7 @@
                                 TextColor="{StaticResource TextPrimary}" CornerRadius="8"/>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
         </Grid>
 
     </Grid>

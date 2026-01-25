@@ -22,7 +22,7 @@ namespace Tips_Player
 #if WINDOWS
             window.HandlerChanged += (s, e) =>
             {
-                var viewModel = Handler.MauiContext.Services.GetService<PlayerViewModel>();
+                var viewModel = window.Handler?.MauiContext?.Services.GetService<PlayerViewModel>();
                 if (viewModel != null)
                 {
                     viewModel.PropertyChanged += (sender, args) =>

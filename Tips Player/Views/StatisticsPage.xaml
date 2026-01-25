@@ -9,7 +9,7 @@
              x:Class="Tips_Player.Views.StatisticsPage"
              x:DataType="viewmodels:StatisticsViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
@@ -36,19 +36,19 @@
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
 
                     <!-- Total Listening Time -->
-                    <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="&#xf017;" FontFamily="FontAwesome" FontSize="24" TextColor="{StaticResource AccentColor}"/>
                             <Label Text="{Binding Stats.TotalListeningTimeFormatted}" FontSize="20" FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
                             <Label Text="Total Listening" FontSize="12" TextColor="{StaticResource TextMuted}"/>
                         </VerticalStackLayout>
-                    </Frame>
+                    </Border>
 
                     <!-- Tracks Played -->
-                    <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <Border Grid.Row="0" Grid.Column="1" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="24"
                                    TextColor="{StaticResource AccentColor}"/>
@@ -56,22 +56,22 @@
                                    TextColor="{StaticResource TextPrimary}"/>
                             <Label Text="Tracks Played" FontSize="12" TextColor="{StaticResource TextMuted}"/>
                         </VerticalStackLayout>
-                    </Frame>
+                    </Border>
 
                     <!-- Sessions -->
-                    <Frame Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="&#xf073;" FontFamily="FontAwesome" FontSize="24" TextColor="{StaticResource AccentColor}"/>
                             <Label Text="{Binding Stats.TotalSessions}" FontSize="20" FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
                             <Label Text="Days Active" FontSize="12" TextColor="{StaticResource TextMuted}"/>
                         </VerticalStackLayout>
-                    </Frame>
+                    </Border>
 
                     <!-- Top Artists Count -->
-                    <Frame Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource CardBackground}"
-                           BorderColor="Transparent" CornerRadius="12" Padding="16">
+                    <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackground}"
+                           Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="{x:Static helpers:FontIcons.Artist}" FontFamily="FontAwesome" FontSize="24"
                                    TextColor="{StaticResource AccentColor}"/>
@@ -79,12 +79,12 @@
                                    TextColor="{StaticResource TextPrimary}"/>
                             <Label Text="Artists Listened" FontSize="12" TextColor="{StaticResource TextMuted}"/>
                         </VerticalStackLayout>
-                    </Frame>
+                    </Border>
 
                 </Grid>
 
                 <!-- Top Tracks -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Top Tracks" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
 
@@ -96,13 +96,13 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:TrackStats">
                                     <Grid ColumnDefinitions="32,*,Auto" ColumnSpacing="12" Padding="0,8">
-                                        <Frame Grid.Column="0" BackgroundColor="{StaticResource SurfaceBackground}"
-                                               CornerRadius="16" Padding="0" HasShadow="False"
+                                        <Border Grid.Column="0" Background="{StaticResource SurfaceBackground}"
+                                               StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="0"
                                                HeightRequest="32" WidthRequest="32">
                                             <Label Text="{Binding Rank}" FontSize="14" FontAttributes="Bold"
                                                    TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding TrackTitle}" FontSize="14" FontAttributes="Bold"
                                                    TextColor="{StaticResource TextPrimary}"
@@ -127,10 +127,10 @@
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Top Artists -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Top Artists" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
 
@@ -146,19 +146,19 @@
                                 <DataTemplate x:DataType="models:ArtistStats">
                                     <VerticalStackLayout Spacing="8" WidthRequest="100">
                                         <Grid>
-                                            <Frame BackgroundColor="{StaticResource SurfaceBackground}"
-                                                   CornerRadius="35" Padding="0" HasShadow="False"
+                                            <Border Background="{StaticResource SurfaceBackground}"
+                                                   StrokeShape="RoundRectangle 35" Stroke="Transparent" Padding="0"
                                                    HeightRequest="70" WidthRequest="70" HorizontalOptions="Center">
                                                 <Label Text="{x:Static helpers:FontIcons.Artist}" FontFamily="FontAwesome"
                                                        FontSize="28" TextColor="{StaticResource AccentColor}"
                                                        HorizontalOptions="Center" VerticalOptions="Center"/>
-                                            </Frame>
-                                            <Frame BackgroundColor="{StaticResource AccentColor}" CornerRadius="10"
-                                                   Padding="4,2" HasShadow="False" HeightRequest="20" WidthRequest="20"
+                                            </Border>
+                                            <Border Background="{StaticResource AccentColor}" StrokeShape="RoundRectangle 10"
+                                                   Stroke="Transparent" Padding="4,2" HeightRequest="20" WidthRequest="20"
                                                    HorizontalOptions="End" VerticalOptions="End" Margin="10,0">
                                                 <Label Text="{Binding Rank}" FontSize="10" FontAttributes="Bold"
                                                        TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                            </Frame>
+                                            </Border>
                                         </Grid>
                                         <Label Text="{Binding ArtistName}" FontSize="12" FontAttributes="Bold"
                                                TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"
@@ -176,10 +176,10 @@
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Top Albums -->
-                <Frame BackgroundColor="{StaticResource CardBackground}" BorderColor="Transparent" CornerRadius="12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Top Albums" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
 
@@ -194,13 +194,13 @@
                                         <Label Grid.Column="0" Text="{Binding Rank}" FontSize="14" FontAttributes="Bold"
                                                TextColor="{StaticResource AccentColor}"
                                                HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        <Frame Grid.Column="1" BackgroundColor="{StaticResource SurfaceBackground}"
-                                               CornerRadius="6" Padding="0" HasShadow="False"
+                                        <Border Grid.Column="1" Background="{StaticResource SurfaceBackground}"
+                                               StrokeShape="RoundRectangle 6" Stroke="Transparent" Padding="0"
                                                HeightRequest="44" WidthRequest="44">
                                             <Label Text="{x:Static helpers:FontIcons.Album}" FontFamily="FontAwesome"
                                                    FontSize="18" TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        </Border>
                                         <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding AlbumName}" FontSize="14" FontAttributes="Bold"
                                                    TextColor="{StaticResource TextPrimary}"
@@ -223,7 +223,7 @@
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Reset Stats -->
                 <Button Text="Reset Statistics"

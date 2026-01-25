@@ -10,7 +10,7 @@
              x:Class="Tips_Player.Views.PlaylistsPage"
              x:DataType="viewmodels:PlaylistsViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.UseSafeArea="True"
+             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="*,Auto">
@@ -50,26 +50,26 @@
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:SmartPlaylist">
-                            <Frame Style="{StaticResource MediaItemCardStyle}">
-                                <Frame.GestureRecognizers>
+                            <Border Style="{StaticResource MediaItemCardStyle}">
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PlaylistsViewModel}}, Path=OpenPlaylistCommand}"
                                                           CommandParameter="{Binding .}"/>
-                                </Frame.GestureRecognizers>
+                                </Border.GestureRecognizers>
 
                                 <Grid RowDefinitions="80,Auto" RowSpacing="12">
                                     <!-- Playlist Icon -->
-                                    <Frame Grid.Row="0"
-                                           BackgroundColor="{StaticResource SurfaceBackground}"
-                                           CornerRadius="12"
-                                           Padding="0"
-                                           HasShadow="False">
+                                    <Border Grid.Row="0"
+                                           Background="{StaticResource SurfaceBackground}"
+                                           StrokeShape="RoundRectangle 12"
+                                           Stroke="Transparent"
+                                           Padding="0">
                                         <Label Text="{Binding Icon}"
                                                FontFamily="FontAwesome"
                                                FontSize="40"
                                                TextColor="{StaticResource AccentColor}"
                                                HorizontalOptions="Center"
                                                VerticalOptions="Center"/>
-                                    </Frame>
+                                    </Border>
 
                                     <!-- Playlist Info -->
                                     <VerticalStackLayout Grid.Row="1" Spacing="4">
@@ -88,7 +88,7 @@
                                                MaxLines="1"/>
                                     </VerticalStackLayout>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
 
@@ -168,20 +168,20 @@
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:MediaItem">
-                            <Frame Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
-                                <Frame.GestureRecognizers>
+                            <Border Style="{StaticResource MediaItemCardStyle}" Margin="0,4">
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PlaylistsViewModel}}, Path=PlayItemCommand}"
                                                           CommandParameter="{Binding .}"/>
-                                </Frame.GestureRecognizers>
+                                </Border.GestureRecognizers>
 
                                 <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="12">
 
                                     <!-- Media Icon -->
-                                    <Frame Grid.Column="0"
-                                           BackgroundColor="{StaticResource SurfaceBackground}"
-                                           CornerRadius="8"
+                                    <Border Grid.Column="0"
+                                           Background="{StaticResource SurfaceBackground}"
+                                           StrokeShape="RoundRectangle 8"
+                                           Stroke="Transparent"
                                            Padding="0"
-                                           HasShadow="False"
                                            HeightRequest="48"
                                            WidthRequest="48">
                                         <Label Text="{x:Static helpers:FontIcons.Music}"
@@ -190,7 +190,7 @@
                                                TextColor="{StaticResource AccentColor}"
                                                HorizontalOptions="Center"
                                                VerticalOptions="Center"/>
-                                    </Frame>
+                                    </Border>
 
                                     <!-- Track Info -->
                                     <VerticalStackLayout Grid.Column="1"
@@ -231,7 +231,7 @@
                                     </HorizontalStackLayout>
 
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
 
