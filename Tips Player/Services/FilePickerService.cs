@@ -13,10 +13,7 @@ public class FilePickerService : IFilePickerService
         new Dictionary<DevicePlatform, IEnumerable<string>>
         {
             { DevicePlatform.WinUI, ["*.mp3", "*.wav", "*.aac", "*.m4a", "*.flac", "*.ogg", "*.wma",
-                                     "*.mp4", "*.avi", "*.mkv", "*.mov", "*.wmv", "*.webm", "*.m4v"] },
-            { DevicePlatform.Android, ["audio/*", "video/*"] },
-            { DevicePlatform.iOS, ["public.audio", "public.movie"] },
-            { DevicePlatform.MacCatalyst, ["public.audio", "public.movie"] }
+                                     "*.mp4", "*.avi", "*.mkv", "*.mov", "*.wmv", "*.webm", "*.m4v"] }
         });
 
     public async Task<IEnumerable<MediaItem>> PickMediaFilesAsync()
@@ -65,17 +62,7 @@ public class FilePickerService : IFilePickerService
         var status = await Permissions.CheckStatusAsync<Permissions.StorageRead>();
         if (status != PermissionStatus.Granted)
         {
-            status = await Permissions.RequestAsync<Permissions.StorageRead>();
-        }
-
-        // For Android 13+ (API 33+), also request media permission
-        if (DeviceInfo.Platform == DevicePlatform.Android && DeviceInfo.Version >= new Version(13, 0))
-        {
-            var mediaStatus = await Permissions.CheckStatusAsync<Permissions.Media>();
-            if (mediaStatus != PermissionStatus.Granted)
-            {
-                await Permissions.RequestAsync<Permissions.Media>();
-            }
+            await Permissions.RequestAsync<Permissions.StorageRead>();
         }
     }
 
