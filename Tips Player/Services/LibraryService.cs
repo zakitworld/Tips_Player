@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
@@ -9,6 +10,7 @@ public class LibraryService : ILibraryService
 {
     private const string LibraryFileName = "library.json";
     private readonly string _libraryPath;
+    private readonly ILogger<LibraryService> _logger;
 
     public ObservableCollection<MediaItem> MediaItems { get; } = [];
     public ObservableCollection<MediaItem> Songs { get; } = [];
@@ -18,9 +20,11 @@ public class LibraryService : ILibraryService
     public ObservableCollection<Folder> Folders { get; } = [];
     public ObservableCollection<SmartPlaylist> SmartPlaylists { get; } = [];
 
-    public LibraryService()
+    public LibraryService(ILogger<LibraryService> logger)
     {
+        _logger = logger;
         _libraryPath = Path.Combine(FileSystem.AppDataDirectory, LibraryFileName);
+        _logger.LogInformation("LibraryService initialized. Library path: {LibraryPath}", _libraryPath);
         InitializeSmartPlaylists();
     }
 
@@ -32,13 +36,13 @@ public class LibraryService : ILibraryService
         SmartPlaylists.Add(SmartPlaylist.CreateWithLyrics());
     }
 
-    public async Task LoadLibraryAsync()
+    public async Task LoadLibraryAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             if (!File.Exists(_libraryPath)) return;
 
-            var json = await File.ReadAllTextAsync(_libraryPath);
+            var json = await File.ReadAllTextAsync(_libraryPath, cancellationToken);
             var items = JsonSerializer.Deserialize<List<MediaItem>>(json);
 
             if (items != null)
@@ -63,27 +67,29 @@ public class LibraryService : ILibraryService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error loading library: {ex.Message}");
+            _logger.LogError(ex, "Error loading library from {LibraryPath}", _libraryPath);
         }
     }
 
-    public async Task SaveLibraryAsync()
+    public async Task SaveLibraryAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             var json = JsonSerializer.Serialize(MediaItems.ToList());
-            await File.WriteAllTextAsync(_libraryPath, json);
+            await File.WriteAllTextAsync(_libraryPath, json, cancellationToken);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error saving library: {ex.Message}");
+            _logger.LogError(ex, "Error saving library to {LibraryPath}", _libraryPath);
         }
     }
 
-    public async Task AddItemsAsync(IEnumerable<MediaItem> items)
+    public async Task AddItemsAsync(IEnumerable<MediaItem> items, CancellationToken cancellationToken = default)
     {
         foreach (var item in items)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (!MediaItems.Any(m => m.FilePath == item.FilePath))
             {
                 // Set folder path and name from file path
@@ -100,36 +106,36 @@ public class LibraryService : ILibraryService
             }
         }
         RefreshCollections();
-        await SaveLibraryAsync();
+        await SaveLibraryAsync(cancellationToken);
     }
 
-    public async Task RemoveItemAsync(MediaItem item)
+    public async Task RemoveItemAsync(MediaItem item, CancellationToken cancellationToken = default)
     {
         MediaItems.Remove(item);
         RefreshCollections();
-        await SaveLibraryAsync();
+        await SaveLibraryAsync(cancellationToken);
     }
 
-    public async Task ClearLibraryAsync()
+    public async Task ClearLibraryAsync(CancellationToken cancellationToken = default)
     {
         MediaItems.Clear();
         RefreshCollections();
-        await SaveLibraryAsync();
+        await SaveLibraryAsync(cancellationToken);
     }
 
-    public async Task ToggleFavoriteAsync(MediaItem item)
+    public async Task ToggleFavoriteAsync(MediaItem item, CancellationToken cancellationToken = default)
     {
         item.IsFavorite = !item.IsFavorite;
         RefreshSmartPlaylists();
-        await SaveLibraryAsync();
+        await SaveLibraryAsync(cancellationToken);
     }
 
-    public async Task RecordPlayAsync(MediaItem item)
+    public async Task RecordPlayAsync(MediaItem item, CancellationToken cancellationToken = default)
     {
         item.PlayCount++;
         item.LastPlayedDate = DateTime.Now;
         RefreshSmartPlaylists();
-        await SaveLibraryAsync();
+        await SaveLibraryAsync(cancellationToken);
     }
 
     public void RefreshCollections()

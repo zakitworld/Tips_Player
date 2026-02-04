@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
@@ -8,6 +9,7 @@ public class EqualizerService : IEqualizerService
 {
     private const string SettingsFileName = "equalizer.json";
     private readonly string _settingsPath;
+    private readonly ILogger<EqualizerService> _logger;
 
     private bool _isEnabled;
     public bool IsEnabled
@@ -31,9 +33,11 @@ public class EqualizerService : IEqualizerService
     public event EventHandler<EqualizerPreset>? PresetChanged;
     public event EventHandler<bool>? EnabledChanged;
 
-    public EqualizerService()
+    public EqualizerService(ILogger<EqualizerService> logger)
     {
+        _logger = logger;
         _settingsPath = Path.Combine(FileSystem.AppDataDirectory, SettingsFileName);
+        _logger.LogInformation("EqualizerService initialized. Settings path: {SettingsPath}", _settingsPath);
         LoadSettings();
     }
 
@@ -119,7 +123,7 @@ public class EqualizerService : IEqualizerService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error loading equalizer settings: {ex.Message}");
+            _logger.LogError(ex, "Error loading equalizer settings from {SettingsPath}", _settingsPath);
         }
     }
 
@@ -150,7 +154,7 @@ public class EqualizerService : IEqualizerService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error saving equalizer settings: {ex.Message}");
+            _logger.LogError(ex, "Error saving equalizer settings to {SettingsPath}", _settingsPath);
         }
     }
 

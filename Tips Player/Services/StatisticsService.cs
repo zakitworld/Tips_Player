@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
@@ -10,88 +11,95 @@ public class StatisticsService : IStatisticsService
     private const string SessionsFileName = "play_sessions.json";
     private readonly string _statsPath;
     private readonly string _sessionsPath;
+    private readonly ILogger<StatisticsService> _logger;
     private List<PlaySession> _sessions = [];
 
     public ListeningStats Stats { get; private set; } = new();
 
-    public StatisticsService()
+    public StatisticsService(ILogger<StatisticsService> logger)
     {
+        _logger = logger;
         _statsPath = Path.Combine(FileSystem.AppDataDirectory, StatsFileName);
         _sessionsPath = Path.Combine(FileSystem.AppDataDirectory, SessionsFileName);
+        _logger.LogInformation("StatisticsService initialized. Sessions path: {SessionsPath}", _sessionsPath);
     }
 
-    public async Task LoadStatsAsync()
+    public async Task LoadStatsAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             if (File.Exists(_sessionsPath))
             {
-                var json = await File.ReadAllTextAsync(_sessionsPath);
+                var json = await File.ReadAllTextAsync(_sessionsPath, cancellationToken);
                 _sessions = JsonSerializer.Deserialize<List<PlaySession>>(json) ?? [];
             }
 
-            await RecalculateStatsAsync();
+            await RecalculateStatsAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error loading stats: {ex.Message}");
+            _logger.LogError(ex, "Error loading statistics from {SessionsPath}", _sessionsPath);
         }
     }
 
-    public async Task SaveStatsAsync()
+    public async Task SaveStatsAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             var json = JsonSerializer.Serialize(_sessions);
-            await File.WriteAllTextAsync(_sessionsPath, json);
+            await File.WriteAllTextAsync(_sessionsPath, json, cancellationToken);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error saving stats: {ex.Message}");
+            _logger.LogError(ex, "Error saving statistics to {SessionsPath}", _sessionsPath);
         }
     }
 
-    public async Task RecordPlaySessionAsync(PlaySession session)
+    public async Task RecordPlaySessionAsync(PlaySession session, CancellationToken cancellationToken = default)
     {
         _sessions.Add(session);
-        await SaveStatsAsync();
-        await RecalculateStatsAsync();
+        await SaveStatsAsync(cancellationToken);
+        await RecalculateStatsAsync(cancellationToken);
     }
 
-    public async Task<ListeningStats> GetStatsForPeriodAsync(DateTime start, DateTime end)
+    public async Task<ListeningStats> GetStatsForPeriodAsync(DateTime start, DateTime end, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var periodSessions = _sessions.Where(s => s.StartTime >= start && s.StartTime <= end).ToList();
-        return await CalculateStatsFromSessionsAsync(periodSessions);
+        return await CalculateStatsFromSessionsAsync(periodSessions, cancellationToken);
     }
 
-    public async Task<List<TrackStats>> GetTopTracksAsync(int count = 10)
+    public async Task<List<TrackStats>> GetTopTracksAsync(int count = 10, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await Task.FromResult(Stats.TopTracks.Take(count).ToList());
     }
 
-    public async Task<List<ArtistStats>> GetTopArtistsAsync(int count = 10)
+    public async Task<List<ArtistStats>> GetTopArtistsAsync(int count = 10, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await Task.FromResult(Stats.TopArtists.Take(count).ToList());
     }
 
-    public async Task<List<AlbumStats>> GetTopAlbumsAsync(int count = 10)
+    public async Task<List<AlbumStats>> GetTopAlbumsAsync(int count = 10, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await Task.FromResult(Stats.TopAlbums.Take(count).ToList());
     }
 
-    public async Task ResetStatsAsync()
+    public async Task ResetStatsAsync(CancellationToken cancellationToken = default)
     {
         _sessions.Clear();
         Stats = new ListeningStats();
-        await SaveStatsAsync();
+        await SaveStatsAsync(cancellationToken);
     }
 
-    private async Task RecalculateStatsAsync()
+    private async Task RecalculateStatsAsync(CancellationToken cancellationToken = default)
     {
-        Stats = await CalculateStatsFromSessionsAsync(_sessions);
+        Stats = await CalculateStatsFromSessionsAsync(_sessions, cancellationToken);
     }
 
-    private Task<ListeningStats> CalculateStatsFromSessionsAsync(List<PlaySession> sessions)
+    private Task<ListeningStats> CalculateStatsFromSessionsAsync(List<PlaySession> sessions, CancellationToken cancellationToken = default)
     {
         var stats = new ListeningStats();
 

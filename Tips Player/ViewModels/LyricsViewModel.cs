@@ -5,7 +5,7 @@ using Tips_Player.Services.Interfaces;
 
 namespace Tips_Player.ViewModels;
 
-public partial class LyricsViewModel : ObservableObject
+public partial class LyricsViewModel : BaseViewModel
 {
     private readonly ILyricsService _lyricsService;
     private readonly IMediaPlayerService _mediaPlayerService;
@@ -47,13 +47,14 @@ public partial class LyricsViewModel : ObservableObject
     {
         _lyricsService = lyricsService;
         _mediaPlayerService = mediaPlayerService;
+        Title = "Lyrics";
         _mediaPlayerService.MediaChanged += OnMediaChanged;
     }
 
-    private async void OnMediaChanged(object? sender, MediaItem? media)
+    private void OnMediaChanged(object? sender, MediaItem? media)
     {
         CurrentMedia = media;
-        await LoadLyricsAsync();
+        _ = LoadLyricsAsync();
     }
 
     public async Task LoadLyricsAsync()
@@ -166,7 +167,7 @@ public partial class LyricsViewModel : ObservableObject
         StopSyncTimer();
     }
 
-    public async void OnAppearing()
+    public async Task OnAppearingAsync()
     {
         // Sync with current playing media in case we navigated here after playback started
         var serviceMedia = _mediaPlayerService.CurrentMedia;
@@ -179,6 +180,14 @@ public partial class LyricsViewModel : ObservableObject
         {
             StartSyncTimer();
         }
+    }
+
+    /// <summary>
+    /// Fire-and-forget wrapper for page appearing. Use OnAppearingAsync for awaitable version.
+    /// </summary>
+    public void OnAppearing()
+    {
+        _ = OnAppearingAsync();
     }
 
     partial void OnIsLoadingChanged(bool value)
@@ -200,5 +209,16 @@ public partial class LyricsViewModel : ObservableObject
         OnPropertyChanged(nameof(ShowNoMediaState));
         OnPropertyChanged(nameof(ShowNoLyricsState));
         OnPropertyChanged(nameof(ShowLyricsContent));
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _mediaPlayerService.MediaChanged -= OnMediaChanged;
+            StopSyncTimer();
+        }
+
+        base.Dispose(disposing);
     }
 }

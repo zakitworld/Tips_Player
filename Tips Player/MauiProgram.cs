@@ -1,5 +1,7 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Tips_Player.Infrastructure.Logging;
 using Tips_Player.Services;
 using Tips_Player.Services.Interfaces;
 using Tips_Player.ViewModels;
@@ -16,6 +18,7 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
             .UseMauiCommunityToolkitMediaElement()
+            .ConfigureSerilog()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

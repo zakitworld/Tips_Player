@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tips_Player.Models;
@@ -56,13 +57,15 @@ public partial class LibraryViewModel : BaseViewModel
         _libraryService = libraryService;
         Title = "Your Library";
 
-        MediaItems.CollectionChanged += (s, e) =>
-        {
-            HasItems = MediaItems.Count > 0;
-            UpdateStats();
-            ApplySearch();
-        };
+        MediaItems.CollectionChanged += OnMediaItemsCollectionChanged;
 
+        HasItems = MediaItems.Count > 0;
+        UpdateStats();
+        ApplySearch();
+    }
+
+    private void OnMediaItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
         HasItems = MediaItems.Count > 0;
         UpdateStats();
         ApplySearch();
@@ -221,5 +224,15 @@ public partial class LibraryViewModel : BaseViewModel
             PlayItemCommand.Execute(value);
             SelectedItem = null;
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            MediaItems.CollectionChanged -= OnMediaItemsCollectionChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }

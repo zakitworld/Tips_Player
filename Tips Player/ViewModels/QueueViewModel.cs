@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tips_Player.Models;
@@ -34,15 +36,22 @@ public partial class QueueViewModel : BaseViewModel
 
         RefreshQueue();
 
-        _playerViewModel.Playlist.CollectionChanged += (s, e) => RefreshQueue();
-        _playerViewModel.PropertyChanged += (s, e) =>
+        _playerViewModel.Playlist.CollectionChanged += OnPlaylistCollectionChanged;
+        _playerViewModel.PropertyChanged += OnPlayerPropertyChanged;
+    }
+
+    private void OnPlaylistCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RefreshQueue();
+    }
+
+    private void OnPlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PlayerViewModel.CurrentIndex) ||
+            e.PropertyName == nameof(PlayerViewModel.CurrentMedia))
         {
-            if (e.PropertyName == nameof(PlayerViewModel.CurrentIndex) ||
-                e.PropertyName == nameof(PlayerViewModel.CurrentMedia))
-            {
-                RefreshQueue();
-            }
-        };
+            RefreshQueue();
+        }
     }
 
     public void RefreshQueue()
@@ -208,5 +217,16 @@ public partial class QueueViewModel : BaseViewModel
         // This would open a dialog to save the current queue as a playlist
         // For now, show a simple alert
         await Shell.Current.DisplayAlertAsync("Save Playlist", "Playlist saved successfully!", "OK");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _playerViewModel.Playlist.CollectionChanged -= OnPlaylistCollectionChanged;
+            _playerViewModel.PropertyChanged -= OnPlayerPropertyChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }

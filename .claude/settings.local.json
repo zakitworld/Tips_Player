@@ -4,7 +4,13 @@
       "Bash(dir:*)",
       "Bash(dotnet restore:*)",
       "Bash(dotnet build:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(dotnet run:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nRemove Android, iOS, and MacCatalyst platforms - target Windows only\n\n- Delete Android platform files \\(AndroidManifest.xml, MainActivity.cs, MainApplication.cs, colors.xml\\)\n- Delete iOS platform files \\(AppDelegate.cs, Info.plist, Program.cs, PrivacyInfo.xcprivacy\\)\n- Delete MacCatalyst platform files \\(AppDelegate.cs, Entitlements.plist, Info.plist, Program.cs\\)\n- Update .csproj to target only net10.0-windows10.0.19041.0\n- Remove platform-specific conditions from SupportedOSPlatformVersion\n- Clean up FilePickerService.cs to remove Android/iOS/Mac file type mappings and permissions\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd tooltips, fullscreen auto-hide controls, and double-click toggle\n\nFeatures:\n- Add tooltips to all icon buttons across the app for better UX\n- Fullscreen video controls auto-hide after 3 seconds of inactivity\n- Single tap on video shows controls, double-tap toggles fullscreen\n- Fix video controls \\(Fit/Fullscreen\\) not visible in normal mode\n  by moving them above MediaElement layer \\(ZIndex 20\\)\n- Controls dynamically positioned for desktop/mobile layouts\n\nFiles with tooltips:\n- PlaybackControls, MiniPlayerBar, PlayerPage, CarModePage\n- QueuePage, LibraryPage, EqualizerPage, SearchPage, LyricsPage\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(ls:*)",
+      "Bash(dotnet test:*)"
     ]
   }
 }

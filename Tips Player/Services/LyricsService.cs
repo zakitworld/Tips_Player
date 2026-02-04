@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
@@ -8,20 +9,23 @@ public class LyricsService : ILyricsService
 {
     private const string LyricsCacheFolder = "lyrics_cache";
     private readonly string _cacheDirectory;
+    private readonly ILogger<LyricsService> _logger;
 
-    public LyricsService()
+    public LyricsService(ILogger<LyricsService> logger)
     {
+        _logger = logger;
         _cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, LyricsCacheFolder);
         if (!Directory.Exists(_cacheDirectory))
         {
             Directory.CreateDirectory(_cacheDirectory);
         }
+        _logger.LogInformation("LyricsService initialized. Cache directory: {CacheDirectory}", _cacheDirectory);
     }
 
-    public async Task<Lyrics?> GetLyricsAsync(string title, string artist)
+    public async Task<Lyrics?> GetLyricsAsync(string title, string artist, CancellationToken cancellationToken = default)
     {
         // First check cache
-        var cachedLyrics = await GetCachedLyricsAsync(title, artist);
+        var cachedLyrics = await GetCachedLyricsAsync(title, artist, cancellationToken);
         if (cachedLyrics != null)
         {
             return cachedLyrics;
@@ -37,7 +41,7 @@ public class LyricsService : ILyricsService
         return null;
     }
 
-    public async Task<Lyrics?> GetLyricsFromFileAsync(string filePath)
+    public async Task<Lyrics?> GetLyricsFromFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -45,7 +49,7 @@ public class LyricsService : ILyricsService
             var lrcPath = Path.ChangeExtension(filePath, ".lrc");
             if (File.Exists(lrcPath))
             {
-                var content = await File.ReadAllTextAsync(lrcPath);
+                var content = await File.ReadAllTextAsync(lrcPath, cancellationToken);
                 return Lyrics.Parse(content);
             }
 
@@ -53,7 +57,7 @@ public class LyricsService : ILyricsService
             var txtPath = Path.ChangeExtension(filePath, ".txt");
             if (File.Exists(txtPath))
             {
-                var content = await File.ReadAllTextAsync(txtPath);
+                var content = await File.ReadAllTextAsync(txtPath, cancellationToken);
                 return new Lyrics
                 {
                     PlainText = content,
@@ -63,13 +67,13 @@ public class LyricsService : ILyricsService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error reading lyrics file: {ex.Message}");
+            _logger.LogError(ex, "Error reading lyrics file for {FilePath}", filePath);
         }
 
         return null;
     }
 
-    public async Task SaveLyricsAsync(MediaItem media, Lyrics lyrics)
+    public async Task SaveLyricsAsync(MediaItem media, Lyrics lyrics, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -91,7 +95,7 @@ public class LyricsService : ILyricsService
             };
 
             var json = JsonSerializer.Serialize(data);
-            await File.WriteAllTextAsync(filePath, json);
+            await File.WriteAllTextAsync(filePath, json, cancellationToken);
 
             // Update media item
             media.HasLyrics = true;
@@ -99,18 +103,19 @@ public class LyricsService : ILyricsService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error saving lyrics: {ex.Message}");
+            _logger.LogError(ex, "Error saving lyrics for {Title} by {Artist}", media.Title, media.Artist);
         }
     }
 
-    public async Task<bool> HasCachedLyricsAsync(MediaItem media)
+    public async Task<bool> HasCachedLyricsAsync(MediaItem media, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var fileName = GetCacheFileName(media.Title, media.Artist);
         var filePath = Path.Combine(_cacheDirectory, fileName);
         return await Task.FromResult(File.Exists(filePath));
     }
 
-    private async Task<Lyrics?> GetCachedLyricsAsync(string title, string artist)
+    private async Task<Lyrics?> GetCachedLyricsAsync(string title, string artist, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -119,7 +124,7 @@ public class LyricsService : ILyricsService
 
             if (!File.Exists(filePath)) return null;
 
-            var json = await File.ReadAllTextAsync(filePath);
+            var json = await File.ReadAllTextAsync(filePath, cancellationToken);
             var data = JsonSerializer.Deserialize<LyricsData>(json);
 
             if (data == null) return null;
@@ -142,7 +147,7 @@ public class LyricsService : ILyricsService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error loading cached lyrics: {ex.Message}");
+            _logger.LogError(ex, "Error loading cached lyrics for {Title} by {Artist}", title, artist);
         }
 
         return null;

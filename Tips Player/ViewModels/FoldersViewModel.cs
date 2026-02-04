@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tips_Player.Models;
@@ -41,12 +42,14 @@ public partial class FoldersViewModel : BaseViewModel
         _libraryService = libraryService;
         Title = "Folders";
 
-        Folders.CollectionChanged += (s, e) =>
-        {
-            OnPropertyChanged(nameof(HasItems));
-            ApplySearch();
-        };
+        Folders.CollectionChanged += OnFoldersCollectionChanged;
 
+        ApplySearch();
+    }
+
+    private void OnFoldersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(HasItems));
         ApplySearch();
     }
 
@@ -165,5 +168,15 @@ public partial class FoldersViewModel : BaseViewModel
             PlayItemCommand.Execute(value);
             SelectedItem = null;
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Folders.CollectionChanged -= OnFoldersCollectionChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }

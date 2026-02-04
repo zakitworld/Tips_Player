@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tips_Player.Models;
@@ -41,12 +42,14 @@ public partial class AlbumsViewModel : BaseViewModel
         _libraryService = libraryService;
         Title = "Albums";
 
-        Albums.CollectionChanged += (s, e) =>
-        {
-            OnPropertyChanged(nameof(HasItems));
-            ApplySearch();
-        };
+        Albums.CollectionChanged += OnAlbumsCollectionChanged;
 
+        ApplySearch();
+    }
+
+    private void OnAlbumsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(HasItems));
         ApplySearch();
     }
 
@@ -191,5 +194,15 @@ public partial class AlbumsViewModel : BaseViewModel
             PlayItemCommand.Execute(value);
             SelectedItem = null;
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Albums.CollectionChanged -= OnAlbumsCollectionChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }

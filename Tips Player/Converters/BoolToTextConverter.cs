@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Tips_Player.Helpers;
+namespace Tips_Player.Converters;
 
 public class BoolToTextConverter : IValueConverter
 {

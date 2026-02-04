@@ -16,15 +16,15 @@ public interface ILibraryService
     ObservableCollection<SmartPlaylist> SmartPlaylists { get; }
 
     // Basic operations
-    Task LoadLibraryAsync();
-    Task SaveLibraryAsync();
-    Task AddItemsAsync(IEnumerable<MediaItem> items);
-    Task RemoveItemAsync(MediaItem item);
-    Task ClearLibraryAsync();
-    Task ToggleFavoriteAsync(MediaItem item);
+    Task LoadLibraryAsync(CancellationToken cancellationToken = default);
+    Task SaveLibraryAsync(CancellationToken cancellationToken = default);
+    Task AddItemsAsync(IEnumerable<MediaItem> items, CancellationToken cancellationToken = default);
+    Task RemoveItemAsync(MediaItem item, CancellationToken cancellationToken = default);
+    Task ClearLibraryAsync(CancellationToken cancellationToken = default);
+    Task ToggleFavoriteAsync(MediaItem item, CancellationToken cancellationToken = default);
 
     // Play tracking
-    Task RecordPlayAsync(MediaItem item);
+    Task RecordPlayAsync(MediaItem item, CancellationToken cancellationToken = default);
 
     // Refresh collections
     void RefreshCollections();

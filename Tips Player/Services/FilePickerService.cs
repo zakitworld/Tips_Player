@@ -1,13 +1,21 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.ApplicationModel;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
-using Microsoft.Maui.ApplicationModel;
 
 namespace Tips_Player.Services;
 
 public class FilePickerService : IFilePickerService
 {
+    private readonly ILogger<FilePickerService> _logger;
     private static readonly string[] AudioExtensions = [".mp3", ".wav", ".aac", ".m4a", ".flac", ".ogg", ".wma"];
     private static readonly string[] VideoExtensions = [".mp4", ".avi", ".mkv", ".mov", ".wmv", ".webm", ".m4v"];
+
+    public FilePickerService(ILogger<FilePickerService> logger)
+    {
+        _logger = logger;
+        _logger.LogInformation("FilePickerService initialized");
+    }
 
     private static readonly FilePickerFileType MediaFileTypes = new(
         new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -28,10 +36,13 @@ public class FilePickerService : IFilePickerService
             };
 
             var results = await FilePicker.Default.PickMultipleAsync(options);
-            return results.Where(r => r != null).Select(r => CreateMediaItem(r!)).ToList();
+            var mediaItems = results.Where(r => r != null).Select(r => CreateMediaItem(r!)).ToList();
+            _logger.LogInformation("Picked {Count} media files", mediaItems.Count);
+            return mediaItems;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error picking multiple media files");
             return [];
         }
     }
@@ -48,10 +59,16 @@ public class FilePickerService : IFilePickerService
             };
 
             var result = await FilePicker.Default.PickAsync(options);
-            return result != null ? CreateMediaItem(result) : null;
+            if (result != null)
+            {
+                _logger.LogInformation("Picked single media file: {FilePath}", result.FullPath);
+                return CreateMediaItem(result);
+            }
+            return null;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error picking single media file");
             return null;
         }
     }

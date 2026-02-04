@@ -18,10 +18,10 @@ public interface IMediaPlayerService
     event EventHandler<bool>? PlaybackStateChanged;
     event EventHandler? MediaEnded;
 
-    Task LoadAsync(MediaItem media);
-    Task PlayAsync();
-    Task PauseAsync();
-    Task StopAsync();
-    Task SeekAsync(TimeSpan position);
+    Task LoadAsync(MediaItem media, CancellationToken cancellationToken = default);
+    Task PlayAsync(CancellationToken cancellationToken = default);
+    Task PauseAsync(CancellationToken cancellationToken = default);
+    Task StopAsync(CancellationToken cancellationToken = default);
+    Task SeekAsync(TimeSpan position, CancellationToken cancellationToken = default);
     void SetMediaElement(CommunityToolkit.Maui.Views.MediaElement mediaElement);
 }

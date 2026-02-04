@@ -4,6 +4,7 @@
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
              xmlns:models="clr-namespace:Tips_Player.Models"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             xmlns:converters="clr-namespace:Tips_Player.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Tips_Player.Views.LyricsPage"
@@ -176,7 +177,7 @@
                     <Button.Text>
                         <Binding Path="ShowPlainText">
                             <Binding.Converter>
-                                <helpers:BoolToTextConverter TrueText="Show Synced" FalseText="Show Plain"/>
+                                <converters:BoolToTextConverter TrueText="Show Synced" FalseText="Show Plain"/>
                             </Binding.Converter>
                         </Binding>
                     </Button.Text>
@@ -195,7 +196,7 @@
                     <Button.Text>
                         <Binding Path="AutoScroll">
                             <Binding.Converter>
-                                <helpers:BoolToTextConverter TrueText="Auto-Scroll: On" FalseText="Auto-Scroll: Off"/>
+                                <converters:BoolToTextConverter TrueText="Auto-Scroll: On" FalseText="Auto-Scroll: Off"/>
                             </Binding.Converter>
                         </Binding>
                     </Button.Text>

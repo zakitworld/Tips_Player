@@ -360,13 +360,21 @@ public partial class PlayerViewModel : BaseViewModel
         _isUserSeeking = true;
     }
 
-    public async void OnSliderDragCompleted()
+    public async Task OnSliderDragCompletedAsync()
     {
         _isUserSeeking = false;
         var position = TimeSpan.FromSeconds(SliderPosition);
         CurrentPosition = position;
         OnPropertyChanged(nameof(CurrentPositionFormatted));
         await _mediaPlayerService.SeekAsync(position);
+    }
+
+    /// <summary>
+    /// Fire-and-forget wrapper for slider drag completion. Use OnSliderDragCompletedAsync for awaitable version.
+    /// </summary>
+    public void OnSliderDragCompleted()
+    {
+        _ = OnSliderDragCompletedAsync();
     }
 
     public void OnSliderValueChanged(double newValue)
@@ -668,5 +676,28 @@ public partial class PlayerViewModel : BaseViewModel
     private static async Task NavigateToEqualizerAsync()
     {
         await Shell.Current.GoToAsync("EqualizerPage");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // Unsubscribe from events
+            _mediaPlayerService.PositionChanged -= OnPositionChanged;
+            _mediaPlayerService.PlaybackStateChanged -= OnPlaybackStateChanged;
+            _mediaPlayerService.MediaEnded -= OnMediaEnded;
+            _mediaPlayerService.MediaChanged -= OnMediaChanged;
+
+            // Dispose timers
+            _sleepTimer?.Stop();
+            _sleepTimer?.Dispose();
+            _sleepTimer = null;
+
+            _controlsHideTimer?.Stop();
+            _controlsHideTimer?.Dispose();
+            _controlsHideTimer = null;
+        }
+
+        base.Dispose(disposing);
     }
 }

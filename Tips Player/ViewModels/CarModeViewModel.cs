@@ -5,7 +5,7 @@ using Tips_Player.Services.Interfaces;
 
 namespace Tips_Player.ViewModels;
 
-public partial class CarModeViewModel : ObservableObject
+public partial class CarModeViewModel : BaseViewModel
 {
     private readonly IMediaPlayerService _mediaPlayerService;
     private readonly PlayerViewModel _playerViewModel;
@@ -35,6 +35,7 @@ public partial class CarModeViewModel : ObservableObject
     {
         _mediaPlayerService = mediaPlayerService;
         _playerViewModel = playerViewModel;
+        Title = "Car Mode";
 
         _mediaPlayerService.MediaChanged += OnMediaChanged;
         _mediaPlayerService.PlaybackStateChanged += OnPlaybackStateChanged;
@@ -106,5 +107,17 @@ public partial class CarModeViewModel : ObservableObject
     private static async Task ExitCarModeAsync()
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _mediaPlayerService.MediaChanged -= OnMediaChanged;
+            _mediaPlayerService.PlaybackStateChanged -= OnPlaybackStateChanged;
+            _mediaPlayerService.PositionChanged -= OnPositionChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }

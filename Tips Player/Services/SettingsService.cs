@@ -1,9 +1,12 @@
+using Microsoft.Extensions.Logging;
 using Tips_Player.Services.Interfaces;
 
 namespace Tips_Player.Services;
 
 public class SettingsService : ISettingsService
 {
+    private readonly ILogger<SettingsService> _logger;
+
     // Preference Keys
     private const string KeyVolume = "volume";
     private const string KeyMuted = "muted";
@@ -42,8 +45,10 @@ public class SettingsService : ISettingsService
     public string DefaultVideoAspect { get; set; } = "Fit";
     public bool AutoRotateVideo { get; set; } = true;
 
-    public SettingsService()
+    public SettingsService(ILogger<SettingsService> logger)
     {
+        _logger = logger;
+        _logger.LogInformation("SettingsService initialized");
         LoadSettings();
     }
 

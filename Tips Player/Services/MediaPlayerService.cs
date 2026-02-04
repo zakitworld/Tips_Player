@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Core.Primitives;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
@@ -7,9 +8,16 @@ namespace Tips_Player.Services;
 
 public class MediaPlayerService : IMediaPlayerService
 {
+    private readonly ILogger<MediaPlayerService> _logger;
     private MediaElement? _mediaElement;
     private MediaItem? _currentMedia;
     private System.Timers.Timer? _positionTimer;
+
+    public MediaPlayerService(ILogger<MediaPlayerService> logger)
+    {
+        _logger = logger;
+        _logger.LogInformation("MediaPlayerService initialized");
+    }
 
     public MediaItem? CurrentMedia => _currentMedia;
     public TimeSpan CurrentPosition => _mediaElement?.Position ?? TimeSpan.Zero;
@@ -86,43 +94,53 @@ public class MediaPlayerService : IMediaPlayerService
         PlaybackStateChanged?.Invoke(this, e.NewState == MediaElementState.Playing);
     }
 
-    public async Task LoadAsync(MediaItem media)
+    public async Task LoadAsync(MediaItem media, CancellationToken cancellationToken = default)
     {
-        if (_mediaElement == null) return;
+        if (_mediaElement == null)
+        {
+            _logger.LogWarning("LoadAsync called but MediaElement is not set");
+            return;
+        }
 
+        cancellationToken.ThrowIfCancellationRequested();
+        _logger.LogInformation("Loading media: {Title} from {FilePath}", media.Title, media.FilePath);
         _currentMedia = media;
         _mediaElement.Source = MediaSource.FromFile(media.FilePath);
         MediaChanged?.Invoke(this, media);
         await Task.CompletedTask;
     }
 
-    public async Task PlayAsync()
+    public async Task PlayAsync(CancellationToken cancellationToken = default)
     {
         if (_mediaElement == null) return;
+        cancellationToken.ThrowIfCancellationRequested();
         _mediaElement.Play();
         PlaybackStateChanged?.Invoke(this, true);
         await Task.CompletedTask;
     }
 
-    public async Task PauseAsync()
+    public async Task PauseAsync(CancellationToken cancellationToken = default)
     {
         if (_mediaElement == null) return;
+        cancellationToken.ThrowIfCancellationRequested();
         _mediaElement.Pause();
         PlaybackStateChanged?.Invoke(this, false);
         await Task.CompletedTask;
     }
 
-    public async Task StopAsync()
+    public async Task StopAsync(CancellationToken cancellationToken = default)
     {
         if (_mediaElement == null) return;
+        cancellationToken.ThrowIfCancellationRequested();
         _mediaElement.Stop();
         PlaybackStateChanged?.Invoke(this, false);
         await Task.CompletedTask;
     }
 
-    public async Task SeekAsync(TimeSpan position)
+    public async Task SeekAsync(TimeSpan position, CancellationToken cancellationToken = default)
     {
         if (_mediaElement == null) return;
-        await _mediaElement.SeekTo(position);
+        cancellationToken.ThrowIfCancellationRequested();
+        await _mediaElement.SeekTo(position, cancellationToken);
     }
 }

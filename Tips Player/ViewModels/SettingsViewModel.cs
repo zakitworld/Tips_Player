@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tips_Player.Services.Interfaces;
@@ -101,7 +102,12 @@ public partial class SettingsViewModel : BaseViewModel
         LoadSettings();
         UpdateLibraryStats();
 
-        _libraryService.MediaItems.CollectionChanged += (s, e) => UpdateLibraryStats();
+        _libraryService.MediaItems.CollectionChanged += OnMediaItemsCollectionChanged;
+    }
+
+    private void OnMediaItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        UpdateLibraryStats();
     }
 
     private void LoadSettings()
@@ -301,5 +307,15 @@ public partial class SettingsViewModel : BaseViewModel
     private static async Task NavigateToEqualizerAsync()
     {
         await Shell.Current.GoToAsync("EqualizerPage");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _libraryService.MediaItems.CollectionChanged -= OnMediaItemsCollectionChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }
