@@ -19,29 +19,51 @@ public static class LoggingConfiguration
     /// <returns>The configured builder.</returns>
     public static MauiAppBuilder ConfigureSerilog(this MauiAppBuilder builder)
     {
-        var logDirectory = Path.Combine(FileSystem.AppDataDirectory, "logs");
-        Directory.CreateDirectory(logDirectory);
+        try
+        {
+            var appDataDir = FileSystem.AppDataDirectory;
+            if (string.IsNullOrEmpty(appDataDir))
+            {
+                throw new InvalidOperationException("AppDataDirectory is not available during early startup.");
+            }
 
-        var logFilePath = Path.Combine(logDirectory, "tipsplayer-.log");
+            var logDirectory = Path.Combine(appDataDir, "logs");
+            Directory.CreateDirectory(logDirectory);
 
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("System", LogEventLevel.Warning)
-            .Enrich.FromLogContext()
-            .WriteTo.Debug(outputTemplate: DebugTemplate)
-            .WriteTo.File(
-                logFilePath,
-                rollingInterval: RollingInterval.Day,
-                retainedFileCountLimit: 7,
-                outputTemplate: LogFileTemplate,
-                shared: true)
-            .CreateLogger();
+            var logFilePath = Path.Combine(logDirectory, "tipsplayer-.log");
 
-        builder.Logging.ClearProviders();
-        builder.Logging.AddSerilog(Log.Logger, dispose: true);
+            var logConfig = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Debug(outputTemplate: DebugTemplate)
+                .WriteTo.File(
+                    logFilePath,
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 7,
+                    outputTemplate: LogFileTemplate);
 
-        Log.Information("Application starting. Log directory: {LogDirectory}", logDirectory);
+            Log.Logger = logConfig.CreateLogger();
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(Log.Logger, dispose: true);
+
+            Log.Information("Application starting. Log directory: {LogDirectory}", logDirectory);
+        }
+        catch (Exception ex)
+        {
+            // Fall back to debug-only logging if file sink fails (e.g. on Android with restricted paths)
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Debug(outputTemplate: DebugTemplate)
+                .CreateLogger();
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(Log.Logger, dispose: true);
+
+            Log.Warning(ex, "File logging unavailable; using debug sink only");
+        }
 
         return builder;
     }

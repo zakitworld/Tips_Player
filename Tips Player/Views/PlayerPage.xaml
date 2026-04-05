@@ -4,14 +4,20 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
-             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
              x:Class="Tips_Player.Views.PlayerPage"
              x:DataType="viewmodels:PlayerViewModel"
              BackgroundColor="{StaticResource PageBackground}"
              Shell.NavBarIsVisible="False"
-             ios:Page.SafeAreaEdges="All"
              Shell.TabBarIsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}">
     
+    <ContentPage.Resources>
+        <x:Int32 x:Key="SleepTimer0">0</x:Int32>
+        <x:Int32 x:Key="SleepTimer15">15</x:Int32>
+        <x:Int32 x:Key="SleepTimer30">30</x:Int32>
+        <x:Int32 x:Key="SleepTimer60">60</x:Int32>
+    </ContentPage.Resources>
+
     <Grid x:Name="RootGrid">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="DisplayStates">
@@ -106,30 +112,31 @@
             <!-- Header -->
             <Grid Grid.Row="0"
                   ColumnDefinitions="*,Auto"
-                  Padding="24,16"
+                  Padding="{OnPlatform Android='8,8', Default='24,16'}"
                   BackgroundColor="{StaticResource PageBackground}">
-                <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
+                <HorizontalStackLayout Grid.Column="0" Spacing="{OnPlatform Android=8, Default=12}" VerticalOptions="Center">
                     <Image Source="app_logo.png"
                            HeightRequest="32"
                            WidthRequest="32"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center"
+                           IsVisible="{OnPlatform Android=False, Default=True}"/>
                     <Label Text="Now Playing"
-                           FontSize="24"
+                           FontSize="{OnPlatform Android=18, Default=24}"
                            FontAttributes="Bold"
                            TextColor="{StaticResource TextPrimary}"
                            VerticalOptions="Center"/>
                 </HorizontalStackLayout>
-                <HorizontalStackLayout Grid.Column="1" Spacing="6">
+                <HorizontalStackLayout Grid.Column="1" Spacing="{OnPlatform Android=2, Default=6}">
                     <!-- Queue Button -->
                     <Button Text="{x:Static helpers:FontIcons.List}"
                             FontFamily="FontAwesome"
                             Command="{Binding NavigateToQueueCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="16"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            CornerRadius="20"
+                            FontSize="{OnPlatform Android=14, Default=16}"
+                            HeightRequest="{OnPlatform Android=34, Default=40}"
+                            WidthRequest="{OnPlatform Android=34, Default=40}"
+                            CornerRadius="{OnPlatform Android=17, Default=20}"
                             Padding="0"
                             ToolTipProperties.Text="Queue"/>
                     <!-- Lyrics Button -->
@@ -138,10 +145,10 @@
                             Command="{Binding NavigateToLyricsCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="16"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            CornerRadius="20"
+                            FontSize="{OnPlatform Android=14, Default=16}"
+                            HeightRequest="{OnPlatform Android=34, Default=40}"
+                            WidthRequest="{OnPlatform Android=34, Default=40}"
+                            CornerRadius="{OnPlatform Android=17, Default=20}"
                             Padding="0"
                             ToolTipProperties.Text="Lyrics"/>
                     <!-- Equalizer Button -->
@@ -150,10 +157,10 @@
                             Command="{Binding NavigateToEqualizerCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="16"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            CornerRadius="20"
+                            FontSize="{OnPlatform Android=14, Default=16}"
+                            HeightRequest="{OnPlatform Android=34, Default=40}"
+                            WidthRequest="{OnPlatform Android=34, Default=40}"
+                            CornerRadius="{OnPlatform Android=17, Default=20}"
                             Padding="0"
                             ToolTipProperties.Text="Equalizer"/>
                     <!-- Car Mode Button -->
@@ -162,10 +169,10 @@
                             Command="{Binding EnterCarModeCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="16"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            CornerRadius="20"
+                            FontSize="{OnPlatform Android=14, Default=16}"
+                            HeightRequest="{OnPlatform Android=34, Default=40}"
+                            WidthRequest="{OnPlatform Android=34, Default=40}"
+                            CornerRadius="{OnPlatform Android=17, Default=20}"
                             Padding="0"
                             ToolTipProperties.Text="Car Mode"/>
                     <!-- Add Files Button -->
@@ -174,10 +181,10 @@
                             Command="{Binding AddFilesCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
                             TextColor="{StaticResource TextPrimary}"
-                            FontSize="18"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            CornerRadius="20"
+                            FontSize="{OnPlatform Android=14, Default=18}"
+                            HeightRequest="{OnPlatform Android=34, Default=40}"
+                            WidthRequest="{OnPlatform Android=34, Default=40}"
+                            CornerRadius="{OnPlatform Android=17, Default=20}"
                             Padding="0"
                             ToolTipProperties.Text="Add Files"/>
                 </HorizontalStackLayout>
@@ -198,9 +205,11 @@
                         </Border.Shadow>
 
                         <Grid>
-                            <!-- Double-tap to enter fullscreen -->
                             <Grid.GestureRecognizers>
+                                <!-- Double-tap → fullscreen -->
                                 <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding ToggleFullScreenCommand}"/>
+                                <!-- Swipe left/right → next/previous -->
+                                <PanGestureRecognizer PanUpdated="OnAlbumArtPanned"/>
                             </Grid.GestureRecognizers>
 
                             <!-- Video placeholder - actual MediaElement is above -->
@@ -256,6 +265,16 @@
                                                HorizontalOptions="Center"/>
                                     </VerticalStackLayout>
                                 </Grid>
+
+                                <!-- Sound wave indicator — bottom-centre of art area -->
+                                <controls:SoundWaveIndicator
+                                    IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}}"
+                                    IsPlaying="{Binding IsPlaying}"
+                                    BarColor="{StaticResource AccentColor}"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="End"
+                                    Scale="2.5"
+                                    Margin="0,0,0,20"/>
                             </Grid>
 
                         </Grid>
@@ -388,22 +407,22 @@
                                        FontSize="11"/>
                                 <Button Text="Off"
                                         Command="{Binding SetSleepTimerCommand}"
-                                        CommandParameter="{x:Int32 0}"
+                                        CommandParameter="{StaticResource SleepTimer0}"
                                         Style="{StaticResource SecondaryControlStyle}"
                                         WidthRequest="36" FontSize="10" Padding="0"/>
                                 <Button Text="15m"
                                         Command="{Binding SetSleepTimerCommand}"
-                                        CommandParameter="{x:Int32 15}"
+                                        CommandParameter="{StaticResource SleepTimer15}"
                                         Style="{StaticResource SecondaryControlStyle}"
                                         WidthRequest="36" FontSize="10" Padding="0"/>
                                 <Button Text="30m"
                                         Command="{Binding SetSleepTimerCommand}"
-                                        CommandParameter="{x:Int32 30}"
+                                        CommandParameter="{StaticResource SleepTimer30}"
                                         Style="{StaticResource SecondaryControlStyle}"
                                         WidthRequest="36" FontSize="10" Padding="0"/>
                                 <Button Text="60m"
                                         Command="{Binding SetSleepTimerCommand}"
-                                        CommandParameter="{x:Int32 60}"
+                                        CommandParameter="{StaticResource SleepTimer60}"
                                         Style="{StaticResource SecondaryControlStyle}"
                                         WidthRequest="36" FontSize="10" Padding="0"/>
                                 <Button Text="Custom"

@@ -212,4 +212,26 @@ public partial class PlayerPage : ContentPage
     {
         _viewModel?.ShowFullscreenControls();
     }
+
+    // Swipe left → next track, swipe right → previous track
+    private double _panX;
+
+    private async void OnAlbumArtPanned(object? sender, PanUpdatedEventArgs e)
+    {
+        switch (e.StatusType)
+        {
+            case GestureStatus.Running:
+                _panX = e.TotalX;
+                break;
+
+            case GestureStatus.Completed:
+                if (_viewModel == null) break;
+                if (_panX < -60 && _viewModel.HasNext)
+                    await _viewModel.NextCommand.ExecuteAsync(null);
+                else if (_panX > 60 && _viewModel.HasPrevious)
+                    await _viewModel.PreviousCommand.ExecuteAsync(null);
+                _panX = 0;
+                break;
+        }
+    }
 }

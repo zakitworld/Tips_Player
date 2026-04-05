@@ -17,7 +17,18 @@ namespace Tips_Player
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            var window = new Window(new AppShell());
+            AppShell shell;
+            try
+            {
+                shell = new AppShell();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[TipsPlayer] FATAL: AppShell init failed: {ex}");
+                throw new InvalidOperationException($"AppShell init failed: {ex.Message}", ex);
+            }
+
+            var window = new Window(shell);
 
 #if WINDOWS
             window.HandlerChanged += (s, e) =>

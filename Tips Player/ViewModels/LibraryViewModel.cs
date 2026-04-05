@@ -116,6 +116,21 @@ public partial class LibraryViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task ScanDeviceAsync()
+    {
+        IsBusy = true;
+        try
+        {
+            await _libraryService.ScanDeviceMediaAsync();
+            UpdateStats();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
     private async Task PlayItemAsync(MediaItem? item)
     {
         if (item == null) return;

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
+using Tips_Player.Services;
 
 namespace Tips_Player.ViewModels;
 
@@ -13,6 +14,8 @@ public partial class PlayerViewModel : BaseViewModel
     private readonly IFilePickerService _filePickerService;
     private readonly ILibraryService _libraryService;
     private readonly ISettingsService _settingsService;
+    private readonly IAlbumArtService _albumArtService;
+    private readonly IEqualizerService _equalizerService;
     private bool _isUserSeeking;
 
     [ObservableProperty]
@@ -112,16 +115,25 @@ public partial class PlayerViewModel : BaseViewModel
 
     public double SliderMaximum => Duration.TotalSeconds > 0 ? Duration.TotalSeconds : 100;
 
+    /// <summary>Playback progress 0–1, used by MiniPlayerBar progress bar.</summary>
+    public double Progress => Duration.TotalSeconds > 0
+        ? Math.Clamp(CurrentPosition.TotalSeconds / Duration.TotalSeconds, 0, 1)
+        : 0;
+
     public PlayerViewModel(
         IMediaPlayerService mediaPlayerService,
         IFilePickerService filePickerService,
         ILibraryService libraryService,
-        ISettingsService settingsService)
+        ISettingsService settingsService,
+        IAlbumArtService albumArtService,
+        IEqualizerService equalizerService)
     {
         _mediaPlayerService = mediaPlayerService;
         _filePickerService = filePickerService;
         _libraryService = libraryService;
         _settingsService = settingsService;
+        _albumArtService = albumArtService;
+        _equalizerService = equalizerService;
 
         Title = "Now Playing";
 
@@ -141,7 +153,26 @@ public partial class PlayerViewModel : BaseViewModel
         _mediaPlayerService.PlaybackStateChanged += OnPlaybackStateChanged;
         _mediaPlayerService.MediaEnded += OnMediaEnded;
         _mediaPlayerService.MediaChanged += OnMediaChanged;
+
+#if ANDROID
+        // Handle media notification / Bluetooth / headset button events
+        Tips_Player.Platforms.Android.MediaServiceBridge.PlayPauseRequested += OnNotificationPlayPause;
+        Tips_Player.Platforms.Android.MediaServiceBridge.NextRequested      += OnNotificationNext;
+        Tips_Player.Platforms.Android.MediaServiceBridge.PreviousRequested  += OnNotificationPrevious;
+        Tips_Player.Platforms.Android.MediaServiceBridge.StopRequested      += OnNotificationStop;
+#endif
     }
+
+#if ANDROID
+    private void OnNotificationPlayPause() =>
+        MainThread.BeginInvokeOnMainThread(() => PlayPauseCommand.Execute(null));
+    private void OnNotificationNext() =>
+        MainThread.BeginInvokeOnMainThread(() => _ = NextAsync());
+    private void OnNotificationPrevious() =>
+        MainThread.BeginInvokeOnMainThread(() => _ = PreviousAsync());
+    private void OnNotificationStop() =>
+        MainThread.BeginInvokeOnMainThread(() => _ = StopAsync());
+#endif
 
     private bool _isInitialized;
 
@@ -155,6 +186,12 @@ public partial class PlayerViewModel : BaseViewModel
         {
             Playlist.Add(item);
         }
+
+#if ANDROID
+        // Initialise hardware equalizer (session 0 = global)
+        if (_equalizerService is Tips_Player.Platforms.Android.Services.AndroidEqualizerService androidEq)
+            androidEq.InitializeHardware(0);
+#endif
     }
 
     partial void OnVolumeChanged(double value)
@@ -197,6 +234,7 @@ public partial class PlayerViewModel : BaseViewModel
             CurrentPosition = position;
             SliderPosition = position.TotalSeconds;
             OnPropertyChanged(nameof(CurrentPositionFormatted));
+            OnPropertyChanged(nameof(Progress));
         }
     }
 
@@ -227,8 +265,11 @@ public partial class PlayerViewModel : BaseViewModel
 
     private void OnMediaChanged(object? sender, MediaItem? media)
     {
+        if (CurrentMedia != null) CurrentMedia.IsCurrentTrack = false;
         CurrentMedia = media;
         ShowVideoPlayer = media?.MediaType == MediaType.Video;
+        if (CurrentMedia != null) CurrentMedia.IsCurrentTrack = true;
+        OnPropertyChanged(nameof(Progress));
     }
 
     [RelayCommand]
@@ -395,8 +436,24 @@ public partial class PlayerViewModel : BaseViewModel
         OnPropertyChanged(nameof(SliderMaximum));
         OnPropertyChanged(nameof(CurrentPositionFormatted));
 
+        // Fetch album art in background so it's ready for the notification and PlayerPage
+        if (string.IsNullOrEmpty(media.AlbumArtPath))
+        {
+            _ = Task.Run(async () =>
+            {
+                var artPath = await _albumArtService.GetAlbumArtPathAsync(media);
+                if (!string.IsNullOrEmpty(artPath))
+                {
+                    media.AlbumArtPath = artPath;
+                    // Re-notify bridge so notification refreshes with art
+#if ANDROID
+                    Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(media, true);
+#endif
+                }
+            });
+        }
+
         await _mediaPlayerService.LoadAsync(media);
-        // Add a small delay to ensure the native media source is ready for playback
         await Task.Delay(200);
         await _mediaPlayerService.PlayAsync();
     }
@@ -463,23 +520,41 @@ public partial class PlayerViewModel : BaseViewModel
         _sleepTimer = new System.Timers.Timer(60000); // 1 minute
         _sleepTimer.Elapsed += (s, e) =>
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 SleepTimerMinutes--;
                 if (SleepTimerMinutes <= 0)
                 {
-                    if (IsPlaying)
-                    {
-                        PlayPauseCommand.Execute(null);
-                    }
-                    IsSleepTimerActive = false;
                     _sleepTimer?.Stop();
                     _sleepTimer?.Dispose();
                     _sleepTimer = null;
+                    IsSleepTimerActive = false;
+
+                    if (IsPlaying)
+                        await FadeOutAndPauseAsync();
                 }
             });
         };
         _sleepTimer.Start();
+    }
+
+    /// <summary>Smoothly fades volume to zero over ~4 seconds then pauses.</summary>
+    private async Task FadeOutAndPauseAsync()
+    {
+        const int steps = 20;
+        const int stepMs = 200; // 20 × 200 ms = 4 s fade
+        double originalVolume = Volume;
+
+        for (int i = steps; i >= 0; i--)
+        {
+            _mediaPlayerService.Volume = originalVolume * i / steps;
+            await Task.Delay(stepMs);
+            if (!IsPlaying) break; // already stopped externally
+        }
+
+        await _mediaPlayerService.PauseAsync();
+        _mediaPlayerService.Volume = originalVolume; // restore volume after pause
+        Volume = originalVolume;
     }
 
     [RelayCommand]

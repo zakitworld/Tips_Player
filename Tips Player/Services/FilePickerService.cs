@@ -21,7 +21,10 @@ public class FilePickerService : IFilePickerService
         new Dictionary<DevicePlatform, IEnumerable<string>>
         {
             { DevicePlatform.WinUI, ["*.mp3", "*.wav", "*.aac", "*.m4a", "*.flac", "*.ogg", "*.wma",
-                                     "*.mp4", "*.avi", "*.mkv", "*.mov", "*.wmv", "*.webm", "*.m4v"] }
+                                     "*.mp4", "*.avi", "*.mkv", "*.mov", "*.wmv", "*.webm", "*.m4v"] },
+            { DevicePlatform.Android, ["audio/mpeg", "audio/x-wav", "audio/aac", "audio/mp4", "audio/flac",
+                                       "audio/ogg", "audio/x-ms-wma", "video/mp4", "video/x-msvideo",
+                                       "video/x-matroska", "video/quicktime", "video/x-ms-wmv", "video/webm"] }
         });
 
     public async Task<IEnumerable<MediaItem>> PickMediaFilesAsync()

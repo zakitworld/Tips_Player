@@ -17,6 +17,9 @@ public interface ILibraryService
 
     // Basic operations
     Task LoadLibraryAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Scans the device for media files and adds any new ones to the library.</summary>
+    Task ScanDeviceMediaAsync(CancellationToken cancellationToken = default);
     Task SaveLibraryAsync(CancellationToken cancellationToken = default);
     Task AddItemsAsync(IEnumerable<MediaItem> items, CancellationToken cancellationToken = default);
     Task RemoveItemAsync(MediaItem item, CancellationToken cancellationToken = default);

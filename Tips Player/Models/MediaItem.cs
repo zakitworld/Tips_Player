@@ -67,6 +67,10 @@ public partial class MediaItem : ObservableObject
     [ObservableProperty]
     private TimeSpan _lastPosition; // For resume playback
 
+    /// <summary>True while this item is loaded in the player (regardless of play/pause state).</summary>
+    [ObservableProperty]
+    private bool _isCurrentTrack;
+
     public string DurationFormatted => Duration.TotalHours >= 1
         ? Duration.ToString(@"hh\:mm\:ss")
         : Duration.ToString(@"mm\:ss");

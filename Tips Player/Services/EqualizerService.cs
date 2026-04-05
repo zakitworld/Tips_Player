@@ -5,7 +5,7 @@ using Tips_Player.Services.Interfaces;
 
 namespace Tips_Player.Services;
 
-public class EqualizerService : IEqualizerService
+public class EqualizerService : IEqualizerService, IDisposable
 {
     private const string SettingsFileName = "equalizer.json";
     private readonly string _settingsPath;
@@ -41,14 +41,14 @@ public class EqualizerService : IEqualizerService
         LoadSettings();
     }
 
-    public void ApplyPreset(EqualizerPreset preset)
+    public virtual void ApplyPreset(EqualizerPreset preset)
     {
         CurrentPreset = preset.Clone();
         PresetChanged?.Invoke(this, CurrentPreset);
         SaveSettings();
     }
 
-    public void SetBand(int bandIndex, double value)
+    public virtual void SetBand(int bandIndex, double value)
     {
         var bands = CurrentPreset.GetBands();
         if (bandIndex >= 0 && bandIndex < bands.Length)
@@ -157,6 +157,8 @@ public class EqualizerService : IEqualizerService
             _logger.LogError(ex, "Error saving equalizer settings to {SettingsPath}", _settingsPath);
         }
     }
+
+    public virtual void Dispose() { /* base has no unmanaged resources */ }
 
     private class EqualizerData
     {

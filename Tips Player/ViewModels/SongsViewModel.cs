@@ -26,6 +26,9 @@ public partial class SongsViewModel : BaseViewModel
 
     public bool HasItems => Songs.Count > 0;
 
+    /// <summary>Exposes player playing state for DataTemplate bindings inside the songs list.</summary>
+    public bool IsPlayerPlaying => _playerViewModel.IsPlaying;
+
     public SongsViewModel(IFilePickerService filePickerService, PlayerViewModel playerViewModel, ILibraryService libraryService)
     {
         _filePickerService = filePickerService;
@@ -34,8 +37,15 @@ public partial class SongsViewModel : BaseViewModel
         Title = "Songs";
 
         Songs.CollectionChanged += OnSongsCollectionChanged;
+        _playerViewModel.PropertyChanged += OnPlayerPropertyChanged;
 
         ApplySearch();
+    }
+
+    private void OnPlayerPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PlayerViewModel.IsPlaying))
+            OnPropertyChanged(nameof(IsPlayerPlaying));
     }
 
     private void OnSongsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -133,6 +143,7 @@ public partial class SongsViewModel : BaseViewModel
         if (disposing)
         {
             Songs.CollectionChanged -= OnSongsCollectionChanged;
+            _playerViewModel.PropertyChanged -= OnPlayerPropertyChanged;
         }
 
         base.Dispose(disposing);

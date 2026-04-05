@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Tips_Player.Views.Controls.SoundWaveIndicator">
+
+    <!--
+        4 bars animated from the bottom (AnchorY=1).
+        Heights and colours are driven by code-behind.
+    -->
+    <HorizontalStackLayout x:Name="BarsContainer"
+                           HeightRequest="22"
+                           Spacing="3"
+                           VerticalOptions="Center">
+        <BoxView x:Name="Bar1" WidthRequest="4" HeightRequest="22" AnchorY="1" VerticalOptions="End" CornerRadius="2"/>
+        <BoxView x:Name="Bar2" WidthRequest="4" HeightRequest="22" AnchorY="1" VerticalOptions="End" CornerRadius="2"/>
+        <BoxView x:Name="Bar3" WidthRequest="4" HeightRequest="22" AnchorY="1" VerticalOptions="End" CornerRadius="2"/>
+        <BoxView x:Name="Bar4" WidthRequest="4" HeightRequest="22" AnchorY="1" VerticalOptions="End" CornerRadius="2"/>
+    </HorizontalStackLayout>
+
+</ContentView>

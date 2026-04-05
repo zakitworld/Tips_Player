@@ -13,10 +13,30 @@ public class MediaPlayerService : IMediaPlayerService
     private MediaItem? _currentMedia;
     private System.Timers.Timer? _positionTimer;
 
+#if ANDROID
+    private readonly Tips_Player.Platforms.Android.Services.AudioFocusManager _audioFocus;
+    private float _duckMultiplier = 1f;
+#endif
+
     public MediaPlayerService(ILogger<MediaPlayerService> logger)
     {
         _logger = logger;
         _logger.LogInformation("MediaPlayerService initialized");
+
+#if ANDROID
+        _audioFocus = new Tips_Player.Platforms.Android.Services.AudioFocusManager();
+        _audioFocus.FocusLost  += () => MainThread.BeginInvokeOnMainThread(() => _ = PauseAsync());
+        _audioFocus.FocusGained += () => MainThread.BeginInvokeOnMainThread(() =>
+        {
+            _duckMultiplier = 1f;
+            if (_mediaElement != null) _mediaElement.Volume = Volume;
+        });
+        _audioFocus.Duck += multiplier => MainThread.BeginInvokeOnMainThread(() =>
+        {
+            _duckMultiplier = multiplier;
+            if (_mediaElement != null) _mediaElement.Volume = Volume * multiplier;
+        });
+#endif
     }
 
     public MediaItem? CurrentMedia => _currentMedia;
@@ -105,8 +125,14 @@ public class MediaPlayerService : IMediaPlayerService
         cancellationToken.ThrowIfCancellationRequested();
         _logger.LogInformation("Loading media: {Title} from {FilePath}", media.Title, media.FilePath);
         _currentMedia = media;
-        _mediaElement.Source = MediaSource.FromFile(media.FilePath);
+        // content:// URIs (Android MediaStore) and http(s) require FromUri; local paths use FromFile
+        _mediaElement.Source = media.FilePath.StartsWith("content://") || media.FilePath.StartsWith("http")
+            ? MediaSource.FromUri(media.FilePath)
+            : MediaSource.FromFile(media.FilePath);
         MediaChanged?.Invoke(this, media);
+#if ANDROID
+        Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(media, false);
+#endif
         await Task.CompletedTask;
     }
 
@@ -114,6 +140,11 @@ public class MediaPlayerService : IMediaPlayerService
     {
         if (_mediaElement == null) return;
         cancellationToken.ThrowIfCancellationRequested();
+#if ANDROID
+        _audioFocus.RequestFocus();
+        Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(_currentMedia, true);
+        Tips_Player.Platforms.Android.MediaPlaybackService.Start();
+#endif
         _mediaElement.Play();
         PlaybackStateChanged?.Invoke(this, true);
         await Task.CompletedTask;
@@ -125,6 +156,9 @@ public class MediaPlayerService : IMediaPlayerService
         cancellationToken.ThrowIfCancellationRequested();
         _mediaElement.Pause();
         PlaybackStateChanged?.Invoke(this, false);
+#if ANDROID
+        Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(_currentMedia, false);
+#endif
         await Task.CompletedTask;
     }
 
@@ -134,6 +168,11 @@ public class MediaPlayerService : IMediaPlayerService
         cancellationToken.ThrowIfCancellationRequested();
         _mediaElement.Stop();
         PlaybackStateChanged?.Invoke(this, false);
+#if ANDROID
+        _audioFocus.AbandonFocus();
+        Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(null, false);
+        Tips_Player.Platforms.Android.MediaPlaybackService.Stop();
+#endif
         await Task.CompletedTask;
     }
 

@@ -11,6 +11,7 @@ public class LibraryService : ILibraryService
     private const string LibraryFileName = "library.json";
     private readonly string _libraryPath;
     private readonly ILogger<LibraryService> _logger;
+    private readonly IMediaScannerService _scanner;
 
     public ObservableCollection<MediaItem> MediaItems { get; } = [];
     public ObservableCollection<MediaItem> Songs { get; } = [];
@@ -20,9 +21,10 @@ public class LibraryService : ILibraryService
     public ObservableCollection<Folder> Folders { get; } = [];
     public ObservableCollection<SmartPlaylist> SmartPlaylists { get; } = [];
 
-    public LibraryService(ILogger<LibraryService> logger)
+    public LibraryService(ILogger<LibraryService> logger, IMediaScannerService scanner)
     {
         _logger = logger;
+        _scanner = scanner;
         _libraryPath = Path.Combine(FileSystem.AppDataDirectory, LibraryFileName);
         _logger.LogInformation("LibraryService initialized. Library path: {LibraryPath}", _libraryPath);
         InitializeSmartPlaylists();
@@ -38,36 +40,73 @@ public class LibraryService : ILibraryService
 
     public async Task LoadLibraryAsync(CancellationToken cancellationToken = default)
     {
+        // 1. Load persisted library (fast)
         try
         {
-            if (!File.Exists(_libraryPath)) return;
-
-            var json = await File.ReadAllTextAsync(_libraryPath, cancellationToken);
-            var items = JsonSerializer.Deserialize<List<MediaItem>>(json);
-
-            if (items != null)
+            if (File.Exists(_libraryPath))
             {
-                MediaItems.Clear();
-                foreach (var item in items)
+                var json = await File.ReadAllTextAsync(_libraryPath, cancellationToken);
+                var items = JsonSerializer.Deserialize<List<MediaItem>>(json);
+
+                if (items != null)
                 {
-                    // Set folder path and name from file path
-                    if (!string.IsNullOrEmpty(item.FilePath))
+                    MediaItems.Clear();
+                    foreach (var item in items)
                     {
-                        var directory = Path.GetDirectoryName(item.FilePath);
-                        if (!string.IsNullOrEmpty(directory))
+                        if (!string.IsNullOrEmpty(item.FilePath))
                         {
-                            item.FolderPath = directory;
-                            item.FolderName = Path.GetFileName(directory);
+                            var directory = Path.GetDirectoryName(item.FilePath);
+                            if (!string.IsNullOrEmpty(directory))
+                            {
+                                item.FolderPath = directory;
+                                item.FolderName = Path.GetFileName(directory);
+                            }
                         }
+                        MediaItems.Add(item);
                     }
-                    MediaItems.Add(item);
+                    RefreshCollections();
                 }
-                RefreshCollections();
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading library from {LibraryPath}", _libraryPath);
+        }
+
+        // 2. Kick off a background device scan — adds new files, skips duplicates
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await ScanDeviceMediaAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Background device scan failed");
+            }
+        }, cancellationToken);
+    }
+
+    public async Task ScanDeviceMediaAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("Starting device media scan");
+            var scanned = await _scanner.ScanAsync(cancellationToken);
+            var newItems = scanned.ToList();
+
+            if (newItems.Count == 0)
+            {
+                _logger.LogInformation("Device scan complete — no media found");
+                return;
+            }
+
+            await AddItemsAsync(newItems, cancellationToken);
+            _logger.LogInformation("Device scan complete — added/merged {Count} items", newItems.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during device media scan");
         }
     }
 

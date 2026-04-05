@@ -10,7 +10,7 @@
     <Border Background="#CC1A1A1D"
             Stroke="#33FAFAFA"
             StrokeThickness="1"
-            Padding="12"
+            Padding="0"
             StrokeShape="RoundRectangle 0">
         <Border.Shadow>
             <Shadow Brush="Black" Offset="0,-4" Radius="20" Opacity="0.3"/>
@@ -20,7 +20,17 @@
             <TapGestureRecognizer Tapped="OnMiniPlayerTapped"/>
         </Border.GestureRecognizers>
 
-        <Grid ColumnDefinitions="50,*,Auto,Auto" ColumnSpacing="12">
+        <Grid RowDefinitions="3,Auto">
+
+            <!-- Playback progress bar (thin strip at top) -->
+            <ProgressBar Grid.Row="0"
+                         Progress="{Binding Progress}"
+                         ProgressColor="{StaticResource AccentColor}"
+                         BackgroundColor="#33FFFFFF"
+                         HeightRequest="3"
+                         Margin="0"/>
+
+        <Grid Grid.Row="1" ColumnDefinitions="50,*,Auto,Auto" ColumnSpacing="12" Padding="12,10,12,10">
 
             <!-- Album Art / Media Icon -->
             <Border Grid.Column="0"
@@ -83,6 +93,8 @@
                     ToolTipProperties.Text="Next"/>
 
         </Grid>
+
+        </Grid><!-- outer row grid -->
 
     </Border>
 

@@ -6,11 +6,9 @@
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:converters="clr-namespace:Tips_Player.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Tips_Player.Views.LyricsPage"
              x:DataType="viewmodels:LyricsViewModel"
              Style="{StaticResource PlayerPageStyle}"
-             ios:Page.SafeAreaEdges="All"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto">
