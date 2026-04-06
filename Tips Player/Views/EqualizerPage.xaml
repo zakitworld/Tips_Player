@@ -5,6 +5,7 @@
              xmlns:models="clr-namespace:Tips_Player.Models"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
              x:Class="Tips_Player.Views.EqualizerPage"
              x:DataType="viewmodels:EqualizerViewModel"
              Style="{StaticResource PlayerPageStyle}"
@@ -85,83 +86,109 @@
                                    TextColor="{StaticResource AccentColor}"/>
                         </Grid>
 
-                        <!-- EQ Bands -->
-                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*,*,*" ColumnSpacing="4" HeightRequest="200">
+                        <!-- EQ Bands — VerticalSlider uses PanGestureRecognizer so touch works
+                             correctly on Android (rotated Slider breaks Android gesture handling) -->
+                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*,*,*" ColumnSpacing="4" HeightRequest="250">
                             <!-- Band 1: 32Hz -->
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band32Hz}"
-                                        Rotation="270"
-                                        HeightRequest="120"
-                                        WidthRequest="40"
-                                        HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}"
-                                        MaximumTrackColor="{StaticResource Gray700}"
-                                        ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="32" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band32Hz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band32Hz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="32 Hz — Sub bass"/>
+                                <Label Grid.Row="2" Text="32" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 2: 64Hz -->
-                            <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band64Hz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="64" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band64Hz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band64Hz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="64 Hz — Bass"/>
+                                <Label Grid.Row="2" Text="64" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 3: 125Hz -->
-                            <VerticalStackLayout Grid.Column="2" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band125Hz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="125" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band125Hz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band125Hz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="125 Hz — Upper bass"/>
+                                <Label Grid.Row="2" Text="125" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 4: 250Hz -->
-                            <VerticalStackLayout Grid.Column="3" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band250Hz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="250" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="3" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band250Hz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band250Hz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="250 Hz — Low midrange"/>
+                                <Label Grid.Row="2" Text="250" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 5: 500Hz -->
-                            <VerticalStackLayout Grid.Column="4" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band500Hz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="500" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="4" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band500Hz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band500Hz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="500 Hz — Midrange"/>
+                                <Label Grid.Row="2" Text="500" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 6: 1kHz -->
-                            <VerticalStackLayout Grid.Column="5" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band1kHz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="1K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="5" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band1kHz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band1kHz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="1 kHz — Upper midrange"/>
+                                <Label Grid.Row="2" Text="1K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 7: 2kHz -->
-                            <VerticalStackLayout Grid.Column="6" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band2kHz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="2K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="6" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band2kHz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band2kHz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="2 kHz — Presence"/>
+                                <Label Grid.Row="2" Text="2K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 8: 4kHz -->
-                            <VerticalStackLayout Grid.Column="7" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band4kHz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="4K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="7" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band4kHz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band4kHz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="4 kHz — Upper presence"/>
+                                <Label Grid.Row="2" Text="4K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 9: 8kHz -->
-                            <VerticalStackLayout Grid.Column="8" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band8kHz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="8K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="8" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band8kHz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band8kHz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="8 kHz — Brilliance"/>
+                                <Label Grid.Row="2" Text="8K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                             <!-- Band 10: 16kHz -->
-                            <VerticalStackLayout Grid.Column="9" Spacing="4">
-                                <Slider Minimum="-12" Maximum="12" Value="{Binding Band16kHz}"
-                                        Rotation="270" HeightRequest="120" WidthRequest="40" HorizontalOptions="Center"
-                                        MinimumTrackColor="{StaticResource AccentColor}" MaximumTrackColor="{StaticResource Gray700}" ThumbColor="{StaticResource AccentColor}"/>
-                                <Label Text="16K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
+                            <Grid Grid.Column="9" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="2">
+                                <Label Grid.Row="0" Text="{Binding Band16kHz, StringFormat='{0:+0.#;-0.#;0}'}"
+                                       FontSize="9" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                                <controls:VerticalSlider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Band16kHz}"
+                                    ThumbColor="{StaticResource AccentColor}" VerticalOptions="Fill"
+                                    ToolTipProperties.Text="16 kHz — Air / Sparkle"/>
+                                <Label Grid.Row="2" Text="16K" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                                <Label Grid.Row="3" Text="Hz" FontSize="8" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Opacity="0.6"/>
+                            </Grid>
                         </Grid>
 
                         <!-- Buttons -->

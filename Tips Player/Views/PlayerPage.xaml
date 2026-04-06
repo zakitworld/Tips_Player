@@ -56,23 +56,13 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <!-- Single MediaElement that's always present but repositioned -->
-        <toolkit:MediaElement x:Name="MediaElement"
-                               ShouldAutoPlay="False"
-                               ShouldShowPlaybackControls="False"
-                               Aspect="{Binding VideoAspect}"
-                               MediaOpened="OnMediaOpened"
-                               PositionChanged="OnPositionChanged"
-                               IsVisible="{Binding ShowVideoPlayer}"
-                               ZIndex="10"/>
-
-        <!-- Video Controls Overlay (Normal Mode) - positioned above MediaElement -->
+        <!-- Video Controls Overlay (Normal Mode) - ZIndex=70 keeps it above FullscreenContainer (60) -->
         <HorizontalStackLayout x:Name="NormalVideoControls"
                                HorizontalOptions="Start"
                                VerticalOptions="Start"
                                Margin="36,84,0,0"
                                Spacing="8"
-                               ZIndex="20"
+                               ZIndex="70"
                                IsVisible="False">
             <Button Command="{Binding ToggleAspectCommand}"
                     BackgroundColor="#40000000"
@@ -152,7 +142,7 @@
                             Padding="0"
                             ToolTipProperties.Text="Lyrics"/>
                     <!-- Equalizer Button -->
-                    <Button Text="&#xf3f3;"
+                    <Button Text="{x:Static helpers:FontIcons.Equalizer}"
                             FontFamily="FontAwesome"
                             Command="{Binding NavigateToEqualizerCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
@@ -164,7 +154,7 @@
                             Padding="0"
                             ToolTipProperties.Text="Equalizer"/>
                     <!-- Car Mode Button -->
-                    <Button Text="&#xf1b9;"
+                    <Button Text="{x:Static helpers:FontIcons.Car}"
                             FontFamily="FontAwesome"
                             Command="{Binding EnterCarModeCommand}"
                             BackgroundColor="{StaticResource CardBackground}"
@@ -531,14 +521,31 @@
             </ScrollView>
         </Grid>
 
-        <!-- Fullscreen Mode Layout -->
+        <!-- Fullscreen Mode Layout — always rendered so ExoPlayer SurfaceView is always attached.
+             InputTransparent=True in normal mode lets taps reach views below.
+             BackgroundColor toggled in code-behind (Transparent ↔ Black). -->
         <Grid x:Name="FullscreenContainer"
-              IsVisible="{Binding IsFullScreen}"
               BackgroundColor="Transparent"
-              ZIndex="50">
+              InputTransparent="True"
+              ZIndex="60">
 
-            <!-- Video/Audio Display Area (Fullscreen) -->
-            <Grid x:Name="FullscreenVideoArea">
+            <!-- MediaElement lives here so ExoPlayer SurfaceView is inside this container.
+                 Code-behind repositions it (fill in fullscreen, bounds-match in normal mode).
+                 InputTransparent="True" so normal-mode gestures on NormalMediaContainer work. -->
+            <toolkit:MediaElement x:Name="MediaElement"
+                                  ShouldAutoPlay="False"
+                                  ShouldShowPlaybackControls="False"
+                                  Aspect="{Binding VideoAspect}"
+                                  MediaOpened="OnMediaOpened"
+                                  PositionChanged="OnPositionChanged"
+                                  IsVisible="{Binding ShowVideoPlayer}"
+                                  InputTransparent="True"/>
+
+            <!-- Video/Audio Display Area (Fullscreen) — hidden in normal mode -->
+            <Grid x:Name="FullscreenVideoArea"
+                  IsVisible="{Binding IsFullScreen}"
+                  BackgroundColor="Transparent"
+                  InputTransparent="False">
                 <!-- Tap to show controls, double-tap to exit fullscreen -->
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnFullscreenVideoTapped"/>
@@ -625,6 +632,7 @@
 
             <!-- Fullscreen Controls Overlay -->
             <Grid x:Name="FullscreenBottomControls"
+                  IsVisible="{Binding IsFullScreen}"
                   VerticalOptions="End"
                   BackgroundColor="#90000000"
                   Padding="24,32"

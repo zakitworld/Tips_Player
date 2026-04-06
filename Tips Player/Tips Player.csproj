@@ -29,8 +29,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.png" Color="#1A1A1D" />
+		<!-- App Icon (adaptive: background layer + foreground layer for Android; single image for Windows) -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg"
+		          ForegroundFile="Resources\AppIcon\appiconfg.svg"
+		          Color="#1A1A2E"
+		          ForegroundScale="0.65" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Images\tips_player_logo.png" Color="#1A1A1D" BaseSize="128,128" />
@@ -44,6 +47,10 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AndroidResource Remove="Platforms\Android\Resources\values\strings.xml" />
 	</ItemGroup>
 
 	<ItemGroup>

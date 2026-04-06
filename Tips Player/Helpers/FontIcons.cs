@@ -36,5 +36,7 @@ public static class FontIcons
     public const string ChevronRight = "\uf054";
     public const string PlayCircle = "\uf144";
     public const string Home = "\uf015";
-    public const string Library = "\uf02d"; // book
+    public const string Library   = "\uf02d"; // book
+    public const string Equalizer = "\uf1de"; // sliders-h (FA5 Free Solid)
+    public const string Car        = "\uf1b9"; // car
 }

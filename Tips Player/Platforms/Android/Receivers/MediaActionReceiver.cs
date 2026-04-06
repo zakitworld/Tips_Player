@@ -6,12 +6,6 @@ namespace Tips_Player.Platforms.Android.Receivers;
     Name     = "com.companyname.tipsplayer.MediaActionReceiver",
     Enabled  = true,
     Exported = false)]
-[IntentFilter(new[] {
-    MediaActionReceiver.ActionPlayPause,
-    MediaActionReceiver.ActionNext,
-    MediaActionReceiver.ActionPrev,
-    MediaActionReceiver.ActionStop
-})]
 public class MediaActionReceiver : BroadcastReceiver
 {
     public const string ActionPlayPause = "com.companyname.tipsplayer.PLAY_PAUSE";

@@ -17,25 +17,25 @@
     <TabBar>
         <ShellContent
             Title="Player"
-            Icon="{x:Null}"
+            Icon="tab_player.png"
             ContentTemplate="{DataTemplate views:PlayerPage}"
             Route="PlayerPage" />
 
         <ShellContent
             Title="Library"
-            Icon="{x:Null}"
+            Icon="tab_library.png"
             ContentTemplate="{DataTemplate views:LibraryPage}"
             Route="LibraryPage" />
 
         <ShellContent
             Title="Search"
-            Icon="{x:Null}"
+            Icon="tab_search.png"
             ContentTemplate="{DataTemplate views:SearchPage}"
             Route="SearchPage" />
 
         <ShellContent
             Title="Settings"
-            Icon="{x:Null}"
+            Icon="tab_settings.png"
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="SettingsPage" />
     </TabBar>

@@ -12,6 +12,9 @@ public class MediaPlayerService : IMediaPlayerService
     private MediaElement? _mediaElement;
     private MediaItem? _currentMedia;
     private System.Timers.Timer? _positionTimer;
+    // Set to true when Play() is called before ExoPlayer has finished preparing the source.
+    // The MediaOpened handler will call Play() once the element is ready.
+    private volatile bool _pendingPlay;
 
 #if ANDROID
     private readonly Tips_Player.Platforms.Android.Services.AudioFocusManager _audioFocus;
@@ -76,13 +79,17 @@ public class MediaPlayerService : IMediaPlayerService
     {
         if (_mediaElement != null)
         {
-            _mediaElement.MediaEnded -= OnMediaEnded;
+            _mediaElement.MediaEnded   -= OnMediaEnded;
             _mediaElement.StateChanged -= OnStateChanged;
+            _mediaElement.MediaOpened  -= OnMediaOpened;
+            _mediaElement.MediaFailed  -= OnMediaFailed;
         }
 
         _mediaElement = mediaElement;
-        _mediaElement.MediaEnded += OnMediaEnded;
+        _mediaElement.MediaEnded   += OnMediaEnded;
         _mediaElement.StateChanged += OnStateChanged;
+        _mediaElement.MediaOpened  += OnMediaOpened;
+        _mediaElement.MediaFailed  += OnMediaFailed;
 
         StartPositionTimer();
     }
@@ -106,12 +113,38 @@ public class MediaPlayerService : IMediaPlayerService
 
     private void OnMediaEnded(object? sender, EventArgs e)
     {
+        _pendingPlay = false;
         MediaEnded?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnStateChanged(object? sender, MediaStateChangedEventArgs e)
     {
         PlaybackStateChanged?.Invoke(this, e.NewState == MediaElementState.Playing);
+    }
+
+    // Fired by ExoPlayer once the source is fully prepared and ready to play.
+    private void OnMediaOpened(object? sender, EventArgs e)
+    {
+        if (!_pendingPlay) return;
+        _pendingPlay = false;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            if (_mediaElement == null) return;
+#if ANDROID
+            _audioFocus.RequestFocus();
+            Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(_currentMedia, true);
+            Tips_Player.Platforms.Android.MediaPlaybackService.Start();
+#endif
+            _mediaElement.Play();
+            PlaybackStateChanged?.Invoke(this, true);
+        });
+    }
+
+    private void OnMediaFailed(object? sender, MediaFailedEventArgs e)
+    {
+        _pendingPlay = false;
+        _logger.LogError("Media failed: {Error}", e.ErrorMessage);
+        PlaybackStateChanged?.Invoke(this, false);
     }
 
     public async Task LoadAsync(MediaItem media, CancellationToken cancellationToken = default)
@@ -124,11 +157,15 @@ public class MediaPlayerService : IMediaPlayerService
 
         cancellationToken.ThrowIfCancellationRequested();
         _logger.LogInformation("Loading media: {Title} from {FilePath}", media.Title, media.FilePath);
+
+        _pendingPlay = false; // clear any stale pending-play from the previous track
         _currentMedia = media;
+
         // content:// URIs (Android MediaStore) and http(s) require FromUri; local paths use FromFile
         _mediaElement.Source = media.FilePath.StartsWith("content://") || media.FilePath.StartsWith("http")
             ? MediaSource.FromUri(media.FilePath)
             : MediaSource.FromFile(media.FilePath);
+
         MediaChanged?.Invoke(this, media);
 #if ANDROID
         Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(media, false);
@@ -140,6 +177,16 @@ public class MediaPlayerService : IMediaPlayerService
     {
         if (_mediaElement == null) return;
         cancellationToken.ThrowIfCancellationRequested();
+
+        // If the element is still preparing the source, defer Play() until MediaOpened fires.
+        var state = _mediaElement.CurrentState;
+        if (state == MediaElementState.Opening || state == MediaElementState.Buffering)
+        {
+            _pendingPlay = true;
+            await Task.CompletedTask;
+            return;
+        }
+
 #if ANDROID
         _audioFocus.RequestFocus();
         Tips_Player.Platforms.Android.MediaServiceBridge.NotifyState(_currentMedia, true);

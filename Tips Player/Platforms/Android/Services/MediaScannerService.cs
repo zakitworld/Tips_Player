@@ -9,7 +9,9 @@ public class MediaScannerService : IMediaScannerService
 {
     public async Task<IEnumerable<MediaItem>> ScanAsync(CancellationToken cancellationToken = default)
     {
-        if (!await EnsurePermissionsAsync())
+        // Permissions must be requested on the main thread — invoke there regardless of caller thread.
+        bool granted = await MainThread.InvokeOnMainThreadAsync(EnsurePermissionsAsync);
+        if (!granted)
             return [];
 
         var audio = await ScanAudioAsync(cancellationToken);

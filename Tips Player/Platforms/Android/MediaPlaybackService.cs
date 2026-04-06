@@ -80,8 +80,8 @@ public class MediaPlaybackService : Service
         _mediaSession = new MediaSession(this, "TipsPlayerSession");
         _mediaSession.SetCallback(new MediaSessionCallback());
         _mediaSession.SetFlags(
-            (int)(MediaSessionFlags.HandlesMediaButtons |
-                  MediaSessionFlags.HandlesTransportControls));
+            MediaSessionFlags.HandlesMediaButtons |
+            MediaSessionFlags.HandlesTransportControls);
         _mediaSession.Active = true;
     }
 

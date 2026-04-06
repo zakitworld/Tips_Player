@@ -46,6 +46,8 @@ public partial class PlayerPage : ContentPage
         _viewModel = viewModel;
         BindingContext = viewModel;
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        // Re-position the floating MediaElement whenever the container is laid out
+        NormalMediaContainer.SizeChanged += (_, _) => UpdateMediaElementLayout();
     }
 
     private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -107,51 +109,93 @@ public partial class PlayerPage : ContentPage
         {
             if (_viewModel.IsFullScreen)
             {
-                // Fullscreen: Make MediaElement fill the entire screen
+                // Fullscreen: MediaElement fills FullscreenContainer.
+                // No ZIndex juggling needed — MediaElement is the first child of
+                // FullscreenContainer so ExoPlayer SurfaceView renders below the controls.
+                FullscreenContainer.InputTransparent = false;
+                FullscreenContainer.BackgroundColor  = Colors.Black;
+
                 MediaElement.HorizontalOptions = LayoutOptions.Fill;
-                MediaElement.VerticalOptions = LayoutOptions.Fill;
-                MediaElement.Margin = new Thickness(0); // Fill entire window
-                MediaElement.HeightRequest = -1; // Auto
-                MediaElement.ZIndex = 11;
+                MediaElement.VerticalOptions   = LayoutOptions.Fill;
+                MediaElement.Margin            = new Thickness(0);
+                MediaElement.HeightRequest     = -1;
+                MediaElement.WidthRequest      = -1;
+
+#if ANDROID
+                SetAndroidImmersiveMode(true);
+#endif
             }
             else
             {
-                // Normal: Position MediaElement within the border container
-                bool isDesktop = Width > 850;
-                MediaElement.HorizontalOptions = LayoutOptions.Fill;
-                MediaElement.ZIndex = 11;
+#if ANDROID
+                SetAndroidImmersiveMode(false);
+#endif
+                // Normal mode: FullscreenContainer is transparent + input-passthrough.
+                FullscreenContainer.InputTransparent = true;
+                FullscreenContainer.BackgroundColor  = Colors.Transparent;
 
-                if (isDesktop)
+                // Overlay MediaElement exactly over NormalMediaContainer.
+                // Bounds gives X/Y relative to the page automatically.
+                var bounds = NormalMediaContainer.Bounds;
+                if (bounds.Width > 0 && bounds.Height > 0)
                 {
-                    // Desktop: Media on left, controls on right (400 width)
-                    // Margin: Header (72) + side padding (24)
-                    var newMargin = new Thickness(24, 72, 424, 24);
-                    if (MediaElement.VerticalOptions != LayoutOptions.Fill ||
-                        MediaElement.Margin != newMargin ||
-                        MediaElement.HeightRequest != -1)
-                    {
-                        MediaElement.VerticalOptions = LayoutOptions.Fill;
-                        MediaElement.Margin = newMargin;
-                        MediaElement.HeightRequest = -1;
-                    }
+                    MediaElement.HorizontalOptions = LayoutOptions.Start;
+                    MediaElement.VerticalOptions   = LayoutOptions.Start;
+                    MediaElement.Margin            = new Thickness(bounds.X, bounds.Y, 0, 0);
+                    MediaElement.WidthRequest      = bounds.Width;
+                    MediaElement.HeightRequest     = bounds.Height;
                 }
                 else
                 {
-                    // Mobile: Vertical stack
-                    var newMargin = new Thickness(24, 72, 24, 0);
-                    if (MediaElement.VerticalOptions != LayoutOptions.Start ||
-                        MediaElement.Margin != newMargin ||
-                        MediaElement.HeightRequest != 320)
+                    // Fallback until first layout pass completes
+                    bool isDesktop = Width > 850;
+                    MediaElement.HorizontalOptions = LayoutOptions.Fill;
+                    if (isDesktop)
+                    {
+                        MediaElement.VerticalOptions = LayoutOptions.Fill;
+                        MediaElement.Margin          = new Thickness(24, 72, 424, 24);
+                        MediaElement.HeightRequest   = -1;
+                        MediaElement.WidthRequest    = -1;
+                    }
+                    else
                     {
                         MediaElement.VerticalOptions = LayoutOptions.Start;
-                        MediaElement.Margin = newMargin;
-                        MediaElement.HeightRequest = 320;
+                        MediaElement.Margin          = new Thickness(24, 56, 24, 0);
+                        MediaElement.HeightRequest   = 280;
+                        MediaElement.WidthRequest    = -1;
                     }
                 }
             }
             _isUpdatingLayout = false;
         });
     }
+
+#if ANDROID
+    private static void SetAndroidImmersiveMode(bool enter)
+    {
+        var window = Platform.CurrentActivity?.Window;
+        if (window == null) return;
+
+#pragma warning disable CA1416
+        if (enter)
+        {
+            window.AddFlags(Android.Views.WindowManagerFlags.Fullscreen);
+            window.DecorView.SystemUiFlags =
+                Android.Views.SystemUiFlags.ImmersiveSticky |
+                Android.Views.SystemUiFlags.HideNavigation |
+                Android.Views.SystemUiFlags.Fullscreen |
+                Android.Views.SystemUiFlags.LayoutHideNavigation |
+                Android.Views.SystemUiFlags.LayoutFullscreen |
+                Android.Views.SystemUiFlags.LayoutStable;
+        }
+        else
+        {
+            window.ClearFlags(Android.Views.WindowManagerFlags.Fullscreen);
+            window.DecorView.SystemUiFlags = Android.Views.SystemUiFlags.Visible;
+        }
+#pragma warning restore CA1416
+    }
+#endif
 
     protected override void OnSizeAllocated(double width, double height)
     {

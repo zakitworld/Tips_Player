@@ -454,7 +454,6 @@ public partial class PlayerViewModel : BaseViewModel
         }
 
         await _mediaPlayerService.LoadAsync(media);
-        await Task.Delay(200);
         await _mediaPlayerService.PlayAsync();
     }
 

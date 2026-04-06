@@ -392,7 +392,7 @@
                     </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Label Grid.Column="0"
-                               Text="&#xf3f3;"
+                               Text="{x:Static helpers:FontIcons.Equalizer}"
                                FontFamily="FontAwesome"
                                FontSize="20"
                                TextColor="{StaticResource AccentColor}"

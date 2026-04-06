@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Tips_Player.Views.Controls.VerticalSlider"
+             x:Name="Root">
+
+    <!-- Track container — fill height, fixed width -->
+    <Grid WidthRequest="36"
+          HorizontalOptions="Center"
+          VerticalOptions="Fill">
+
+        <!-- Track background -->
+        <BoxView x:Name="TrackBg"
+                 WidthRequest="4"
+                 CornerRadius="2"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Fill"
+                 Color="#FF3A3A3A"/>
+
+        <!-- Filled portion (grows from bottom) -->
+        <BoxView x:Name="TrackFill"
+                 WidthRequest="4"
+                 CornerRadius="2"
+                 HorizontalOptions="Center"
+                 VerticalOptions="End"
+                 HeightRequest="0"
+                 Color="{Binding ThumbColor, Source={x:Reference Root}}"/>
+
+        <!-- Thumb -->
+        <Ellipse x:Name="Thumb"
+                 WidthRequest="18"
+                 HeightRequest="18"
+                 HorizontalOptions="Center"
+                 VerticalOptions="End"
+                 Fill="{Binding ThumbColor, Source={x:Reference Root}}">
+            <Ellipse.Shadow>
+                <Shadow Brush="#000000" Offset="0,2" Radius="4" Opacity="0.4"/>
+            </Ellipse.Shadow>
+        </Ellipse>
+
+        <!-- Transparent hit area for gestures -->
+        <BoxView Color="Transparent"
+                 HorizontalOptions="Fill"
+                 VerticalOptions="Fill">
+            <BoxView.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                <TapGestureRecognizer Tapped="OnTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+    </Grid>
+</ContentView>

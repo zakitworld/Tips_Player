@@ -10,7 +10,7 @@ namespace Tips_Player.Platforms.Android.Services;
 public sealed class AudioFocusManager : Java.Lang.Object, AudioManager.IOnAudioFocusChangeListener
 {
     private readonly AudioManager _audioManager;
-    private AudioFocusRequest? _focusRequest;
+    private AudioFocusRequestClass? _focusRequest;
     private bool _hasFocus;
 
     /// <summary>Fired when audio focus is fully regained (resume + restore volume).</summary>
@@ -49,7 +49,7 @@ public sealed class AudioFocusManager : Java.Lang.Object, AudioManager.IOnAudioF
         else
         {
 #pragma warning disable CA1422
-            result = _audioManager.RequestAudioFocus(this, Stream.Music, AudioFocus.Gain);
+            result = _audioManager.RequestAudioFocus(this, global::Android.Media.Stream.Music, AudioFocus.Gain);
 #pragma warning restore CA1422
         }
 

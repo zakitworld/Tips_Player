@@ -50,21 +50,27 @@ public class LibraryService : ILibraryService
 
                 if (items != null)
                 {
-                    MediaItems.Clear();
-                    foreach (var item in items)
+                    await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        if (!string.IsNullOrEmpty(item.FilePath))
+                        MediaItems.Clear();
+                        foreach (var item in items)
                         {
-                            var directory = Path.GetDirectoryName(item.FilePath);
-                            if (!string.IsNullOrEmpty(directory))
+                            // Only fill FolderPath for plain file paths, not content:// URIs
+                            if (string.IsNullOrEmpty(item.FolderPath)
+                                && !string.IsNullOrEmpty(item.FilePath)
+                                && !item.FilePath.StartsWith("content://"))
                             {
-                                item.FolderPath = directory;
-                                item.FolderName = Path.GetFileName(directory);
+                                var directory = Path.GetDirectoryName(item.FilePath);
+                                if (!string.IsNullOrEmpty(directory))
+                                {
+                                    item.FolderPath = directory;
+                                    item.FolderName = Path.GetFileName(directory);
+                                }
                             }
+                            MediaItems.Add(item);
                         }
-                        MediaItems.Add(item);
-                    }
-                    RefreshCollections();
+                        RefreshCollections();
+                    });
                 }
             }
         }
@@ -125,26 +131,47 @@ public class LibraryService : ILibraryService
 
     public async Task AddItemsAsync(IEnumerable<MediaItem> items, CancellationToken cancellationToken = default)
     {
+        // Collect new items first (can run on any thread)
+        var toAdd = new List<MediaItem>();
         foreach (var item in items)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!MediaItems.Any(m => m.FilePath == item.FilePath))
+            if (MediaItems.Any(m => m.FilePath == item.FilePath))
+                continue;
+
+            // Only derive folder info from the file path when it hasn't already been
+            // set (e.g. by the Android MediaStore scanner using the DATA column).
+            // Never run Path.GetDirectoryName on a content:// URI — it produces garbage.
+            if (string.IsNullOrEmpty(item.FolderPath) && !string.IsNullOrEmpty(item.FilePath)
+                && !item.FilePath.StartsWith("content://"))
             {
-                // Set folder path and name from file path
-                if (!string.IsNullOrEmpty(item.FilePath))
+                var directory = Path.GetDirectoryName(item.FilePath);
+                if (!string.IsNullOrEmpty(directory))
                 {
-                    var directory = Path.GetDirectoryName(item.FilePath);
-                    if (!string.IsNullOrEmpty(directory))
-                    {
-                        item.FolderPath = directory;
-                        item.FolderName = Path.GetFileName(directory);
-                    }
+                    item.FolderPath = directory;
+                    item.FolderName = Path.GetFileName(directory);
                 }
-                MediaItems.Add(item);
             }
+
+            toAdd.Add(item);
         }
-        RefreshCollections();
+
+        if (toAdd.Count == 0)
+        {
+            await SaveLibraryAsync(cancellationToken);
+            return;
+        }
+
+        // ObservableCollections must be mutated on the main thread.
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            foreach (var item in toAdd)
+                MediaItems.Add(item);
+
+            RefreshCollections();
+        });
+
         await SaveLibraryAsync(cancellationToken);
     }
 

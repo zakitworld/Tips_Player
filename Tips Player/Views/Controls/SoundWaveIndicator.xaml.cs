@@ -74,10 +74,10 @@ public partial class SoundWaveIndicator : ContentView
             {
                 double[] target = frame % 2 == 0 ? FrameA : FrameB;
 
-                var t1 = Bar1.ScaleYTo(target[0], Delays[0], Easing.SinInOut);
-                var t2 = Bar2.ScaleYTo(target[1], Delays[1], Easing.SinInOut);
-                var t3 = Bar3.ScaleYTo(target[2], Delays[2], Easing.SinInOut);
-                var t4 = Bar4.ScaleYTo(target[3], Delays[3], Easing.SinInOut);
+                var t1 = Bar1.ScaleYToAsync(target[0], Delays[0], Easing.SinInOut);
+                var t2 = Bar2.ScaleYToAsync(target[1], Delays[1], Easing.SinInOut);
+                var t3 = Bar3.ScaleYToAsync(target[2], Delays[2], Easing.SinInOut);
+                var t4 = Bar4.ScaleYToAsync(target[3], Delays[3], Easing.SinInOut);
                 await Task.WhenAll(t1, t2, t3, t4);
 
                 frame++;
@@ -96,10 +96,10 @@ public partial class SoundWaveIndicator : ContentView
         MainThread.BeginInvokeOnMainThread(async () =>
         {
             await Task.WhenAll(
-                Bar1.ScaleYTo(Paused[0], 200, Easing.CubicOut),
-                Bar2.ScaleYTo(Paused[1], 200, Easing.CubicOut),
-                Bar3.ScaleYTo(Paused[2], 200, Easing.CubicOut),
-                Bar4.ScaleYTo(Paused[3], 200, Easing.CubicOut));
+                Bar1.ScaleYToAsync(Paused[0], 200, Easing.CubicOut),
+                Bar2.ScaleYToAsync(Paused[1], 200, Easing.CubicOut),
+                Bar3.ScaleYToAsync(Paused[2], 200, Easing.CubicOut),
+                Bar4.ScaleYToAsync(Paused[3], 200, Easing.CubicOut));
         });
     }
 

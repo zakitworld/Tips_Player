@@ -1,3 +1,4 @@
+
 using Android.Media.Audiofx;
 using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
@@ -42,15 +43,17 @@ public class AndroidEqualizerService : EqualizerService, IDisposable
         DisposeHardware();
         try
         {
+#pragma warning disable CA1422 // Virtualizer constructor deprecated on newer API levels — no replacement API exists
             _eq   = new Equalizer(0, audioSessionId);
             _bass = new BassBoost(0, audioSessionId);
             _virt = new Virtualizer(0, audioSessionId);
+#pragma warning restore CA1422
 
             _eq.SetEnabled(IsEnabled);
             _bass.SetEnabled(IsEnabled && AudioEffects.BassBoostEnabled);
             _virt.SetEnabled(IsEnabled && AudioEffects.VirtualizerEnabled);
 
-            var range = _eq.BandLevelRange!;
+            var range = _eq.GetBandLevelRange()!;
             _minMb = range[0];
             _maxMb = range[1];
 
@@ -133,7 +136,9 @@ public class AndroidEqualizerService : EqualizerService, IDisposable
         {
             _virt.SetEnabled(IsEnabled && AudioEffects.VirtualizerEnabled);
             var strength = (short)Math.Clamp(AudioEffects.VirtualizerStrength * 10, 0, 1000);
+#pragma warning disable CA1422
             try { _virt.SetStrength(strength); } catch { /* non-fatal */ }
+#pragma warning restore CA1422
         }
     }
 

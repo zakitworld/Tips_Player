@@ -1,4 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="456" height="456" fill="#512BD4" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#1A1A2E"/>
+  <!-- Outer glow ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#6366F1" stroke-width="6" opacity="0.4"/>
+  <!-- Headphones arc -->
+  <path d="M 140 256 A 116 116 0 0 1 372 256" fill="none" stroke="#6366F1" stroke-width="18" stroke-linecap="round"/>
+  <!-- Left ear cup -->
+  <rect x="118" y="248" width="44" height="72" rx="22" fill="#6366F1"/>
+  <!-- Right ear cup -->
+  <rect x="350" y="248" width="44" height="72" rx="22" fill="#6366F1"/>
+  <!-- Sound wave bars — centre -->
+  <rect x="222" y="306" width="12" height="36" rx="6" fill="#ffffff" opacity="0.9"/>
+  <rect x="242" y="294" width="12" height="48" rx="6" fill="#6366F1"/>
+  <rect x="262" y="302" width="12" height="40" rx="6" fill="#ffffff" opacity="0.9"/>
+  <rect x="282" y="310" width="12" height="32" rx="6" fill="#6366F1" opacity="0.7"/>
+  <rect x="202" y="314" width="12" height="28" rx="6" fill="#6366F1" opacity="0.7"/>
 </svg>
