@@ -9,7 +9,7 @@
              x:DataType="viewmodels:PlayerViewModel"
              BackgroundColor="{StaticResource PageBackground}"
              Shell.NavBarIsVisible="False"
-             Shell.TabBarIsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}">
+             Shell.TabBarIsVisible="True">
     
     <ContentPage.Resources>
         <x:Int32 x:Key="SleepTimer0">0</x:Int32>
@@ -18,7 +18,7 @@
         <x:Int32 x:Key="SleepTimer60">60</x:Int32>
     </ContentPage.Resources>
 
-    <Grid x:Name="RootGrid">
+    <Grid x:Name="RootGrid" BackgroundColor="{StaticResource PageBackground}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="DisplayStates">
                 <VisualState x:Name="Mobile">
@@ -56,13 +56,24 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <!-- Video Controls Overlay (Normal Mode) - ZIndex=70 keeps it above FullscreenContainer (60) -->
+        <!-- MediaElement for normal-mode video — positioned over NormalMediaContainer by code-behind -->
+        <toolkit:MediaElement x:Name="MediaElement"
+                              ShouldAutoPlay="False"
+                              ShouldShowPlaybackControls="False"
+                              Aspect="{Binding VideoAspect}"
+                              MediaOpened="OnMediaOpened"
+                              PositionChanged="OnPositionChanged"
+                              IsVisible="{Binding ShowVideoPlayer}"
+                              ZIndex="10"
+                              InputTransparent="True"/>
+
+        <!-- Video Controls Overlay (Normal Mode) -->
         <HorizontalStackLayout x:Name="NormalVideoControls"
                                HorizontalOptions="Start"
                                VerticalOptions="Start"
                                Margin="36,84,0,0"
                                Spacing="8"
-                               ZIndex="70"
+                               ZIndex="20"
                                IsVisible="False">
             <Button Command="{Binding ToggleAspectCommand}"
                     BackgroundColor="#40000000"
@@ -95,9 +106,8 @@
                     ToolTipProperties.Text="Fullscreen"/>
         </HorizontalStackLayout>
 
-        <!-- Normal Mode Layout -->
-        <Grid IsVisible="{Binding IsFullScreen, Converter={StaticResource InverseBoolConverter}}"
-              RowDefinitions="Auto,*">
+        <!-- Normal Mode Layout (fullscreen is handled by FullscreenVideoPage modal) -->
+        <Grid RowDefinitions="Auto,*">
 
             <!-- Header -->
             <Grid Grid.Row="0"
@@ -519,185 +529,6 @@
                     </VerticalStackLayout>
                 </Grid>
             </ScrollView>
-        </Grid>
-
-        <!-- Fullscreen Mode Layout — always rendered so ExoPlayer SurfaceView is always attached.
-             InputTransparent=True in normal mode lets taps reach views below.
-             BackgroundColor toggled in code-behind (Transparent ↔ Black). -->
-        <Grid x:Name="FullscreenContainer"
-              BackgroundColor="Transparent"
-              InputTransparent="True"
-              ZIndex="60">
-
-            <!-- MediaElement lives here so ExoPlayer SurfaceView is inside this container.
-                 Code-behind repositions it (fill in fullscreen, bounds-match in normal mode).
-                 InputTransparent="True" so normal-mode gestures on NormalMediaContainer work. -->
-            <toolkit:MediaElement x:Name="MediaElement"
-                                  ShouldAutoPlay="False"
-                                  ShouldShowPlaybackControls="False"
-                                  Aspect="{Binding VideoAspect}"
-                                  MediaOpened="OnMediaOpened"
-                                  PositionChanged="OnPositionChanged"
-                                  IsVisible="{Binding ShowVideoPlayer}"
-                                  InputTransparent="True"/>
-
-            <!-- Video/Audio Display Area (Fullscreen) — hidden in normal mode -->
-            <Grid x:Name="FullscreenVideoArea"
-                  IsVisible="{Binding IsFullScreen}"
-                  BackgroundColor="Transparent"
-                  InputTransparent="False">
-                <!-- Tap to show controls, double-tap to exit fullscreen -->
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnFullscreenVideoTapped"/>
-                    <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding ToggleFullScreenCommand}"/>
-                </Grid.GestureRecognizers>
-
-                <!-- Video placeholder for fullscreen - actual MediaElement sits below the controls but above the background -->
-                <BoxView IsVisible="{Binding ShowVideoPlayer}"
-                         Color="Transparent"
-                         HorizontalOptions="Fill"
-                         VerticalOptions="Fill"/>
-
-                <!-- Audio Visualization Fullscreen -->
-                <Grid IsVisible="{Binding ShowVideoPlayer, Converter={StaticResource InverseBoolConverter}}"
-                      BackgroundColor="Black">
-                    <BoxView>
-                        <BoxView.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#0d0d1a" Offset="0.0"/>
-                                <GradientStop Color="#1a1a3e" Offset="0.5"/>
-                                <GradientStop Color="#0a2040" Offset="1.0"/>
-                            </LinearGradientBrush>
-                        </BoxView.Background>
-                    </BoxView>
-
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="24">
-                        <Grid HorizontalOptions="Center">
-                            <Ellipse WidthRequest="280" HeightRequest="280" Fill="#106366F1"/>
-                            <Ellipse WidthRequest="220" HeightRequest="220" Fill="#206366F1" HorizontalOptions="Center" VerticalOptions="Center"/>
-                            <Ellipse WidthRequest="160" HeightRequest="160" Fill="#406366F1" HorizontalOptions="Center" VerticalOptions="Center"/>
-                            <Label Text="{x:Static helpers:FontIcons.Music}"
-                                   FontFamily="FontAwesome"
-                                   FontSize="100"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
-                        </Grid>
-
-                        <Label Text="{Binding CurrentMedia.Title}"
-                               FontSize="28"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource TextPrimary}"
-                               HorizontalTextAlignment="Center"/>
-                        <Label Text="{Binding CurrentMedia.DisplaySubtitle}"
-                               FontSize="18"
-                               TextColor="{StaticResource TextSecondary}"
-                               HorizontalTextAlignment="Center"/>
-                    </VerticalStackLayout>
-                </Grid>
-
-                <!-- Exit Fullscreen and Aspect Toggle Button -->
-                <HorizontalStackLayout x:Name="FullscreenTopControls"
-                                       HorizontalOptions="End" VerticalOptions="Start" Margin="16" Spacing="12" ZIndex="300"
-                                       Opacity="{Binding FullscreenControlsOpacity}">
-                    <Button Command="{Binding ToggleAspectCommand}"
-                            BackgroundColor="#60000000"
-                            TextColor="White"
-                            FontSize="14"
-                            HeightRequest="48"
-                            WidthRequest="80"
-                            CornerRadius="24"
-                            ToolTipProperties.Text="Toggle Aspect Ratio">
-                        <Button.Triggers>
-                            <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
-                                <Setter Property="Text" Value="Fit" />
-                            </DataTrigger>
-                            <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
-                                <Setter Property="Text" Value="Fill" />
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
-
-                    <Button Text="{x:Static helpers:FontIcons.Close}"
-                            FontFamily="FontAwesome"
-                            Command="{Binding ToggleFullScreenCommand}"
-                            BackgroundColor="#60000000"
-                            TextColor="White"
-                            FontSize="20"
-                            HeightRequest="48"
-                            WidthRequest="48"
-                            CornerRadius="24"
-                            ToolTipProperties.Text="Exit Fullscreen"/>
-                </HorizontalStackLayout>
-            </Grid>
-
-            <!-- Fullscreen Controls Overlay -->
-            <Grid x:Name="FullscreenBottomControls"
-                  IsVisible="{Binding IsFullScreen}"
-                  VerticalOptions="End"
-                  BackgroundColor="#90000000"
-                  Padding="24,32"
-                  RowDefinitions="Auto,Auto"
-                  ZIndex="300"
-                  Opacity="{Binding FullscreenControlsOpacity}">
-
-                <!-- Progress -->
-                <Grid Grid.Row="0" ColumnDefinitions="60,*,60">
-                    <Label Grid.Column="0"
-                           Text="{Binding CurrentPositionFormatted}"
-                           FontSize="13"
-                           TextColor="White"
-                           VerticalOptions="Center"/>
-                    <Slider Grid.Column="1"
-                            Minimum="0"
-                            Maximum="{Binding SliderMaximum}"
-                            Value="{Binding SliderPosition, Mode=TwoWay}"
-                            MinimumTrackColor="{StaticResource AccentColor}"
-                            MaximumTrackColor="#60FFFFFF"
-                            ThumbColor="{StaticResource AccentColor}"
-                            DragStarted="OnSliderDragStarted"
-                            DragCompleted="OnSliderDragCompleted"/>
-                    <Label Grid.Column="2"
-                           Text="{Binding DurationFormatted}"
-                           FontSize="13"
-                           TextColor="White"
-                           HorizontalTextAlignment="End"
-                           VerticalOptions="Center"/>
-                </Grid>
-
-                <!-- Controls -->
-                <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center" Spacing="24" Margin="0,12,0,0">
-                    <Button Text="{x:Static helpers:FontIcons.StepBackward}"
-                            FontFamily="FontAwesome"
-                            Command="{Binding PreviousCommand}"
-                            BackgroundColor="Transparent"
-                            TextColor="White"
-                            FontSize="28"
-                            HeightRequest="56"
-                            WidthRequest="56"
-                            ToolTipProperties.Text="Previous"/>
-
-                    <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
-                            FontFamily="FontAwesome"
-                            Command="{Binding PlayPauseCommand}"
-                            BackgroundColor="{StaticResource AccentColor}"
-                            TextColor="White"
-                            FontSize="32"
-                            HeightRequest="64"
-                            WidthRequest="64"
-                            CornerRadius="32"
-                            ToolTipProperties.Text="Play/Pause"/>
-
-                    <Button Text="{x:Static helpers:FontIcons.StepForward}"
-                            FontFamily="FontAwesome"
-                            Command="{Binding NextCommand}"
-                            BackgroundColor="Transparent"
-                            TextColor="White"
-                            FontSize="28"
-                            HeightRequest="56"
-                            WidthRequest="56"
-                            ToolTipProperties.Text="Next"/>
-                </HorizontalStackLayout>
-            </Grid>
         </Grid>
 
     </Grid>

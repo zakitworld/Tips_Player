@@ -1,6 +1,10 @@
 using Android.Content;
 using Android.Media;
 
+// All code in this file targets Android only. CA1416 calls are already guarded by
+// Build.VERSION.SdkInt >= BuildVersionCodes.O at runtime.
+#pragma warning disable CA1416, CS8602, CS8604  // Android builder chains are non-null by contract
+
 namespace Tips_Player.Platforms.Android.Services;
 
 /// <summary>
@@ -43,8 +47,8 @@ public sealed class AudioFocusManager : Java.Lang.Object, AudioManager.IOnAudioF
                     .Build()!)
                 .SetOnAudioFocusChangeListener(this)
                 .SetWillPauseWhenDucked(false)
-                .Build();
-            result = _audioManager.RequestAudioFocus(_focusRequest);
+                .Build()!;   // Build() is non-null when builder is fully configured
+            result = _audioManager.RequestAudioFocus(_focusRequest!);
         }
         else
         {
@@ -87,7 +91,7 @@ public sealed class AudioFocusManager : Java.Lang.Object, AudioManager.IOnAudioF
                 break;
 
             case AudioFocus.LossTransientCanDuck:
-                Duck?.Invoke(0.25f); // lower to 25 % while another app is temporarily loud
+                Duck?.Invoke(0.25f);
                 break;
 
             case AudioFocus.LossTransient:

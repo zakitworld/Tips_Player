@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.companyname.tipsplayer">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="gh.websitedesignerghana.tipsplayer">
   <!-- Required permissions -->
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <!-- Required on Android 14+ to start a foreground service of type mediaPlayback -->
@@ -17,18 +17,18 @@
                android:label="Tips Player">
 
     <!-- Foreground media playback service (keep alive when app is backgrounded) -->
-    <service android:name="com.companyname.tipsplayer.MediaPlaybackService"
+    <service android:name="gh.websitedesignerghana.tipsplayer.MediaPlaybackService"
              android:foregroundServiceType="mediaPlayback"
              android:exported="false"/>
 
     <!-- Broadcast receiver for notification play/pause/skip actions -->
-    <receiver android:name="com.companyname.tipsplayer.MediaActionReceiver"
+    <receiver android:name="gh.websitedesignerghana.tipsplayer.MediaActionReceiver"
               android:exported="false">
         <intent-filter>
-            <action android:name="com.companyname.tipsplayer.PLAY_PAUSE"/>
-            <action android:name="com.companyname.tipsplayer.NEXT"/>
-            <action android:name="com.companyname.tipsplayer.PREV"/>
-            <action android:name="com.companyname.tipsplayer.STOP"/>
+            <action android:name="gh.websitedesignerghana.tipsplayer.PLAY_PAUSE"/>
+            <action android:name="gh.websitedesignerghana.tipsplayer.NEXT"/>
+            <action android:name="gh.websitedesignerghana.tipsplayer.PREV"/>
+            <action android:name="gh.websitedesignerghana.tipsplayer.STOP"/>
         </intent-filter>
     </receiver>
 

@@ -3,15 +3,15 @@ using Android.Content;
 namespace Tips_Player.Platforms.Android.Receivers;
 
 [BroadcastReceiver(
-    Name     = "com.companyname.tipsplayer.MediaActionReceiver",
+    Name     = "gh.websitedesignerghana.tipsplayer.MediaActionReceiver",
     Enabled  = true,
     Exported = false)]
 public class MediaActionReceiver : BroadcastReceiver
 {
-    public const string ActionPlayPause = "com.companyname.tipsplayer.PLAY_PAUSE";
-    public const string ActionNext      = "com.companyname.tipsplayer.NEXT";
-    public const string ActionPrev      = "com.companyname.tipsplayer.PREV";
-    public const string ActionStop      = "com.companyname.tipsplayer.STOP";
+    public const string ActionPlayPause = "gh.websitedesignerghana.tipsplayer.PLAY_PAUSE";
+    public const string ActionNext      = "gh.websitedesignerghana.tipsplayer.NEXT";
+    public const string ActionPrev      = "gh.websitedesignerghana.tipsplayer.PREV";
+    public const string ActionStop      = "gh.websitedesignerghana.tipsplayer.STOP";
 
     public override void OnReceive(Context? context, Intent? intent)
     {

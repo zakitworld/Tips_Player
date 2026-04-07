@@ -3,6 +3,10 @@ using Android.Provider;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
+// AlbumArtist, Genre (audio) and Year (video) are API 30+ constants.
+// On older devices GetColumnIndex returns -1, so the columns are simply skipped.
+#pragma warning disable CA1416
+
 namespace Tips_Player.Platforms.Android.Services;
 
 public class MediaScannerService : IMediaScannerService

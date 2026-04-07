@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
+             x:Class="Tips_Player.Views.FullscreenVideoPage"
+             x:DataType="viewmodels:PlayerViewModel"
+             BackgroundColor="Black"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+
+    <Grid>
+        <!-- Video fills the entire screen -->
+        <toolkit:MediaElement x:Name="VideoElement"
+                              ShouldAutoPlay="False"
+                              ShouldShowPlaybackControls="False"
+                              Aspect="{Binding VideoAspect}"
+                              HorizontalOptions="Fill"
+                              VerticalOptions="Fill"
+                              MediaOpened="OnMediaOpened"
+                              PositionChanged="OnPositionChanged"/>
+
+        <!-- Tap layer — single tap shows/hides controls, double tap exits -->
+        <Grid BackgroundColor="Transparent"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnScreenTapped"/>
+                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnScreenDoubleTapped"/>
+            </Grid.GestureRecognizers>
+        </Grid>
+
+        <!-- Controls overlay (auto-hides) -->
+        <Grid x:Name="ControlsOverlay" VerticalOptions="Fill" HorizontalOptions="Fill">
+
+            <!-- Top bar: Back + Title + Aspect toggle -->
+            <Grid VerticalOptions="Start"
+                  BackgroundColor="#CC000000"
+                  Padding="8,12,16,12"
+                  ColumnDefinitions="56,*,90">
+
+                <Button Text="{x:Static helpers:FontIcons.Close}"
+                        FontFamily="FontAwesome"
+                        Clicked="OnBackClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="White"
+                        FontSize="20"
+                        HeightRequest="48"
+                        WidthRequest="56"
+                        Padding="0"/>
+
+                <Label Grid.Column="1"
+                       Text="{Binding CurrentMedia.Title, FallbackValue=''}"
+                       TextColor="White"
+                       FontSize="15"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       LineBreakMode="TailTruncation"/>
+
+                <Button Grid.Column="2"
+                        Clicked="OnAspectToggled"
+                        BackgroundColor="#60FFFFFF"
+                        TextColor="Black"
+                        FontSize="13"
+                        HeightRequest="36"
+                        CornerRadius="18"
+                        Padding="0"
+                        ToolTipProperties.Text="Toggle Aspect">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
+                            <Setter Property="Text" Value="Fit" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
+                            <Setter Property="Text" Value="Fill" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+
+            <!-- Bottom bar: Progress + Prev/Play/Next -->
+            <Grid VerticalOptions="End"
+                  BackgroundColor="#CC000000"
+                  Padding="16,16,16,20"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="8">
+
+                <!-- Progress row -->
+                <Grid ColumnDefinitions="52,*,52">
+                    <Label Text="{Binding CurrentPositionFormatted}"
+                           TextColor="White"
+                           FontSize="12"
+                           VerticalOptions="Center"/>
+                    <Slider Grid.Column="1"
+                            Minimum="0"
+                            Maximum="{Binding SliderMaximum}"
+                            Value="{Binding SliderPosition, Mode=TwoWay}"
+                            MinimumTrackColor="{StaticResource AccentColor}"
+                            MaximumTrackColor="#60FFFFFF"
+                            ThumbColor="{StaticResource AccentColor}"
+                            DragStarted="OnSliderDragStarted"
+                            DragCompleted="OnSliderDragCompleted"/>
+                    <Label Grid.Column="2"
+                           Text="{Binding DurationFormatted}"
+                           TextColor="White"
+                           FontSize="12"
+                           HorizontalTextAlignment="End"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <!-- Buttons row -->
+                <HorizontalStackLayout Grid.Row="1"
+                                       HorizontalOptions="Center"
+                                       Spacing="40">
+                    <Button Text="{x:Static helpers:FontIcons.StepBackward}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding PreviousCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            FontSize="26"
+                            HeightRequest="52"
+                            WidthRequest="52"
+                            ToolTipProperties.Text="Previous"/>
+
+                    <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding PlayPauseCommand}"
+                            BackgroundColor="{StaticResource AccentColor}"
+                            TextColor="White"
+                            FontSize="30"
+                            HeightRequest="64"
+                            WidthRequest="64"
+                            CornerRadius="32"
+                            ToolTipProperties.Text="Play/Pause"/>
+
+                    <Button Text="{x:Static helpers:FontIcons.StepForward}"
+                            FontFamily="FontAwesome"
+                            Command="{Binding NextCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            FontSize="26"
+                            HeightRequest="52"
+                            WidthRequest="52"
+                            ToolTipProperties.Text="Next"/>
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+    </Grid>
+
+</ContentPage>

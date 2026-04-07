@@ -12,7 +12,6 @@ public partial class PlayerPage : ContentPage
         InitializeComponent();
     }
 
-    // Constructor for DI (when resolved through service provider)
     public PlayerPage(PlayerViewModel viewModel) : this()
     {
         SetupViewModel(viewModel);
@@ -22,20 +21,21 @@ public partial class PlayerPage : ContentPage
     {
         base.OnAppearing();
 
-        // If ViewModel wasn't injected, get it from the service provider
         if (_viewModel == null)
         {
             var viewModel = Handler?.MauiContext?.Services.GetService<PlayerViewModel>();
             if (viewModel != null)
-            {
                 SetupViewModel(viewModel);
-            }
         }
 
         if (_viewModel != null)
         {
             await _viewModel.InitializeAsync();
+
+            // Always (re)claim the MediaElement when this page appears — including
+            // when returning from the fullscreen modal.
             _viewModel.SetMediaElement(MediaElement);
+
             UpdateMediaElementLayout();
             UpdateVideoControlsVisibility();
         }
@@ -43,19 +43,25 @@ public partial class PlayerPage : ContentPage
 
     private void SetupViewModel(PlayerViewModel viewModel)
     {
-        _viewModel = viewModel;
+        _viewModel     = viewModel;
         BindingContext = viewModel;
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-        // Re-position the floating MediaElement whenever the container is laid out
-        NormalMediaContainer.SizeChanged += (_, _) => UpdateMediaElementLayout();
-    }
-
-    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(PlayerViewModel.IsFullScreen))
+        NormalMediaContainer.SizeChanged += (_, _) =>
         {
             UpdateMediaElementLayout();
             UpdateVideoControlsVisibility();
+        };
+    }
+
+    private void OnViewModelPropertyChanged(object? sender,
+        System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PlayerViewModel.IsFullScreen) &&
+            _viewModel?.IsFullScreen == true)
+        {
+            // Launch fullscreen as a modal page — the only reliable way to get
+            // true full-screen video on Android without fighting ExoPlayer.
+            MainThread.BeginInvokeOnMainThread(async () => await EnterFullscreenAsync());
         }
         else if (e.PropertyName == nameof(PlayerViewModel.ShowVideoPlayer))
         {
@@ -63,41 +69,23 @@ public partial class PlayerPage : ContentPage
         }
     }
 
-    private void UpdateVideoControlsVisibility()
+    private async Task EnterFullscreenAsync()
     {
         if (_viewModel == null) return;
 
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            // Show video controls only when playing video AND not in fullscreen
-            bool shouldShow = _viewModel.ShowVideoPlayer && !_viewModel.IsFullScreen;
-            NormalVideoControls.IsVisible = shouldShow;
+        var position  = MediaElement.Position;
+        var isPlaying = MediaElement.CurrentState == MediaElementState.Playing;
 
-            if (shouldShow)
-            {
-                UpdateVideoControlsPosition();
-            }
-        });
+        // Pause so there's no audio overlap during the modal transition
+        MediaElement.Pause();
+
+        var fullscreenPage = new FullscreenVideoPage(
+            _viewModel, MediaElement, position, isPlaying);
+
+        await Navigation.PushModalAsync(fullscreenPage, animated: false);
     }
 
-    private void UpdateVideoControlsPosition()
-    {
-        bool isDesktop = Width > 850;
-        if (isDesktop)
-        {
-            // Desktop: Position at top-right of video area (video ends at Width - 424)
-            // Video area: left=24, top=72, right=Width-424
-            // Controls at top-right of video: right margin = 424 + 12 (padding)
-            NormalVideoControls.HorizontalOptions = LayoutOptions.End;
-            NormalVideoControls.Margin = new Thickness(0, 84, 436, 0);
-        }
-        else
-        {
-            // Mobile: Position at top-right of video area
-            NormalVideoControls.HorizontalOptions = LayoutOptions.End;
-            NormalVideoControls.Margin = new Thickness(0, 84, 36, 0);
-        }
-    }
+    // ───────── normal-mode video overlay positioning ─────────
 
     private bool _isUpdatingLayout;
     private void UpdateMediaElementLayout()
@@ -107,95 +95,53 @@ public partial class PlayerPage : ContentPage
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            if (_viewModel.IsFullScreen)
+            var bounds = NormalMediaContainer.Bounds;
+            if (bounds.Width > 0 && bounds.Height > 0)
             {
-                // Fullscreen: MediaElement fills FullscreenContainer.
-                // No ZIndex juggling needed — MediaElement is the first child of
-                // FullscreenContainer so ExoPlayer SurfaceView renders below the controls.
-                FullscreenContainer.InputTransparent = false;
-                FullscreenContainer.BackgroundColor  = Colors.Black;
-
-                MediaElement.HorizontalOptions = LayoutOptions.Fill;
-                MediaElement.VerticalOptions   = LayoutOptions.Fill;
-                MediaElement.Margin            = new Thickness(0);
-                MediaElement.HeightRequest     = -1;
-                MediaElement.WidthRequest      = -1;
-
-#if ANDROID
-                SetAndroidImmersiveMode(true);
-#endif
+                MediaElement.HorizontalOptions = LayoutOptions.Start;
+                MediaElement.VerticalOptions   = LayoutOptions.Start;
+                MediaElement.Margin            = new Thickness(bounds.X, bounds.Y, 0, 0);
+                MediaElement.WidthRequest      = bounds.Width;
+                MediaElement.HeightRequest     = bounds.Height;
             }
             else
             {
-#if ANDROID
-                SetAndroidImmersiveMode(false);
-#endif
-                // Normal mode: FullscreenContainer is transparent + input-passthrough.
-                FullscreenContainer.InputTransparent = true;
-                FullscreenContainer.BackgroundColor  = Colors.Transparent;
-
-                // Overlay MediaElement exactly over NormalMediaContainer.
-                // Bounds gives X/Y relative to the page automatically.
-                var bounds = NormalMediaContainer.Bounds;
-                if (bounds.Width > 0 && bounds.Height > 0)
-                {
-                    MediaElement.HorizontalOptions = LayoutOptions.Start;
-                    MediaElement.VerticalOptions   = LayoutOptions.Start;
-                    MediaElement.Margin            = new Thickness(bounds.X, bounds.Y, 0, 0);
-                    MediaElement.WidthRequest      = bounds.Width;
-                    MediaElement.HeightRequest     = bounds.Height;
-                }
-                else
-                {
-                    // Fallback until first layout pass completes
-                    bool isDesktop = Width > 850;
-                    MediaElement.HorizontalOptions = LayoutOptions.Fill;
-                    if (isDesktop)
-                    {
-                        MediaElement.VerticalOptions = LayoutOptions.Fill;
-                        MediaElement.Margin          = new Thickness(24, 72, 424, 24);
-                        MediaElement.HeightRequest   = -1;
-                        MediaElement.WidthRequest    = -1;
-                    }
-                    else
-                    {
-                        MediaElement.VerticalOptions = LayoutOptions.Start;
-                        MediaElement.Margin          = new Thickness(24, 56, 24, 0);
-                        MediaElement.HeightRequest   = 280;
-                        MediaElement.WidthRequest    = -1;
-                    }
-                }
+                // Fallback until first layout pass provides bounds
+                MediaElement.HorizontalOptions = LayoutOptions.Fill;
+                MediaElement.VerticalOptions   = LayoutOptions.Start;
+                MediaElement.Margin = Width > 850
+                    ? new Thickness(24, 72, 424, 0)
+                    : new Thickness(24, 56, 24, 0);
+                MediaElement.HeightRequest = Width > 850 ? -1 : 280;
+                MediaElement.WidthRequest  = -1;
             }
             _isUpdatingLayout = false;
         });
     }
 
-#if ANDROID
-    private static void SetAndroidImmersiveMode(bool enter)
+    private void UpdateVideoControlsVisibility()
     {
-        var window = Platform.CurrentActivity?.Window;
-        if (window == null) return;
+        if (_viewModel == null) return;
 
-#pragma warning disable CA1416
-        if (enter)
+        MainThread.BeginInvokeOnMainThread(() =>
         {
-            window.AddFlags(Android.Views.WindowManagerFlags.Fullscreen);
-            window.DecorView.SystemUiFlags =
-                Android.Views.SystemUiFlags.ImmersiveSticky |
-                Android.Views.SystemUiFlags.HideNavigation |
-                Android.Views.SystemUiFlags.Fullscreen |
-                Android.Views.SystemUiFlags.LayoutHideNavigation |
-                Android.Views.SystemUiFlags.LayoutFullscreen |
-                Android.Views.SystemUiFlags.LayoutStable;
-        }
-        else
-        {
-            window.ClearFlags(Android.Views.WindowManagerFlags.Fullscreen);
-            window.DecorView.SystemUiFlags = Android.Views.SystemUiFlags.Visible;
-        }
-#pragma warning restore CA1416
+            bool show = _viewModel.ShowVideoPlayer && !_viewModel.IsFullScreen;
+            NormalVideoControls.IsVisible = show;
+
+            if (show)
+            {
+                var bounds    = NormalMediaContainer.Bounds;
+                double right  = bounds.Width > 0
+                    ? Width - (bounds.X + bounds.Width) + 8
+                    : (Width > 850 ? 436 : 36);
+                double top    = bounds.Width > 0 ? bounds.Y + 8 : 84;
+
+                NormalVideoControls.HorizontalOptions = LayoutOptions.End;
+                NormalVideoControls.VerticalOptions   = LayoutOptions.Start;
+                NormalVideoControls.Margin            = new Thickness(0, top, right, 0);
+            }
+        });
     }
-#endif
 
     protected override void OnSizeAllocated(double width, double height)
     {
@@ -204,14 +150,14 @@ public partial class PlayerPage : ContentPage
         UpdateVideoControlsVisibility();
     }
 
+    // ───────── event handlers ─────────
+
     private void OnMediaOpened(object? sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
             if (_viewModel != null && MediaElement.Duration != TimeSpan.Zero)
-            {
                 _viewModel.UpdateDuration(MediaElement.Duration);
-            }
         });
     }
 
@@ -219,47 +165,22 @@ public partial class PlayerPage : ContentPage
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            if (_viewModel != null && _viewModel.Duration == TimeSpan.Zero && MediaElement.Duration != TimeSpan.Zero)
-            {
+            if (_viewModel != null && _viewModel.Duration == TimeSpan.Zero &&
+                MediaElement.Duration != TimeSpan.Zero)
                 _viewModel.UpdateDuration(MediaElement.Duration);
-            }
         });
     }
 
-    private void OnSliderDragStarted(object? sender, EventArgs e)
-    {
+    private void OnSliderDragStarted(object? sender, EventArgs e) =>
         _viewModel?.OnSliderDragStarted();
-        // Keep controls visible while seeking
-        if (_viewModel?.IsFullScreen == true)
-        {
-            _viewModel?.ShowFullscreenControls();
-        }
-    }
 
-    private void OnSliderDragCompleted(object? sender, EventArgs e)
-    {
+    private void OnSliderDragCompleted(object? sender, EventArgs e) =>
         _viewModel?.OnSliderDragCompleted();
-        // Reset auto-hide timer after seeking
-        if (_viewModel?.IsFullScreen == true)
-        {
-            _viewModel?.ShowFullscreenControls();
-        }
-    }
 
-    private void OnSliderValueChanged(object? sender, ValueChangedEventArgs e)
-    {
+    private void OnSliderValueChanged(object? sender, ValueChangedEventArgs e) =>
         _viewModel?.OnSliderValueChanged(e.NewValue);
-    }
 
-    // Called when user taps on fullscreen video area to show controls
-    private void OnFullscreenVideoTapped(object? sender, TappedEventArgs e)
-    {
-        _viewModel?.ShowFullscreenControls();
-    }
-
-    // Swipe left → next track, swipe right → previous track
     private double _panX;
-
     private async void OnAlbumArtPanned(object? sender, PanUpdatedEventArgs e)
     {
         switch (e.StatusType)
@@ -267,7 +188,6 @@ public partial class PlayerPage : ContentPage
             case GestureStatus.Running:
                 _panX = e.TotalX;
                 break;
-
             case GestureStatus.Completed:
                 if (_viewModel == null) break;
                 if (_panX < -60 && _viewModel.HasNext)

@@ -6,10 +6,16 @@ using Android.Media.Session;
 using Android.OS;
 using Tips_Player.Platforms.Android.Receivers;
 
+// All code in this file runs only on Android. The version guards (Build.VERSION.SdkInt >=)
+// already protect every API-gated call at runtime; pragmas just silence the analyzer.
+#pragma warning disable CS8602, CS8604   // Null-dereference — Android builder chains are non-null by contract
+#pragma warning disable CA1416           // Platform version — all calls are runtime-guarded
+#pragma warning disable CA1422           // Obsolete API — kept for API 21-22 compatibility
+
 namespace Tips_Player.Platforms.Android;
 
 [Service(
-    Name             = "com.companyname.tipsplayer.MediaPlaybackService",
+    Name             = "gh.websitedesignerghana.tipsplayer.MediaPlaybackService",
     Exported         = false,
     ForegroundServiceType = global::Android.Content.PM.ForegroundService.TypeMediaPlayback)]
 public class MediaPlaybackService : Service
@@ -48,7 +54,6 @@ public class MediaPlaybackService : Service
 
         EnsureNotificationChannel();
 
-        // Build initial notification (needed before StartForeground)
         var notification = BuildNotification();
 
         if (Build.VERSION.SdkInt >= BuildVersionCodes.Q)
@@ -91,33 +96,32 @@ public class MediaPlaybackService : Service
         if (_mediaSession == null || media == null) return;
 
         var builder = new MediaMetadata.Builder()
-            .PutString(MediaMetadata.MetadataKeyTitle,  media.Title)
-            .PutString(MediaMetadata.MetadataKeyArtist, media.Artist)
-            .PutString(MediaMetadata.MetadataKeyAlbum,  media.Album)
+            .PutString(MediaMetadata.MetadataKeyTitle,  media.Title)!
+            .PutString(MediaMetadata.MetadataKeyArtist, media.Artist)!
+            .PutString(MediaMetadata.MetadataKeyAlbum,  media.Album)!
             .PutLong(MediaMetadata.MetadataKeyDuration, (long)media.Duration.TotalMilliseconds);
 
-        // Load album art if cached
         if (!string.IsNullOrEmpty(media.AlbumArtPath) && File.Exists(media.AlbumArtPath))
         {
             try
             {
                 var bmp = BitmapFactory.DecodeFile(media.AlbumArtPath);
-                if (bmp != null) builder.PutBitmap(MediaMetadata.MetadataKeyAlbumArt, bmp);
+                if (bmp != null) builder!.PutBitmap(MediaMetadata.MetadataKeyAlbumArt, bmp);
             }
             catch { /* non-fatal */ }
         }
 
-        _mediaSession.SetMetadata(builder.Build());
+        _mediaSession.SetMetadata(builder!.Build());
 
         var state = new PlaybackState.Builder()
             .SetActions(PlaybackState.ActionPlay | PlaybackState.ActionPause |
                         PlaybackState.ActionSkipToNext | PlaybackState.ActionSkipToPrevious |
-                        PlaybackState.ActionStop)
+                        PlaybackState.ActionStop)!
             .SetState(
                 MediaServiceBridge.IsPlaying
                     ? PlaybackStateCode.Playing
                     : PlaybackStateCode.Paused,
-                0, 1.0f)
+                0, 1.0f)!
             .Build();
         _mediaSession.SetPlaybackState(state);
     }
@@ -145,12 +149,10 @@ public class MediaPlaybackService : Service
 
         var context = global::Android.App.Application.Context;
 
-        // Tap → open app
         var tapIntent  = context.PackageManager!.GetLaunchIntentForPackage(context.PackageName!)!;
         var tapPending = PendingIntent.GetActivity(context, 0, tapIntent,
             PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable)!;
 
-        // Action helpers
         PendingIntent ActionIntent(string action, int reqCode)
         {
             var i = new Intent(action).SetPackage(context.PackageName);
@@ -167,44 +169,38 @@ public class MediaPlaybackService : Service
             ? global::Android.Resource.Drawable.IcMediaPause
             : global::Android.Resource.Drawable.IcMediaPlay;
 
-        // Use Notification.Builder (API 26+ requires channel; API 21+ otherwise)
         var builder = new Notification.Builder(context, ChannelId)
-            .SetContentTitle(media?.Title ?? "Tips Player")
-            .SetContentText(media != null ? $"{media.Artist} • {media.Album}" : "Ready to play")
-            .SetSmallIcon(global::Android.Resource.Drawable.IcMediaPlay)
-            .SetContentIntent(tapPending)
-            .SetOngoing(isPlaying)
-            .SetVisibility(NotificationVisibility.Public)
-            .SetCategory(Notification.CategoryTransport)
-#pragma warning disable CA1416 // Suppress obsolete AddAction warning — 3-arg overload still valid
-            .AddAction(global::Android.Resource.Drawable.IcMediaPrevious, "Previous", prevIntent)
-            .AddAction(playPauseIcon, isPlaying ? "Pause" : "Play", ppIntent)
-            .AddAction(global::Android.Resource.Drawable.IcMediaNext, "Next", nextIntent)
+            .SetContentTitle(media?.Title ?? "Tips Player")!
+            .SetContentText(media != null ? $"{media.Artist} • {media.Album}" : "Ready to play")!
+            .SetSmallIcon(global::Android.Resource.Drawable.IcMediaPlay)!
+            .SetContentIntent(tapPending)!
+            .SetOngoing(isPlaying)!
+            .SetVisibility(NotificationVisibility.Public)!
+            .SetCategory(Notification.CategoryTransport)!
+            .AddAction(global::Android.Resource.Drawable.IcMediaPrevious, "Previous", prevIntent)!
+            .AddAction(playPauseIcon, isPlaying ? "Pause" : "Play", ppIntent)!
+            .AddAction(global::Android.Resource.Drawable.IcMediaNext, "Next", nextIntent)!
             .AddAction(global::Android.Resource.Drawable.IcDelete, "Stop", stopIntent);
-#pragma warning restore CA1416
 
-        // Album art
         if (!string.IsNullOrEmpty(media?.AlbumArtPath) && File.Exists(media.AlbumArtPath))
         {
             try
             {
                 var bmp = BitmapFactory.DecodeFile(media.AlbumArtPath);
-                if (bmp != null) builder.SetLargeIcon(bmp);
+                if (bmp != null) builder!.SetLargeIcon(bmp);
             }
             catch { /* non-fatal */ }
         }
 
-        // Notification.MediaStyle (API 21+) — shows controls on lock screen
-        // No external AndroidX package needed; uses the Android SDK directly.
         if (_mediaSession != null)
         {
             var style = new Notification.MediaStyle()
-                .SetMediaSession(_mediaSession.SessionToken)
-                .SetShowActionsInCompactView(0, 1, 2); // prev, play/pause, next
-            builder.SetStyle(style);
+                .SetMediaSession(_mediaSession.SessionToken)!
+                .SetShowActionsInCompactView(0, 1, 2);
+            builder!.SetStyle(style);
         }
 
-        return builder.Build()!;
+        return builder!.Build()!;
     }
 
     private void OnBridgeStateChanged()

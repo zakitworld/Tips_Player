@@ -427,6 +427,21 @@ public partial class PlayerViewModel : BaseViewModel
         }
     }
 
+    /// <summary>
+    /// Re-loads the current media on whatever MediaElement is now active and seeks to
+    /// the given position.  Used when handing the MediaElement between normal and
+    /// fullscreen pages.
+    /// </summary>
+    public async Task ResumeAtPositionAsync(TimeSpan position, bool shouldPlay)
+    {
+        if (CurrentMedia == null) return;
+        await _mediaPlayerService.LoadAsync(CurrentMedia);
+        if (position > TimeSpan.Zero)
+            await _mediaPlayerService.SeekAsync(position);
+        if (shouldPlay)
+            await _mediaPlayerService.PlayAsync();
+    }
+
     public async Task LoadAndPlayAsync(MediaItem media)
     {
         CurrentPosition = TimeSpan.Zero;
