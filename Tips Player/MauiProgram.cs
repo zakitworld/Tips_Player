@@ -6,6 +6,7 @@ using Tips_Player.Services;
 using Tips_Player.Services.Interfaces;
 using Tips_Player.ViewModels;
 using Tips_Player.Views;
+using Tips_Player.Infrastructure.Persistence;
 
 namespace Tips_Player;
 
@@ -17,7 +18,9 @@ public static class MauiProgram
 
         Step("UseMauiApp", () => builder.UseMauiApp<App>());
         Step("UseMauiCommunityToolkit", () => builder.UseMauiCommunityToolkit());
-        Step("UseMauiCommunityToolkitMediaElement", () => builder.UseMauiCommunityToolkitMediaElement());
+        // The app owns its Android foreground playback service and notification controls.
+        Step("UseMauiCommunityToolkitMediaElement", () => builder.UseMauiCommunityToolkitMediaElement(
+            isAndroidForegroundServiceEnabled: false));
         Step("ConfigureSerilog", () => builder.ConfigureSerilog());
         Step("ConfigureFonts", () => builder.ConfigureFonts(fonts =>
         {
@@ -29,6 +32,8 @@ public static class MauiProgram
         // Register Services
         Step("RegisterServices", () =>
         {
+            builder.Services.AddSingleton<IJsonFileStore, AtomicJsonFileStore>();
+            builder.Services.AddSingleton<IAppDatabase, AppDatabase>();
             builder.Services.AddSingleton<IMediaPlayerService, MediaPlayerService>();
             builder.Services.AddSingleton<IFilePickerService, FilePickerService>();
             builder.Services.AddSingleton<ILibraryService, LibraryService>();

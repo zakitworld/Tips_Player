@@ -28,83 +28,43 @@
                     <VisualState.Setters>
                         <Setter TargetName="NormalModeContentGrid" Property="ColumnDefinitions" Value="*" />
                         <Setter TargetName="NormalModeContentGrid" Property="RowDefinitions" Value="Auto,Auto" />
+                        <Setter TargetName="NormalModeContentGrid" Property="WidthRequest" Value="-1" />
+                        <Setter TargetName="NormalModeContentGrid" Property="HorizontalOptions" Value="Fill" />
                         <Setter TargetName="NormalMediaContainer" Property="Grid.Column" Value="0" />
                         <Setter TargetName="NormalMediaContainer" Property="Grid.Row" Value="0" />
                         <Setter TargetName="ControlsPanel" Property="Grid.Column" Value="0" />
                         <Setter TargetName="ControlsPanel" Property="Grid.Row" Value="1" />
                         <Setter TargetName="NormalMediaContainer" Property="HeightRequest" Value="320" />
+                        <Setter TargetName="NormalMediaContainer" Property="WidthRequest" Value="-1" />
+                        <Setter TargetName="NormalMediaContainer" Property="VerticalOptions" Value="Fill" />
+                        <Setter TargetName="ControlsPanel" Property="WidthRequest" Value="-1" />
                         <Setter TargetName="ControlsPanel" Property="Margin" Value="0,10,0,0" />
+                        <Setter TargetName="ControlsPanel" Property="VerticalOptions" Value="Fill" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Desktop">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="850" />
+                        <AdaptiveTrigger MinWindowWidth="1150" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter TargetName="NormalModeContentGrid" Property="ColumnDefinitions" Value="*, 400" />
+                        <Setter TargetName="NormalModeContentGrid" Property="ColumnDefinitions" Value="520,580" />
                         <Setter TargetName="NormalModeContentGrid" Property="RowDefinitions" Value="*" />
+                        <Setter TargetName="NormalModeContentGrid" Property="WidthRequest" Value="1132" />
+                        <Setter TargetName="NormalModeContentGrid" Property="HorizontalOptions" Value="Center" />
                         <Setter TargetName="NormalMediaContainer" Property="Grid.Column" Value="0" />
                         <Setter TargetName="NormalMediaContainer" Property="Grid.Row" Value="0" />
                         <Setter TargetName="ControlsPanel" Property="Grid.Column" Value="1" />
                         <Setter TargetName="ControlsPanel" Property="Grid.Row" Value="0" />
-                        <Setter TargetName="NormalMediaContainer" Property="HeightRequest" Value="-1" />
-                        <Setter TargetName="NormalMediaContainer" Property="VerticalOptions" Value="Fill" />
-                        <Setter TargetName="ControlsPanel" Property="Margin" Value="24,0,0,0" />
-                        <Setter TargetName="ControlsPanel" Property="VerticalOptions" Value="Center" />
+                        <Setter TargetName="NormalMediaContainer" Property="HeightRequest" Value="520" />
+                        <Setter TargetName="NormalMediaContainer" Property="WidthRequest" Value="520" />
+                        <Setter TargetName="NormalMediaContainer" Property="VerticalOptions" Value="Start" />
+                        <Setter TargetName="ControlsPanel" Property="WidthRequest" Value="580" />
+                        <Setter TargetName="ControlsPanel" Property="Margin" Value="32,0,0,0" />
+                        <Setter TargetName="ControlsPanel" Property="VerticalOptions" Value="Start" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-
-        <!-- MediaElement for normal-mode video — positioned over NormalMediaContainer by code-behind -->
-        <toolkit:MediaElement x:Name="MediaElement"
-                              ShouldAutoPlay="False"
-                              ShouldShowPlaybackControls="False"
-                              Aspect="{Binding VideoAspect}"
-                              MediaOpened="OnMediaOpened"
-                              PositionChanged="OnPositionChanged"
-                              IsVisible="{Binding ShowVideoPlayer}"
-                              ZIndex="10"
-                              InputTransparent="True"/>
-
-        <!-- Video Controls Overlay (Normal Mode) -->
-        <HorizontalStackLayout x:Name="NormalVideoControls"
-                               HorizontalOptions="Start"
-                               VerticalOptions="Start"
-                               Margin="36,84,0,0"
-                               Spacing="8"
-                               ZIndex="20"
-                               IsVisible="False">
-            <Button Command="{Binding ToggleAspectCommand}"
-                    BackgroundColor="#40000000"
-                    TextColor="{StaticResource TextPrimary}"
-                    FontSize="14"
-                    HeightRequest="40"
-                    WidthRequest="60"
-                    CornerRadius="20"
-                    TextTransform="None"
-                    ToolTipProperties.Text="Toggle Aspect Ratio">
-                <Button.Triggers>
-                    <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit">
-                        <Setter Property="Text" Value="Fit" />
-                    </DataTrigger>
-                    <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill">
-                        <Setter Property="Text" Value="Fill" />
-                    </DataTrigger>
-                </Button.Triggers>
-            </Button>
-
-            <Button Text="{x:Static helpers:FontIcons.Expand}"
-                    FontFamily="FontAwesome"
-                    Command="{Binding ToggleFullScreenCommand}"
-                    BackgroundColor="#40000000"
-                    TextColor="{StaticResource TextPrimary}"
-                    FontSize="18"
-                    HeightRequest="40"
-                    WidthRequest="40"
-                    CornerRadius="20"
-                    ToolTipProperties.Text="Fullscreen"/>
-        </HorizontalStackLayout>
 
         <!-- Normal Mode Layout (fullscreen is handled by FullscreenVideoPage modal) -->
         <Grid RowDefinitions="Auto,*">
@@ -114,97 +74,128 @@
                   ColumnDefinitions="*,Auto"
                   Padding="{OnPlatform Android='8,8', Default='24,16'}"
                   BackgroundColor="{StaticResource PageBackground}">
-                <HorizontalStackLayout Grid.Column="0" Spacing="{OnPlatform Android=8, Default=12}" VerticalOptions="Center">
-                    <Image Source="app_logo.png"
-                           HeightRequest="32"
-                           WidthRequest="32"
-                           VerticalOptions="Center"
-                           IsVisible="{OnPlatform Android=False, Default=True}"/>
-                    <Label Text="Now Playing"
-                           FontSize="{OnPlatform Android=18, Default=24}"
+                <VerticalStackLayout Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                    <Label Text="PLAYBACK" Style="{StaticResource EyebrowStyle}" IsVisible="{OnPlatform Android=False, Default=True}"/>
+                    <Label Text="{Binding PlayerHeading}"
+                           FontSize="{OnPlatform Android=19, Default=28}"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}"
-                           VerticalOptions="Center"/>
-                </HorizontalStackLayout>
+                           TextColor="{StaticResource TextPrimary}"/>
+                </VerticalStackLayout>
                 <HorizontalStackLayout Grid.Column="1" Spacing="{OnPlatform Android=2, Default=6}">
                     <!-- Queue Button -->
                     <Button Text="{x:Static helpers:FontIcons.List}"
                             FontFamily="FontAwesome"
                             Command="{Binding NavigateToQueueCommand}"
-                            BackgroundColor="{StaticResource CardBackground}"
+                            BackgroundColor="{StaticResource ElevatedBackground}"
                             TextColor="{StaticResource TextPrimary}"
                             FontSize="{OnPlatform Android=14, Default=16}"
                             HeightRequest="{OnPlatform Android=34, Default=40}"
                             WidthRequest="{OnPlatform Android=34, Default=40}"
-                            CornerRadius="{OnPlatform Android=17, Default=20}"
+                            CornerRadius="{OnPlatform Android=10, Default=14}"
                             Padding="0"
+                            AutomationProperties.Name="Open queue"
                             ToolTipProperties.Text="Queue"/>
                     <!-- Lyrics Button -->
                     <Button Text="{x:Static helpers:FontIcons.Font}"
                             FontFamily="FontAwesome"
                             Command="{Binding NavigateToLyricsCommand}"
-                            BackgroundColor="{StaticResource CardBackground}"
+                            BackgroundColor="{StaticResource ElevatedBackground}"
                             TextColor="{StaticResource TextPrimary}"
                             FontSize="{OnPlatform Android=14, Default=16}"
                             HeightRequest="{OnPlatform Android=34, Default=40}"
                             WidthRequest="{OnPlatform Android=34, Default=40}"
-                            CornerRadius="{OnPlatform Android=17, Default=20}"
+                            CornerRadius="{OnPlatform Android=10, Default=14}"
                             Padding="0"
+                            AutomationProperties.Name="Open lyrics"
                             ToolTipProperties.Text="Lyrics"/>
                     <!-- Equalizer Button -->
                     <Button Text="{x:Static helpers:FontIcons.Equalizer}"
                             FontFamily="FontAwesome"
                             Command="{Binding NavigateToEqualizerCommand}"
-                            BackgroundColor="{StaticResource CardBackground}"
+                            BackgroundColor="{StaticResource ElevatedBackground}"
                             TextColor="{StaticResource TextPrimary}"
                             FontSize="{OnPlatform Android=14, Default=16}"
                             HeightRequest="{OnPlatform Android=34, Default=40}"
                             WidthRequest="{OnPlatform Android=34, Default=40}"
-                            CornerRadius="{OnPlatform Android=17, Default=20}"
+                            CornerRadius="{OnPlatform Android=10, Default=14}"
                             Padding="0"
+                            AutomationProperties.Name="Open equalizer"
                             ToolTipProperties.Text="Equalizer"/>
                     <!-- Car Mode Button -->
                     <Button Text="{x:Static helpers:FontIcons.Car}"
                             FontFamily="FontAwesome"
                             Command="{Binding EnterCarModeCommand}"
-                            BackgroundColor="{StaticResource CardBackground}"
+                            BackgroundColor="{StaticResource ElevatedBackground}"
                             TextColor="{StaticResource TextPrimary}"
                             FontSize="{OnPlatform Android=14, Default=16}"
                             HeightRequest="{OnPlatform Android=34, Default=40}"
                             WidthRequest="{OnPlatform Android=34, Default=40}"
-                            CornerRadius="{OnPlatform Android=17, Default=20}"
+                            CornerRadius="{OnPlatform Android=10, Default=14}"
                             Padding="0"
+                            AutomationProperties.Name="Enter car mode"
                             ToolTipProperties.Text="Car Mode"/>
                     <!-- Add Files Button -->
                     <Button Text="{x:Static helpers:FontIcons.Plus}"
                             FontFamily="FontAwesome"
                             Command="{Binding AddFilesCommand}"
-                            BackgroundColor="{StaticResource CardBackground}"
+                            BackgroundColor="{StaticResource ElevatedBackground}"
                             TextColor="{StaticResource TextPrimary}"
                             FontSize="{OnPlatform Android=14, Default=18}"
                             HeightRequest="{OnPlatform Android=34, Default=40}"
                             WidthRequest="{OnPlatform Android=34, Default=40}"
-                            CornerRadius="{OnPlatform Android=17, Default=20}"
+                            CornerRadius="{OnPlatform Android=10, Default=14}"
                             Padding="0"
-                            ToolTipProperties.Text="Add Files"/>
+                            AutomationProperties.Name="Add media files"
+                            ToolTipProperties.Text="Add media"/>
                 </HorizontalStackLayout>
             </Grid>
 
             <!-- Main Content Area -->
             <ScrollView Grid.Row="1">
-                <Grid x:Name="NormalModeContentGrid" Padding="24,0,24,24">
+                <Grid x:Name="NormalModeContentGrid" Padding="{OnPlatform Android='12,0,12,20', Default='0,0,0,28'}">
                     
                     <!-- Media Display Area -->
                     <Border x:Name="NormalMediaContainer"
                             StrokeThickness="0"
                             BackgroundColor="{StaticResource CardBackground}"
-                            StrokeShape="RoundRectangle 16"
+                            StrokeShape="RoundRectangle 24"
                             HorizontalOptions="Fill">
                         <Border.Shadow>
                             <Shadow Brush="#000000" Offset="0,8" Radius="24" Opacity="0.5"/>
                         </Border.Shadow>
 
                         <Grid>
+                            <toolkit:MediaElement x:Name="MediaElement"
+                                                  ShouldAutoPlay="False"
+                                                  ShouldShowPlaybackControls="False"
+                                                  Aspect="{Binding VideoAspect}"
+                                                  MediaOpened="OnMediaOpened"
+                                                  PositionChanged="OnPositionChanged"
+                                                  IsVisible="{Binding ShowVideoPlayer}"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  ZIndex="10"/>
+
+                            <HorizontalStackLayout x:Name="NormalVideoControls"
+                                                   HorizontalOptions="End"
+                                                   VerticalOptions="Start"
+                                                   Margin="12"
+                                                   Spacing="8"
+                                                   ZIndex="20"
+                                                   IsVisible="False">
+                                <Button Command="{Binding ToggleAspectCommand}" BackgroundColor="#99000000"
+                                        TextColor="White" FontSize="13" HeightRequest="40" WidthRequest="60"
+                                        CornerRadius="20" Padding="0" ToolTipProperties.Text="Fit or fill video">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFit"><Setter Property="Text" Value="Fit" /></DataTrigger>
+                                        <DataTrigger TargetType="Button" Binding="{Binding VideoAspect}" Value="AspectFill"><Setter Property="Text" Value="Fill" /></DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button Text="{x:Static helpers:FontIcons.Expand}" FontFamily="FontAwesome"
+                                        Command="{Binding ToggleFullScreenCommand}" BackgroundColor="#99000000"
+                                        TextColor="White" FontSize="18" HeightRequest="40" WidthRequest="40"
+                                        CornerRadius="20" Padding="0" ToolTipProperties.Text="Fullscreen"/>
+                            </HorizontalStackLayout>
                             <Grid.GestureRecognizers>
                                 <!-- Double-tap → fullscreen -->
                                 <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding ToggleFullScreenCommand}"/>
@@ -224,12 +215,16 @@
                                 <BoxView>
                                     <BoxView.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#1a1a2e" Offset="0.0"/>
-                                            <GradientStop Color="#16213e" Offset="0.5"/>
-                                            <GradientStop Color="#0f3460" Offset="1.0"/>
+                                            <GradientStop Color="#171A2A" Offset="0.0"/>
+                                            <GradientStop Color="#222345" Offset="0.52"/>
+                                            <GradientStop Color="#123C45" Offset="1.0"/>
                                         </LinearGradientBrush>
                                     </BoxView.Background>
                                 </BoxView>
+
+                                <Image Source="{Binding CurrentMedia.AlbumArtPath}"
+                                       Aspect="AspectFill"
+                                       IsVisible="{Binding CurrentMedia.AlbumArtPath, Converter={StaticResource IsNotNullConverter}}"/>
 
                                 <!-- Music Icon with Glow Effect -->
                                 <Grid VerticalOptions="Center" HorizontalOptions="Center">
@@ -285,14 +280,14 @@
                         
                         <!-- Track Info -->
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                            <Label Text="{Binding CurrentMedia.Title, FallbackValue='No Track Selected'}"
-                                   FontSize="20"
+                            <Label Text="{Binding CurrentMedia.Title, FallbackValue='Choose something to play'}"
+                                   FontSize="24"
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"
                                    HorizontalTextAlignment="Center"
                                    MaxLines="1"
                                    LineBreakMode="TailTruncation"/>
-                            <Label Text="{Binding CurrentMedia.DisplaySubtitle, FallbackValue='Select a track to play'}"
+                            <Label Text="{Binding CurrentMedia.DisplaySubtitle, FallbackValue='Your next favorite track is waiting'}"
                                    FontSize="14"
                                    TextColor="{StaticResource TextSecondary}"
                                    HorizontalTextAlignment="Center"/>
@@ -325,7 +320,9 @@
                         </Grid>
 
                         <!-- Playback Controls -->
-                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="16" Margin="0,4,0,0">
+                        <HorizontalStackLayout HorizontalOptions="Center"
+                                               Spacing="{OnPlatform Android=2, Default=12}"
+                                               Margin="0,4,0,0">
                             <Button Text="{x:Static helpers:FontIcons.Shuffle}"
                                     Command="{Binding ToggleShuffleCommand}"
                                     Style="{StaticResource SecondaryControlStyle}"
@@ -338,20 +335,33 @@
                                     HeightRequest="44" WidthRequest="44" FontSize="18"
                                     ToolTipProperties.Text="Previous"/>
 
+                            <Button Text="{x:Static helpers:FontIcons.SeekBackward}"
+                                    Command="{Binding SeekBackwardCommand}"
+                                    Style="{StaticResource SecondaryControlStyle}"
+                                    FontSize="14"
+                                    AutomationProperties.Name="Rewind 10 seconds"
+                                    ToolTipProperties.Text="Back 10 seconds"/>
+
                             <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
                                     FontFamily="FontAwesome"
                                     Command="{Binding PlayPauseCommand}"
-                                    BackgroundColor="{StaticResource AccentColor}"
-                                    TextColor="{StaticResource TextPrimary}"
-                                    FontSize="24"
-                                    HeightRequest="60"
-                                    WidthRequest="60"
-                                    CornerRadius="30"
+                                    Style="{StaticResource PlayButtonStyle}"
+                                    HeightRequest="64"
+                                    WidthRequest="64"
+                                    CornerRadius="22"
+                                    AutomationProperties.Name="Play or pause"
                                     ToolTipProperties.Text="Play/Pause">
                                 <Button.Shadow>
                                     <Shadow Brush="{StaticResource AccentColor}" Offset="0,4" Radius="12" Opacity="0.4"/>
                                 </Button.Shadow>
                             </Button>
+
+                            <Button Text="{x:Static helpers:FontIcons.SeekForward}"
+                                    Command="{Binding SeekForwardCommand}"
+                                    Style="{StaticResource SecondaryControlStyle}"
+                                    FontSize="14"
+                                    AutomationProperties.Name="Fast forward 10 seconds"
+                                    ToolTipProperties.Text="Forward 10 seconds"/>
 
                             <Button Text="{x:Static helpers:FontIcons.StepBackward}"
                                     Command="{Binding NextCommand}"

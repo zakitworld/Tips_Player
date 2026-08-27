@@ -11,8 +11,11 @@
   <!-- Android 14+ requires this for partial media access fallback -->
   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
-  <application android:allowBackup="true"
-               android:icon="@android:drawable/ic_media_play"
+  <application android:allowBackup="false"
+               android:fullBackupContent="false"
+               android:usesCleartextTraffic="false"
+               android:icon="@mipmap/appicon"
+               android:roundIcon="@mipmap/appicon_round"
                android:supportsRtl="true"
                android:label="Tips Player">
 

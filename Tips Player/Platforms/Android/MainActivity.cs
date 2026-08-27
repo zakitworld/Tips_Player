@@ -2,6 +2,8 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Microsoft.Extensions.DependencyInjection;
+using Tips_Player.ViewModels;
 
 namespace Tips_Player
 {
@@ -28,6 +30,29 @@ namespace Tips_Player
         {
             if (Instance == this) Instance = null;
             base.OnDestroy();
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
+            Window?.ClearFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+
+            var viewModel = IPlatformApplication.Current?.Services.GetService<PlayerViewModel>();
+            if (viewModel != null)
+                MainThread.BeginInvokeOnMainThread(async () => await viewModel.PauseVideoForBackgroundAsync());
+        }
+
+        public static void SetKeepScreenOn(bool enabled)
+        {
+            var activity = Instance;
+            if (activity?.Window == null) return;
+            activity.RunOnUiThread(() =>
+            {
+                if (enabled)
+                    activity.Window.AddFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+                else
+                    activity.Window.ClearFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+            });
         }
 
         public override void OnRequestPermissionsResult(

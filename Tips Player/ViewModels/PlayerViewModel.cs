@@ -120,6 +120,8 @@ public partial class PlayerViewModel : BaseViewModel
         ? Math.Clamp(CurrentPosition.TotalSeconds / Duration.TotalSeconds, 0, 1)
         : 0;
 
+    public string PlayerHeading => CurrentMedia == null ? "Player" : "Now Playing";
+
     public PlayerViewModel(
         IMediaPlayerService mediaPlayerService,
         IFilePickerService filePickerService,
@@ -269,6 +271,7 @@ public partial class PlayerViewModel : BaseViewModel
         CurrentMedia = media;
         ShowVideoPlayer = media?.MediaType == MediaType.Video;
         if (CurrentMedia != null) CurrentMedia.IsCurrentTrack = true;
+        OnPropertyChanged(nameof(PlayerHeading));
         OnPropertyChanged(nameof(Progress));
     }
 
@@ -281,8 +284,10 @@ public partial class PlayerViewModel : BaseViewModel
         }
         else
         {
-            if (CurrentMedia == null && Playlist.Count > 0)
+            if (CurrentMedia == null)
             {
+                await EnsurePlaylistReadyAsync();
+                if (Playlist.Count == 0) return;
                 CurrentIndex = 0;
                 await LoadAndPlayAsync(Playlist[0]);
             }
@@ -291,6 +296,25 @@ public partial class PlayerViewModel : BaseViewModel
                 await _mediaPlayerService.PlayAsync();
             }
         }
+    }
+
+    private async Task EnsurePlaylistReadyAsync()
+    {
+        await InitializeAsync();
+        if (Playlist.Count == 0)
+            await _libraryService.DeviceScanTask;
+
+        foreach (var media in _libraryService.MediaItems)
+        {
+            if (!Playlist.Any(existing => existing.FilePath == media.FilePath))
+                Playlist.Add(media);
+        }
+    }
+
+    public async Task PauseVideoForBackgroundAsync()
+    {
+        if (CurrentMedia?.MediaType == MediaType.Video && IsPlaying)
+            await _mediaPlayerService.PauseAsync();
     }
 
     [RelayCommand]
@@ -324,6 +348,32 @@ public partial class PlayerViewModel : BaseViewModel
             CurrentIndex--;
             await LoadAndPlayAsync(Playlist[CurrentIndex]);
         }
+    }
+
+    [RelayCommand]
+    private async Task SeekBackwardAsync()
+    {
+        var target = CurrentPosition - TimeSpan.FromSeconds(10);
+        if (target < TimeSpan.Zero) target = TimeSpan.Zero;
+        await SeekToAsync(target);
+    }
+
+    [RelayCommand]
+    private async Task SeekForwardAsync()
+    {
+        var target = CurrentPosition + TimeSpan.FromSeconds(10);
+        if (Duration > TimeSpan.Zero && target > Duration) target = Duration;
+        await SeekToAsync(target);
+    }
+
+    private async Task SeekToAsync(TimeSpan position)
+    {
+        CurrentPosition = position;
+        SliderPosition = position.TotalSeconds;
+        OnPropertyChanged(nameof(CurrentPositionFormatted));
+        OnPropertyChanged(nameof(Progress));
+        await _mediaPlayerService.SeekAsync(position);
+        ShowFullscreenControls();
     }
 
     [RelayCommand]
@@ -452,7 +502,8 @@ public partial class PlayerViewModel : BaseViewModel
         OnPropertyChanged(nameof(CurrentPositionFormatted));
 
         // Fetch album art in background so it's ready for the notification and PlayerPage
-        if (string.IsNullOrEmpty(media.AlbumArtPath))
+        if (string.IsNullOrEmpty(media.AlbumArtPath) ||
+            media.AlbumArtPath.StartsWith("content://", StringComparison.OrdinalIgnoreCase))
         {
             _ = Task.Run(async () =>
             {

@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -20,7 +20,7 @@
             <Grid IsVisible="{Binding IsArtistDetailVisible, Converter={StaticResource InverseBoolConverter}}"
                   RowDefinitions="Auto,Auto,*">
 
-                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,32,24,12">
                     <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
                         <Image Source="app_logo.png"
                                HeightRequest="32"

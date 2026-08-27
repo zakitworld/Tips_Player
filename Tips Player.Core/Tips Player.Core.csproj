@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Tips_Player</RootNamespace>
+    <AssemblyName>Tips.Player.Core</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <Compile Include="..\Tips Player\Models\**\*.cs" Link="Models\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\Tips Player\Constants\**\*.cs" Link="Constants\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\Tips Player\Infrastructure\Error.cs" Link="Infrastructure\Error.cs" />
+    <Compile Include="..\Tips Player\Infrastructure\Result.cs" Link="Infrastructure\Result.cs" />
+    <Compile Include="..\Tips Player\Infrastructure\Validation\**\*.cs" Link="Infrastructure\Validation\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

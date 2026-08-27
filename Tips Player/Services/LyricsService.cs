@@ -2,6 +2,9 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
+using Tips_Player.Constants;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Tips_Player.Services;
 
@@ -19,7 +22,7 @@ public class LyricsService : ILyricsService
         {
             Directory.CreateDirectory(_cacheDirectory);
         }
-        _logger.LogInformation("LyricsService initialized. Cache directory: {CacheDirectory}", _cacheDirectory);
+        _logger.LogInformation("LyricsService initialized");
     }
 
     public async Task<Lyrics?> GetLyricsAsync(string title, string artist, CancellationToken cancellationToken = default)
@@ -49,6 +52,8 @@ public class LyricsService : ILyricsService
             var lrcPath = Path.ChangeExtension(filePath, ".lrc");
             if (File.Exists(lrcPath))
             {
+                if (new FileInfo(lrcPath).Length > AppConstants.Validation.MaxLyricsFileBytes)
+                    return null;
                 var content = await File.ReadAllTextAsync(lrcPath, cancellationToken);
                 return Lyrics.Parse(content);
             }
@@ -57,6 +62,8 @@ public class LyricsService : ILyricsService
             var txtPath = Path.ChangeExtension(filePath, ".txt");
             if (File.Exists(txtPath))
             {
+                if (new FileInfo(txtPath).Length > AppConstants.Validation.MaxLyricsFileBytes)
+                    return null;
                 var content = await File.ReadAllTextAsync(txtPath, cancellationToken);
                 return new Lyrics
                 {
@@ -67,7 +74,7 @@ public class LyricsService : ILyricsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error reading lyrics file for {FilePath}", filePath);
+            _logger.LogError(ex, "Error reading a sidecar lyrics file");
         }
 
         return null;
@@ -123,6 +130,8 @@ public class LyricsService : ILyricsService
             var filePath = Path.Combine(_cacheDirectory, fileName);
 
             if (!File.Exists(filePath)) return null;
+            if (new FileInfo(filePath).Length > AppConstants.Validation.MaxLyricsFileBytes)
+                return null;
 
             var json = await File.ReadAllTextAsync(filePath, cancellationToken);
             var data = JsonSerializer.Deserialize<LyricsData>(json);
@@ -155,14 +164,10 @@ public class LyricsService : ILyricsService
 
     private static string GetCacheFileName(string title, string artist)
     {
-        var safeName = $"{SanitizeFileName(artist)}_{SanitizeFileName(title)}.json";
-        return safeName;
-    }
-
-    private static string SanitizeFileName(string name)
-    {
-        var invalid = Path.GetInvalidFileNameChars();
-        return string.Join("_", name.Split(invalid, StringSplitOptions.RemoveEmptyEntries)).ToLowerInvariant();
+        // A fixed-length digest prevents path traversal, collisions caused by sanitizing,
+        // and excessively long filenames from untrusted media metadata.
+        var key = Encoding.UTF8.GetBytes($"{artist.Trim()}\n{title.Trim()}");
+        return $"{Convert.ToHexString(SHA256.HashData(key)).ToLowerInvariant()}.json";
     }
 
     private class LyricsData

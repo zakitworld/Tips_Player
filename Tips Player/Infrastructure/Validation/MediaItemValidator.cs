@@ -47,9 +47,23 @@ public static class MediaItemValidator
             return Result.Failure(Error.Validation("File path is required."));
         }
 
+        if (Uri.TryCreate(filePath, UriKind.Absolute, out var uri) && !uri.IsFile)
+        {
+            // Android's picker and MediaStore expose media through app-scoped content URIs.
+            // Network and arbitrary custom schemes are intentionally not playback sources.
+            return uri.Scheme.Equals("content", StringComparison.OrdinalIgnoreCase) && filePath.Length <= 2048
+                ? Result.Success()
+                : Result.Failure(Error.Validation("Only local files and content URIs are supported."));
+        }
+
         if (filePath.Length > AppConstants.Validation.MaxFilePathLength)
         {
             return Result.Failure(Error.Validation($"File path exceeds maximum length of {AppConstants.Validation.MaxFilePathLength} characters."));
+        }
+
+        if (!Path.IsPathFullyQualified(filePath))
+        {
+            return Result.Failure(Error.Validation("Media file path must be absolute."));
         }
 
         // Check for invalid path characters
@@ -62,7 +76,7 @@ public static class MediaItemValidator
         // Check if file exists
         if (!File.Exists(filePath))
         {
-            return Result.Failure(Error.NotFound($"File not found: {filePath}"));
+            return Result.Failure(Error.NotFound("Media file was not found."));
         }
 
         // Check file extension

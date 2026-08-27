@@ -11,17 +11,20 @@
 
     <ContentPage.Resources>
         <Style x:Key="SettingsSectionHeaderStyle" TargetType="Label">
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontAttributes" Value="Bold"/>
-            <Setter Property="TextColor" Value="{StaticResource AccentColor}"/>
-            <Setter Property="Margin" Value="0,16,0,8"/>
+            <Setter Property="CharacterSpacing" Value="1.2"/>
+            <Setter Property="TextColor" Value="{StaticResource AccentColorLight}"/>
+            <Setter Property="Margin" Value="4,24,0,8"/>
         </Style>
 
         <Style x:Key="SettingsItemFrameStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource CardBackground}"/>
-            <Setter Property="Stroke" Value="Transparent"/>
-            <Setter Property="Padding" Value="16,12"/>
-            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape" Value="RoundRectangle 18"/>
+            <Setter Property="Padding" Value="18,14"/>
+            <Setter Property="Margin" Value="0,5"/>
         </Style>
 
         <Style x:Key="SettingsLabelStyle" TargetType="Label">
@@ -36,26 +39,64 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid x:Name="SettingsRoot" RowDefinitions="Auto,*">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DisplayStates">
+                <VisualState x:Name="Mobile">
+                    <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0" /></VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="SettingsContentGrid" Property="ColumnDefinitions" Value="*" />
+                        <Setter TargetName="SettingsContentGrid" Property="RowDefinitions" Value="Auto,Auto,Auto,Auto,Auto" />
+                        <Setter TargetName="PlaybackSettings" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="PlaybackSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="VideoSettings" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="VideoSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="LibrarySettings" Property="Grid.Row" Value="2" />
+                        <Setter TargetName="LibrarySettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="ToolsSettings" Property="Grid.Row" Value="3" />
+                        <Setter TargetName="ToolsSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="AboutSettings" Property="Grid.Row" Value="4" />
+                        <Setter TargetName="AboutSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="AboutSettings" Property="Grid.ColumnSpan" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Desktop">
+                    <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="1000" /></VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="SettingsContentGrid" Property="ColumnDefinitions" Value="*,*" />
+                        <Setter TargetName="SettingsContentGrid" Property="RowDefinitions" Value="Auto,Auto,Auto" />
+                        <Setter TargetName="PlaybackSettings" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="PlaybackSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="VideoSettings" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="VideoSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="LibrarySettings" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="LibrarySettings" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="ToolsSettings" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="ToolsSettings" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="AboutSettings" Property="Grid.Row" Value="2" />
+                        <Setter TargetName="AboutSettings" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="AboutSettings" Property="Grid.ColumnSpan" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*" Padding="24,40,24,8">
-            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                <Image Source="app_logo.png"
-                       HeightRequest="32"
-                       WidthRequest="32"
-                       VerticalOptions="Center"/>
-                <Label Text="Settings"
-                       Style="{StaticResource PageTitleStyle}"
-                       VerticalOptions="Center"/>
-            </HorizontalStackLayout>
+        <Grid Grid.Row="0" ColumnDefinitions="*" Padding="24,32,24,16">
+            <VerticalStackLayout Spacing="3">
+                <Label Text="MAKE IT YOURS" Style="{StaticResource EyebrowStyle}"/>
+                <Label Text="Settings" Style="{StaticResource PageTitleStyle}"/>
+                <Label Text="Tune playback, organize your library and manage the app" Style="{StaticResource PageSubtitleStyle}"/>
+            </VerticalStackLayout>
         </Grid>
 
         <!-- Settings Content -->
-        <ScrollView Grid.Row="1" Padding="16,0,16,24">
-            <VerticalStackLayout Spacing="0">
+        <ScrollView Grid.Row="1" Padding="20,0,20,32">
+            <Grid x:Name="SettingsContentGrid" ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="24" RowSpacing="4" MaximumWidthRequest="1400" HorizontalOptions="Center">
 
                 <!-- PLAYBACK SECTION -->
+                <VerticalStackLayout x:Name="PlaybackSettings" Spacing="0">
                 <Label Text="PLAYBACK" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Volume -->
@@ -163,8 +204,10 @@
                         </Picker>
                     </Grid>
                 </Border>
+                </VerticalStackLayout>
 
                 <!-- VIDEO SECTION -->
+                <VerticalStackLayout x:Name="VideoSettings" Grid.Row="1" Spacing="0">
                 <Label Text="VIDEO" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Default Video Aspect -->
@@ -201,8 +244,10 @@
                                 VerticalOptions="Center"/>
                     </Grid>
                 </Border>
+                </VerticalStackLayout>
 
                 <!-- LIBRARY SECTION -->
+                <VerticalStackLayout x:Name="LibrarySettings" Grid.Row="2" Spacing="0">
                 <Label Text="LIBRARY" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Show File Extensions -->
@@ -327,8 +372,10 @@
                                 Padding="16,0"/>
                     </Grid>
                 </Border>
+                </VerticalStackLayout>
 
                 <!-- TOOLS SECTION -->
+                <VerticalStackLayout x:Name="ToolsSettings" Grid.Row="3" Spacing="0">
                 <Label Text="TOOLS" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- Listening Statistics -->
@@ -411,8 +458,10 @@
                                VerticalOptions="Center"/>
                     </Grid>
                 </Border>
+                </VerticalStackLayout>
 
                 <!-- ABOUT SECTION -->
+                <VerticalStackLayout x:Name="AboutSettings" Grid.Row="4" Spacing="0">
                 <Label Text="ABOUT" Style="{StaticResource SettingsSectionHeaderStyle}"/>
 
                 <!-- App Info -->
@@ -522,8 +571,9 @@
                        TextColor="{StaticResource TextMuted}"
                        FontSize="12"
                        Margin="0,24,0,16"/>
+                </VerticalStackLayout>
 
-            </VerticalStackLayout>
+            </Grid>
         </ScrollView>
 
     </Grid>

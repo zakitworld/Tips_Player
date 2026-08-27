@@ -1,4 +1,4 @@
-using CommunityToolkit.Maui.Core.Primitives;
+using CommunityToolkit.Maui.Core;
 using Tips_Player.ViewModels;
 
 namespace Tips_Player.Views;
@@ -33,17 +33,34 @@ public partial class FullscreenVideoPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
+        try
+        {
 #if ANDROID
-        SetImmersiveMode(true);
+            SetImmersiveMode(true);
+            Tips_Player.MainActivity.SetKeepScreenOn(true);
 #endif
-        ResetHideTimer();
+            ResetHideTimer();
 
-        // Hand the active MediaElement to the player service
-        _viewModel.SetMediaElement(VideoElement);
+            // Hand the active MediaElement to the player service.
+            _viewModel.SetMediaElement(VideoElement);
 
-        // Reload same media from the saved position
-        await _viewModel.ResumeAtPositionAsync(_resumePosition, _wasPlaying);
+            // Reload same media; MediaPlayerService defers the position restore until
+            // MediaOpened so Windows and Android cannot discard the seek.
+            await _viewModel.ResumeAtPositionAsync(_resumePosition, _wasPlaying);
+        }
+        catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or InvalidOperationException)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TipsPlayer] Fullscreen media handoff failed: {ex}");
+            _dismissing = true;
+            _hideTimer?.Dispose();
+            _hideTimer = null;
+            _viewModel.IsFullScreen = false;
+            _viewModel.SetMediaElement(_originalElement);
+            await DisplayAlertAsync("Fullscreen unavailable",
+                "The video could not be moved to fullscreen, so it will continue in the player window.",
+                "OK");
+            await Navigation.PopModalAsync(animated: false);
+        }
     }
 
     protected override async void OnDisappearing()
@@ -55,18 +72,27 @@ public partial class FullscreenVideoPage : ContentPage
         _hideTimer?.Dispose();
         _hideTimer = null;
 
-        // Save current playback state before handing back
-        var pos     = VideoElement.Position;
-        var playing = VideoElement.CurrentState == MediaElementState.Playing;
+        try
+        {
+            // Save current playback state before handing back.
+            var pos     = VideoElement.Position;
+            var playing = VideoElement.CurrentState == MediaElementState.Playing;
 
-        VideoElement.Stop();
+            VideoElement.Stop();
 
-        // Return control to PlayerPage's MediaElement
-        _viewModel.SetMediaElement(_originalElement);
-        await _viewModel.ResumeAtPositionAsync(pos, playing);
+            // Return control to PlayerPage's MediaElement.
+            _viewModel.SetMediaElement(_originalElement);
+            await _viewModel.ResumeAtPositionAsync(pos, playing);
+        }
+        catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or InvalidOperationException)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TipsPlayer] Fullscreen return handoff failed: {ex}");
+            _viewModel.SetMediaElement(_originalElement);
+        }
 
 #if ANDROID
         SetImmersiveMode(false);
+        Tips_Player.MainActivity.SetKeepScreenOn(false);
 #endif
     }
 
@@ -109,7 +135,7 @@ public partial class FullscreenVideoPage : ContentPage
     }
 
     private void OnPositionChanged(object? sender,
-        CommunityToolkit.Maui.Core.Primitives.MediaPositionChangedEventArgs e)
+        MediaPositionChangedEventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -130,12 +156,19 @@ public partial class FullscreenVideoPage : ContentPage
         ResetHideTimer();
     }
 
+    private void OnSliderValueChanged(object? sender, ValueChangedEventArgs e)
+    {
+        _viewModel.OnSliderValueChanged(e.NewValue);
+        ResetHideTimer();
+    }
+
     // ───────── helpers ─────────
 
     private void ExitFullscreen()
     {
         MainThread.BeginInvokeOnMainThread(async () =>
         {
+            await _viewModel.PauseVideoForBackgroundAsync();
             _viewModel.IsFullScreen = false;
             await Navigation.PopModalAsync(animated: false);
         });

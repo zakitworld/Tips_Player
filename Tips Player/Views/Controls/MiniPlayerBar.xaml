@@ -7,20 +7,20 @@
              x:DataType="viewmodels:PlayerViewModel"
              IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}, FallbackValue=False}">
 
-    <Border Background="#CC1A1A1D"
-            Stroke="#33FAFAFA"
+    <Border Background="{StaticResource ElevatedBackground}"
+            Stroke="{StaticResource BorderColor}"
             StrokeThickness="1"
             Padding="0"
             StrokeShape="RoundRectangle 0">
         <Border.Shadow>
-            <Shadow Brush="Black" Offset="0,-4" Radius="20" Opacity="0.3"/>
+            <Shadow Brush="Black" Offset="0,-6" Radius="24" Opacity="0.35"/>
         </Border.Shadow>
 
         <Border.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnMiniPlayerTapped"/>
         </Border.GestureRecognizers>
 
-        <Grid RowDefinitions="3,Auto">
+        <Grid RowDefinitions="3,Auto" SemanticProperties.Description="Mini player. Tap to open now playing.">
 
             <!-- Playback progress bar (thin strip at top) -->
             <ProgressBar Grid.Row="0"
@@ -30,16 +30,16 @@
                          HeightRequest="3"
                          Margin="0"/>
 
-        <Grid Grid.Row="1" ColumnDefinitions="50,*,Auto,Auto" ColumnSpacing="12" Padding="12,10,12,10">
+        <Grid Grid.Row="1" ColumnDefinitions="54,*,Auto,Auto" ColumnSpacing="12" Padding="16,12">
 
             <!-- Album Art / Media Icon -->
             <Border Grid.Column="0"
                    Background="{StaticResource SurfaceBackground}"
-                   StrokeShape="RoundRectangle 6"
+                   StrokeShape="RoundRectangle 14"
                    Stroke="Transparent"
                    Padding="0"
-                   HeightRequest="50"
-                   WidthRequest="50">
+                   HeightRequest="54"
+                   WidthRequest="54">
                 <Label Text="{Binding CurrentMedia.MediaType, Converter={StaticResource MediaTypeToIconConverter}}"
                        FontFamily="FontAwesome"
                        FontSize="24"
@@ -53,7 +53,7 @@
                                  Spacing="2">
                 <Label Text="{Binding CurrentMedia.Title}"
                        TextColor="{StaticResource TextPrimary}"
-                       FontSize="14"
+                       FontSize="15"
                        FontAttributes="Bold"
                        LineBreakMode="TailTruncation"
                        MaxLines="1"/>
@@ -76,6 +76,7 @@
                     WidthRequest="44"
                     CornerRadius="22"
                     Padding="0"
+                    AutomationProperties.Name="Play or pause"
                     ToolTipProperties.Text="Play/Pause"/>
 
             <!-- Next Button -->
@@ -90,6 +91,7 @@
                     WidthRequest="44"
                     CornerRadius="22"
                     Padding="0"
+                    AutomationProperties.Name="Next track"
                     ToolTipProperties.Text="Next"/>
 
         </Grid>

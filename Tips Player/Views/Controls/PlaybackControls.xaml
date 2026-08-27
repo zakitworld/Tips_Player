@@ -2,13 +2,14 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
+             xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              x:Class="Tips_Player.Views.Controls.PlaybackControls"
              x:DataType="viewmodels:PlayerViewModel">
 
-    <VerticalStackLayout Spacing="20" Padding="20,0">
+    <VerticalStackLayout Spacing="22" Padding="20,0">
 
         <!-- Seek Slider -->
-        <Grid ColumnDefinitions="50,*,50" RowDefinitions="Auto,Auto">
+        <Grid ColumnDefinitions="56,*,56" RowDefinitions="Auto" ColumnSpacing="8">
             <Label Grid.Column="0"
                    Text="{Binding CurrentPositionFormatted}"
                    Style="{StaticResource TimeLabelStyle}"
@@ -31,45 +32,51 @@
         <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
 
             <!-- Shuffle -->
-            <Button Text="&#x1F500;"
+            <Button Text="{x:Static helpers:FontIcons.Shuffle}"
                     Command="{Binding ToggleShuffleCommand}"
                     Style="{StaticResource SecondaryControlStyle}"
                     Opacity="{Binding IsShuffleEnabled, Converter={StaticResource BoolToOpacityConverter}}"
+                    AutomationProperties.Name="Toggle shuffle"
                     ToolTipProperties.Text="Shuffle"/>
 
             <!-- Previous -->
-            <Button Text="&#x23EE;"
+            <Button Text="{x:Static helpers:FontIcons.StepBackward}"
                     Command="{Binding PreviousCommand}"
                     Style="{StaticResource ControlButtonStyle}"
+                    AutomationProperties.Name="Previous track"
                     ToolTipProperties.Text="Previous"/>
 
             <!-- Play/Pause -->
             <Button Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}}"
                     Command="{Binding PlayPauseCommand}"
                     Style="{StaticResource PlayButtonStyle}"
+                    AutomationProperties.Name="Play or pause"
                     ToolTipProperties.Text="Play/Pause"/>
 
             <!-- Next -->
-            <Button Text="&#x23ED;"
+            <Button Text="{x:Static helpers:FontIcons.StepForward}"
                     Command="{Binding NextCommand}"
                     Style="{StaticResource ControlButtonStyle}"
+                    AutomationProperties.Name="Next track"
                     ToolTipProperties.Text="Next"/>
 
             <!-- Repeat -->
-            <Button Text="&#x1F501;"
+            <Button Text="{x:Static helpers:FontIcons.Repeat}"
                     Command="{Binding ToggleRepeatCommand}"
                     Style="{StaticResource SecondaryControlStyle}"
                     Opacity="{Binding IsRepeatEnabled, Converter={StaticResource BoolToOpacityConverter}}"
+                    AutomationProperties.Name="Toggle repeat"
                     ToolTipProperties.Text="Repeat"/>
 
         </HorizontalStackLayout>
 
         <!-- Volume Control -->
-        <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="12,0" ColumnSpacing="8">
             <Button Grid.Column="0"
                     Text="{Binding IsMuted, Converter={StaticResource BoolToMuteConverter}}"
                     Command="{Binding ToggleMuteCommand}"
                     Style="{StaticResource SecondaryControlStyle}"
+                    AutomationProperties.Name="Mute or unmute"
                     ToolTipProperties.Text="Mute/Unmute"/>
 
             <Slider Grid.Column="1"
@@ -80,8 +87,9 @@
                     Margin="10,0"/>
 
             <Label Grid.Column="2"
-                   Text="&#x1F50A;"
-                   FontSize="18"
+                   Text="{x:Static helpers:FontIcons.VolumeHigh}"
+                   FontFamily="FontAwesome"
+                   FontSize="16"
                    TextColor="{StaticResource TextSecondary}"
                    VerticalOptions="Center"/>
         </Grid>

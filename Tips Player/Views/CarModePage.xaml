@@ -127,7 +127,7 @@
         <!-- Car Mode Label -->
         <HorizontalStackLayout Grid.Row="4" HorizontalOptions="Center" Spacing="8" Margin="0,20,0,0">
             <Label Text="&#xf1b9;" FontFamily="FontAwesome" FontSize="18" TextColor="#666666"/>
-            <Label Text="CAR MODE" FontSize="14" FontAttributes="Bold" TextColor="#666666" LetterSpacing="2"/>
+            <Label Text="CAR MODE" FontSize="14" FontAttributes="Bold" TextColor="#666666"/>
         </HorizontalStackLayout>
 
     </Grid>

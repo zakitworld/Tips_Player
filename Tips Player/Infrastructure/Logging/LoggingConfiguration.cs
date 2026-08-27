@@ -33,23 +33,27 @@ public static class LoggingConfiguration
             var logFilePath = Path.Combine(logDirectory, "tipsplayer-.log");
 
             var logConfig = new LoggerConfiguration()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Information()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.Debug(outputTemplate: DebugTemplate)
                 .WriteTo.File(
                     logFilePath,
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 7,
                     outputTemplate: LogFileTemplate);
 
+#if DEBUG
+            logConfig.MinimumLevel.Debug()
+                .WriteTo.Debug(outputTemplate: DebugTemplate);
+#endif
+
             Log.Logger = logConfig.CreateLogger();
 
             builder.Logging.ClearProviders();
             builder.Logging.AddSerilog(Log.Logger, dispose: true);
 
-            Log.Information("Application starting. Log directory: {LogDirectory}", logDirectory);
+            Log.Information("Application starting");
         }
         catch (Exception ex)
         {

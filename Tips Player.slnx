@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="Tips Player.Core/Tips Player.Core.csproj" />
   <Project Path="Tips Player/Tips Player.csproj" />
+  <Project Path="Tips Player.Tests/Tips Player.Tests.csproj" />
 </Solution>

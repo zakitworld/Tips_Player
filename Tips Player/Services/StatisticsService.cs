@@ -1,44 +1,49 @@
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
+using Tips_Player.Infrastructure.Persistence;
+using Tips_Player.Constants;
 
 namespace Tips_Player.Services;
 
 public class StatisticsService : IStatisticsService
 {
-    private const string StatsFileName = "listening_stats.json";
     private const string SessionsFileName = "play_sessions.json";
-    private readonly string _statsPath;
     private readonly string _sessionsPath;
     private readonly ILogger<StatisticsService> _logger;
+    private readonly IAppDatabase _database;
+    private readonly IJsonFileStore _jsonStore;
     private List<PlaySession> _sessions = [];
 
     public ListeningStats Stats { get; private set; } = new();
 
-    public StatisticsService(ILogger<StatisticsService> logger)
+    public StatisticsService(ILogger<StatisticsService> logger, IAppDatabase database, IJsonFileStore jsonStore)
     {
         _logger = logger;
-        _statsPath = Path.Combine(FileSystem.AppDataDirectory, StatsFileName);
+        _database = database;
+        _jsonStore = jsonStore;
         _sessionsPath = Path.Combine(FileSystem.AppDataDirectory, SessionsFileName);
-        _logger.LogInformation("StatisticsService initialized. Sessions path: {SessionsPath}", _sessionsPath);
+        _logger.LogInformation("StatisticsService initialized");
     }
 
     public async Task LoadStatsAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            if (File.Exists(_sessionsPath))
+            _sessions = (await _database.GetSessionsAsync(cancellationToken)).ToList();
+            if (_sessions.Count == 0 && File.Exists(_sessionsPath))
             {
-                var json = await File.ReadAllTextAsync(_sessionsPath, cancellationToken);
-                _sessions = JsonSerializer.Deserialize<List<PlaySession>>(json) ?? [];
+                _sessions = await _jsonStore.ReadAsync<List<PlaySession>>(
+                    _sessionsPath, AppConstants.Validation.MaxPersistedFileBytes, cancellationToken) ?? [];
+                await _database.ReplaceSessionsAsync(_sessions, cancellationToken);
+                File.Move(_sessionsPath, _sessionsPath + ".migrated", overwrite: true);
             }
 
             await RecalculateStatsAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading statistics from {SessionsPath}", _sessionsPath);
+            _logger.LogError(ex, "Error loading statistics");
         }
     }
 
@@ -46,19 +51,18 @@ public class StatisticsService : IStatisticsService
     {
         try
         {
-            var json = JsonSerializer.Serialize(_sessions);
-            await File.WriteAllTextAsync(_sessionsPath, json, cancellationToken);
+            await _database.ReplaceSessionsAsync(_sessions, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving statistics to {SessionsPath}", _sessionsPath);
+            _logger.LogError(ex, "Error saving statistics");
         }
     }
 
     public async Task RecordPlaySessionAsync(PlaySession session, CancellationToken cancellationToken = default)
     {
         _sessions.Add(session);
-        await SaveStatsAsync(cancellationToken);
+        await _database.AddSessionAsync(session, cancellationToken);
         await RecalculateStatsAsync(cancellationToken);
     }
 
@@ -91,7 +95,7 @@ public class StatisticsService : IStatisticsService
     {
         _sessions.Clear();
         Stats = new ListeningStats();
-        await SaveStatsAsync(cancellationToken);
+        await _database.ClearSessionsAsync(cancellationToken);
     }
 
     private async Task RecalculateStatsAsync(CancellationToken cancellationToken = default)

@@ -50,6 +50,7 @@ namespace Tips_Player
         /// </summary>
         private static void WriteCrashLog(Exception? ex)
         {
+#if DEBUG
             try
             {
                 var crashPath = System.IO.Path.Combine(
@@ -63,6 +64,7 @@ namespace Tips_Player
             {
                 // best-effort — never throw from a crash handler
             }
+#endif
         }
     }
 }

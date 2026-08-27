@@ -1,0 +1,29 @@
+name: build-and-security
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+      - name: Restore with NuGet audit
+        run: dotnet restore "Tips Player.slnx" -p:NuGetAudit=true -p:NuGetAuditMode=all -p:WarningsAsErrors="NU1901;NU1902;NU1903;NU1904"
+      - name: Verify dependency and Android security policy
+        shell: pwsh
+        run: ./.github/scripts/security-check.ps1
+      - name: Test
+        run: dotnet test "Tips Player.Tests/Tips Player.Tests.csproj" --no-restore --configuration Release
+      - name: Build Windows
+        run: dotnet build "Tips Player/Tips Player.csproj" --framework net10.0-windows10.0.19041.0 --no-restore --configuration Debug
+      - name: Build Android
+        run: dotnet build "Tips Player/Tips Player.csproj" --framework net10.0-android --no-restore --configuration Release

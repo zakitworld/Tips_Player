@@ -1,17 +1,26 @@
 using System.Collections.ObjectModel;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
+using Tips_Player.Constants;
+using Tips_Player.Infrastructure.Validation;
+using Tips_Player.Infrastructure.Persistence;
 
 namespace Tips_Player.Services;
 
-public class LibraryService : ILibraryService
+public class LibraryService : ILibraryService, IDisposable
 {
     private const string LibraryFileName = "library.json";
     private readonly string _libraryPath;
     private readonly ILogger<LibraryService> _logger;
     private readonly IMediaScannerService _scanner;
+    private readonly IAppDatabase _database;
+    private readonly IJsonFileStore _jsonStore;
+    private readonly IAlbumArtService _albumArtService;
+    private CancellationTokenSource? _scanCancellation;
+    private Task _deviceScanTask = Task.CompletedTask;
+
+    public Task DeviceScanTask => _deviceScanTask;
 
     public ObservableCollection<MediaItem> MediaItems { get; } = [];
     public ObservableCollection<MediaItem> Songs { get; } = [];
@@ -21,12 +30,20 @@ public class LibraryService : ILibraryService
     public ObservableCollection<Folder> Folders { get; } = [];
     public ObservableCollection<SmartPlaylist> SmartPlaylists { get; } = [];
 
-    public LibraryService(ILogger<LibraryService> logger, IMediaScannerService scanner)
+    public LibraryService(
+        ILogger<LibraryService> logger,
+        IMediaScannerService scanner,
+        IAppDatabase database,
+        IJsonFileStore jsonStore,
+        IAlbumArtService albumArtService)
     {
         _logger = logger;
         _scanner = scanner;
+        _database = database;
+        _jsonStore = jsonStore;
+        _albumArtService = albumArtService;
         _libraryPath = Path.Combine(FileSystem.AppDataDirectory, LibraryFileName);
-        _logger.LogInformation("LibraryService initialized. Library path: {LibraryPath}", _libraryPath);
+        _logger.LogInformation("LibraryService initialized");
         InitializeSmartPlaylists();
     }
 
@@ -43,54 +60,52 @@ public class LibraryService : ILibraryService
         // 1. Load persisted library (fast)
         try
         {
-            if (File.Exists(_libraryPath))
-            {
-                var json = await File.ReadAllTextAsync(_libraryPath, cancellationToken);
-                var items = JsonSerializer.Deserialize<List<MediaItem>>(json);
+            var items = (await _database.GetMediaAsync(cancellationToken)).ToList();
 
-                if (items != null)
+            // One-time migration from the legacy bounded JSON store.
+            if (items.Count == 0 && File.Exists(_libraryPath))
+            {
+                items = await _jsonStore.ReadAsync<List<MediaItem>>(
+                    _libraryPath, AppConstants.Validation.MaxPersistedFileBytes, cancellationToken) ?? [];
+                if (items.Count > AppConstants.Validation.MaxLibraryItems)
                 {
-                    await MainThread.InvokeOnMainThreadAsync(() =>
-                    {
-                        MediaItems.Clear();
-                        foreach (var item in items)
-                        {
-                            // Only fill FolderPath for plain file paths, not content:// URIs
-                            if (string.IsNullOrEmpty(item.FolderPath)
-                                && !string.IsNullOrEmpty(item.FilePath)
-                                && !item.FilePath.StartsWith("content://"))
-                            {
-                                var directory = Path.GetDirectoryName(item.FilePath);
-                                if (!string.IsNullOrEmpty(directory))
-                                {
-                                    item.FolderPath = directory;
-                                    item.FolderName = Path.GetFileName(directory);
-                                }
-                            }
-                            MediaItems.Add(item);
-                        }
-                        RefreshCollections();
-                    });
+                    throw new InvalidDataException($"Library data exceeds the {AppConstants.Validation.MaxLibraryItems}-record limit.");
                 }
+            }
+
+            var validItems = items.Where(item => MediaItemValidator.Validate(item).IsSuccess).ToList();
+            if (validItems.Count != items.Count)
+                _logger.LogWarning("Ignored {Count} invalid persisted media records", items.Count - validItems.Count);
+
+            await PopulateArtworkAsync(validItems, cancellationToken);
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                MediaItems.Clear();
+                foreach (var item in validItems)
+                {
+                    PopulateFolder(item);
+                    MediaItems.Add(item);
+                }
+                RefreshCollections();
+            });
+
+            if (File.Exists(_libraryPath) && validItems.Count > 0)
+            {
+                await _database.ReplaceMediaAsync(validItems, cancellationToken);
+                File.Move(_libraryPath, _libraryPath + ".migrated", overwrite: true);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading library from {LibraryPath}", _libraryPath);
+            _logger.LogError(ex, "Error loading library data");
         }
 
-        // 2. Kick off a background device scan — adds new files, skips duplicates
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await ScanDeviceMediaAsync(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Background device scan failed");
-            }
-        }, cancellationToken);
+        // Keep ownership of the background work so cancellation and failures are observable.
+        _scanCancellation?.Cancel();
+        _scanCancellation?.Dispose();
+        _scanCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _deviceScanTask = RunOwnedDeviceScanAsync(_scanCancellation.Token);
     }
 
     public async Task ScanDeviceMediaAsync(CancellationToken cancellationToken = default)
@@ -120,12 +135,12 @@ public class LibraryService : ILibraryService
     {
         try
         {
-            var json = JsonSerializer.Serialize(MediaItems.ToList());
-            await File.WriteAllTextAsync(_libraryPath, json, cancellationToken);
+            var snapshot = MediaItems.Take(AppConstants.Validation.MaxLibraryItems).ToList();
+            await _database.ReplaceMediaAsync(snapshot, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving library to {LibraryPath}", _libraryPath);
+            _logger.LogError(ex, "Error saving library data");
         }
     }
 
@@ -136,6 +151,18 @@ public class LibraryService : ILibraryService
         foreach (var item in items)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            if (toAdd.Count + MediaItems.Count >= AppConstants.Validation.MaxLibraryItems)
+            {
+                _logger.LogWarning("Library item limit reached; remaining scan results were ignored");
+                break;
+            }
+
+            if (MediaItemValidator.Validate(item).IsFailure)
+            {
+                _logger.LogWarning("Ignored an invalid media record");
+                continue;
+            }
 
             if (MediaItems.Any(m => m.FilePath == item.FilePath))
                 continue;
@@ -163,6 +190,8 @@ public class LibraryService : ILibraryService
             return;
         }
 
+        await PopulateArtworkAsync(toAdd, cancellationToken);
+
         // ObservableCollections must be mutated on the main thread.
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
@@ -173,6 +202,29 @@ public class LibraryService : ILibraryService
         });
 
         await SaveLibraryAsync(cancellationToken);
+    }
+
+    private async Task PopulateArtworkAsync(IEnumerable<MediaItem> items, CancellationToken cancellationToken)
+    {
+        // Limit concurrency to avoid decoding many full-size video frames at once.
+        using var artworkGate = new SemaphoreSlim(3);
+        await Task.WhenAll(items.Select(async item =>
+        {
+            if (!string.IsNullOrEmpty(item.AlbumArtPath) && File.Exists(item.AlbumArtPath) &&
+                !item.AlbumArtPath.StartsWith("content://", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            await artworkGate.WaitAsync(cancellationToken);
+            try
+            {
+                var artwork = await _albumArtService.GetAlbumArtPathAsync(item, cancellationToken);
+                if (!string.IsNullOrEmpty(artwork)) item.AlbumArtPath = artwork;
+            }
+            finally
+            {
+                artworkGate.Release();
+            }
+        }));
     }
 
     public async Task RemoveItemAsync(MediaItem item, CancellationToken cancellationToken = default)
@@ -225,6 +277,39 @@ public class LibraryService : ILibraryService
             else if (item.MediaType == MediaType.Video)
                 Videos.Add(item);
         }
+    }
+
+    private async Task RunOwnedDeviceScanAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await ScanDeviceMediaAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogDebug("Device scan cancelled");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Background device scan failed");
+        }
+    }
+
+    private static void PopulateFolder(MediaItem item)
+    {
+        if (!string.IsNullOrEmpty(item.FolderPath) || string.IsNullOrEmpty(item.FilePath) ||
+            item.FilePath.StartsWith("content://", StringComparison.OrdinalIgnoreCase)) return;
+
+        var directory = Path.GetDirectoryName(item.FilePath);
+        if (string.IsNullOrEmpty(directory)) return;
+        item.FolderPath = directory;
+        item.FolderName = Path.GetFileName(directory);
+    }
+
+    public void Dispose()
+    {
+        _scanCancellation?.Cancel();
+        _scanCancellation?.Dispose();
     }
 
     private void RefreshArtists()

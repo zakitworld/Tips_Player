@@ -6,6 +6,8 @@ public static class FontIcons
     public const string Pause = "\uf04c";
     public const string StepForward = "\uf051";
     public const string StepBackward = "\uf048";
+    public const string SeekBackward = "\uf04a";
+    public const string SeekForward = "\uf04e";
     public const string Shuffle = "\uf074";
     public const string Repeat = "\uf01e";
     public const string VolumeUp = "\uf028";
@@ -19,6 +21,8 @@ public static class FontIcons
     public const string Video = "\uf03d";
     public const string Expand = "\uf065";
     public const string Compress = "\uf066";
+    public const string More = "\uf141";
+    public const string Display = "\uf108";
     public const string Close = "\uf00d";
     public const string List = "\uf03a";
     public const string Trash = "\uf1f8";

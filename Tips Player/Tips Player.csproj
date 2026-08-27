@@ -21,14 +21,27 @@
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
-		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
+		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' != 'Release'">None</WindowsPackageType>
+		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">MSIX</WindowsPackageType>
+		<GenerateAppxPackageOnBuild Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">true</GenerateAppxPackageOnBuild>
+		<AppxBundle Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">Always</AppxBundle>
+		<AppxBundlePlatforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">x64</AppxBundlePlatforms>
+		<AppxPackageSigningEnabled Condition="'$(PackageCertificateKeyFile)' != ''">true</AppxPackageSigningEnabled>
+		<AppxPackageSigningEnabled Condition="'$(PackageCertificateKeyFile)' == ''">false</AppxPackageSigningEnabled>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Tips Player.Core\Tips Player.Core.csproj" />
+		<Compile Remove="Models\**\*.cs" />
+		<Compile Remove="Constants\**\*.cs" />
+		<Compile Remove="Infrastructure\Error.cs" />
+		<Compile Remove="Infrastructure\Result.cs" />
+		<Compile Remove="Infrastructure\Validation\**\*.cs" />
+
 		<!-- App Icon — uses the real Tips Player logo PNG -->
 		<MauiIcon Include="Resources\AppIcon\appicon.png" />
 
@@ -51,20 +64,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
-		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.0.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.100" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.1" />
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="10.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
 		<!-- Required by CommunityToolkit.Maui.MediaElement on Android (ExoPlayer dependency) -->
-		<PackageReference Include="Xamarin.AndroidX.LocalBroadcastManager" Version="1.1.0.5" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
+		<PackageReference Include="Xamarin.AndroidX.LocalBroadcastManager" Version="1.1.0.25" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
 		<!-- Logging -->
-		<PackageReference Include="Serilog" Version="4.0.0" />
-		<PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-		<PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+		<PackageReference Include="Serilog" Version="4.4.0" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
 		<!-- Configuration -->
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.11" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
 	</ItemGroup>
 
 </Project>

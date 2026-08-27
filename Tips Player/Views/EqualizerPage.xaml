@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
@@ -14,11 +14,11 @@
     <Grid RowDefinitions="Auto,*">
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,16">
-            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
-                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
-                <Label Text="Equalizer" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
-            </HorizontalStackLayout>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,32,24,18">
+            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                <Label Text="SHAPE YOUR SOUND" Style="{StaticResource EyebrowStyle}"/>
+                <Label Text="Equalizer" Style="{StaticResource PageTitleStyle}"/>
+            </VerticalStackLayout>
             <HorizontalStackLayout Grid.Column="1" Spacing="8">
                 <Label Text="Enabled" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" FontSize="14"/>
                 <Switch IsToggled="{Binding IsEnabled}" OnColor="{StaticResource AccentColor}" VerticalOptions="Center"/>
@@ -26,11 +26,11 @@
         </Grid>
 
         <!-- Content -->
-        <ScrollView Grid.Row="1" Padding="16,0,16,24">
-            <VerticalStackLayout Spacing="16" Opacity="{Binding IsEnabled, Converter={StaticResource BoolToOpacityConverter}}">
+        <ScrollView Grid.Row="1" Padding="20,0,20,32">
+            <VerticalStackLayout Spacing="18" MaximumWidthRequest="1400" HorizontalOptions="Center" Opacity="{Binding IsEnabled, Converter={StaticResource BoolToOpacityConverter}}">
 
                 <!-- Presets Section -->
-                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="18">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Presets" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Start">
@@ -47,8 +47,9 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:EqualizerPreset">
                                     <Border Background="{StaticResource SurfaceBackground}"
-                                           Stroke="Transparent"
-                                           StrokeShape="RoundRectangle 8"
+                                           Stroke="{StaticResource BorderColor}"
+                                           StrokeThickness="1"
+                                           StrokeShape="RoundRectangle 14"
                                            Padding="12,8"
                                            WidthRequest="90">
                                         <Border.GestureRecognizers>
@@ -76,7 +77,7 @@
                 </Border>
 
                 <!-- 10-Band Equalizer -->
-                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="18">
                     <VerticalStackLayout Spacing="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Text="Equalizer Bands" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -206,7 +207,7 @@
                 </Border>
 
                 <!-- Audio Effects -->
-                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
+                <Border Background="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="16">
                     <VerticalStackLayout Spacing="16">
                         <Label Text="Audio Effects" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
 
@@ -241,7 +242,7 @@
                 </Border>
 
                 <!-- Custom Presets -->
-                <Border Background="{StaticResource CardBackground}" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16"
+                <Border Background="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="16"
                        IsVisible="{Binding CustomPresets.Count, Converter={StaticResource IsNotNullConverter}}">
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Custom Presets" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -252,7 +253,7 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:EqualizerPreset">
                                     <Border Background="{StaticResource SurfaceBackground}"
-                                           Stroke="Transparent" StrokeShape="RoundRectangle 8" Padding="12,8">
+                                           Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 16" Padding="12,8">
                                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                             <Label Text="{Binding Name}" VerticalOptions="Center" TextColor="{StaticResource TextPrimary}">
                                                 <Label.GestureRecognizers>

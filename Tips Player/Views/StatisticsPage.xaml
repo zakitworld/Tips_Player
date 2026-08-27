@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Tips_Player.Views.StatisticsPage"
@@ -10,10 +10,44 @@
              Style="{StaticResource PlayerPageStyle}"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid x:Name="StatisticsRoot" RowDefinitions="Auto,*">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DisplayStates">
+                <VisualState x:Name="Mobile">
+                    <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0" /></VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="OverviewGrid" Property="ColumnDefinitions" Value="*,*" />
+                        <Setter TargetName="OverviewGrid" Property="RowDefinitions" Value="Auto,Auto" />
+                        <Setter TargetName="ListeningCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ListeningCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="TracksCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="TracksCard" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="SessionsCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="SessionsCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Column" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Desktop">
+                    <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="900" /></VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="OverviewGrid" Property="ColumnDefinitions" Value="*,*,*,*" />
+                        <Setter TargetName="OverviewGrid" Property="RowDefinitions" Value="Auto" />
+                        <Setter TargetName="ListeningCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ListeningCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="TracksCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="TracksCard" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="SessionsCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="SessionsCard" Property="Grid.Column" Value="2" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Column" Value="3" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,16">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,32,24,18">
             <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
                 <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
                 <Label Text="Statistics" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
@@ -28,13 +62,13 @@
 
         <!-- Content -->
         <ScrollView Grid.Row="1" Padding="16,0,16,24">
-            <VerticalStackLayout Spacing="16">
+            <VerticalStackLayout Spacing="16" MaximumWidthRequest="1400" HorizontalOptions="Center">
 
                 <!-- Overview Cards -->
-                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                <Grid x:Name="OverviewGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
 
                     <!-- Total Listening Time -->
-                    <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource CardBackground}"
+                    <Border x:Name="ListeningCard" Grid.Row="0" Grid.Column="0" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="&#xf017;" FontFamily="FontAwesome" FontSize="24" TextColor="{StaticResource AccentColor}"/>
@@ -45,7 +79,7 @@
                     </Border>
 
                     <!-- Tracks Played -->
-                    <Border Grid.Row="0" Grid.Column="1" Background="{StaticResource CardBackground}"
+                    <Border x:Name="TracksCard" Grid.Row="0" Grid.Column="1" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="24"
@@ -57,7 +91,7 @@
                     </Border>
 
                     <!-- Sessions -->
-                    <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBackground}"
+                    <Border x:Name="SessionsCard" Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="&#xf073;" FontFamily="FontAwesome" FontSize="24" TextColor="{StaticResource AccentColor}"/>
@@ -68,7 +102,7 @@
                     </Border>
 
                     <!-- Top Artists Count -->
-                    <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackground}"
+                    <Border x:Name="ArtistsCard" Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="16">
                         <VerticalStackLayout Spacing="8">
                             <Label Text="{x:Static helpers:FontIcons.Artist}" FontFamily="FontAwesome" FontSize="24"

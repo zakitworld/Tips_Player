@@ -118,6 +118,15 @@ public static class AppConstants
     /// </summary>
     public static class Validation
     {
+        /// <summary>Maximum size of a persisted JSON data file (16 MiB).</summary>
+        public const long MaxPersistedFileBytes = 16 * 1024 * 1024;
+
+        /// <summary>Maximum number of media records accepted from persisted data or a scanner.</summary>
+        public const int MaxLibraryItems = 100_000;
+
+        /// <summary>Maximum size of a sidecar lyrics file (2 MiB).</summary>
+        public const long MaxLyricsFileBytes = 2 * 1024 * 1024;
+
         /// <summary>
         /// Maximum file path length.
         /// </summary>

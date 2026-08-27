@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Tips_Player.Views.LibraryPage"
@@ -10,44 +10,94 @@
              Style="{StaticResource PlayerPageStyle}"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid x:Name="LibraryRoot" RowDefinitions="Auto,*">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DisplayStates">
+                <VisualState x:Name="Mobile">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="LibraryContent" Property="WidthRequest" Value="-1" />
+                        <Setter TargetName="LibraryContent" Property="HorizontalOptions" Value="Fill" />
+                        <Setter TargetName="BrowseGrid" Property="ColumnDefinitions" Value="*,*" />
+                        <Setter TargetName="BrowseGrid" Property="RowDefinitions" Value="Auto,Auto,Auto" />
+                        <Setter TargetName="SongsCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="SongsCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="VideosCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="VideosCard" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="AlbumsCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="AlbumsCard" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="PlaylistsCard" Property="Grid.Row" Value="2" />
+                        <Setter TargetName="PlaylistsCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="FoldersCard" Property="Grid.Row" Value="2" />
+                        <Setter TargetName="FoldersCard" Property="Grid.Column" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Desktop">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="900" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="LibraryContent" Property="WidthRequest" Value="1160" />
+                        <Setter TargetName="LibraryContent" Property="HorizontalOptions" Value="Center" />
+                        <Setter TargetName="BrowseGrid" Property="ColumnDefinitions" Value="*,*,*" />
+                        <Setter TargetName="BrowseGrid" Property="RowDefinitions" Value="Auto,Auto" />
+                        <Setter TargetName="SongsCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="SongsCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="VideosCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="VideosCard" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="ArtistsCard" Property="Grid.Column" Value="2" />
+                        <Setter TargetName="AlbumsCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="AlbumsCard" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="PlaylistsCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="PlaylistsCard" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="FoldersCard" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="FoldersCard" Property="Grid.Column" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,16">
-            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
-                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
-                <Label Text="Library" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
-            </HorizontalStackLayout>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,32,24,18">
+            <VerticalStackLayout Grid.Column="0" Spacing="3" VerticalOptions="Center">
+                <Label Text="YOUR COLLECTION" Style="{StaticResource EyebrowStyle}"/>
+                <Label Text="Library" Style="{StaticResource PageTitleStyle}"/>
+                <Label Text="Everything you love, ready to play" Style="{StaticResource PageSubtitleStyle}"/>
+            </VerticalStackLayout>
             <Button Grid.Column="1"
                     Text="{x:Static helpers:FontIcons.Plus}"
                     FontFamily="FontAwesome"
                     Command="{Binding AddFilesCommand}"
-                    BackgroundColor="{StaticResource CardBackground}"
-                    TextColor="{StaticResource TextPrimary}"
-                    FontSize="20"
-                    HeightRequest="44"
-                    WidthRequest="44"
-                    CornerRadius="22"
-                    Padding="0"
-                    ToolTipProperties.Text="Add Files"/>
+                    Style="{StaticResource IconButtonStyle}"
+                    AutomationProperties.Name="Add media files"
+                    SemanticProperties.Description="Choose audio or video files to add to your library"
+                    ToolTipProperties.Text="Add media"/>
         </Grid>
 
         <!-- Content -->
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="16,0,16,24" Spacing="16">
+            <VerticalStackLayout x:Name="LibraryContent" Padding="20,0,20,32" Spacing="20">
 
                 <!-- Category Cards Grid -->
-                <Label Text="Browse" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="8,0,0,4"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="4,0">
+                    <Label Text="Browse your library" Style="{StaticResource SectionTitleStyle}"/>
+                    <Label Grid.Column="1" Text="Tap a collection to explore" Style="{StaticResource PageSubtitleStyle}" VerticalOptions="Center"/>
+                </Grid>
 
-                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                <Grid x:Name="BrowseGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="16">
 
                     <!-- Songs Card -->
-                    <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource CardBackground}"
+                    <Border x:Name="SongsCard" Grid.Row="0" Grid.Column="0" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToSongsCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="*,Auto" HeightRequest="120">
+                        <Grid RowDefinitions="*,Auto" HeightRequest="{OnPlatform WinUI=180, Default=136}">
                             <Grid Grid.Row="0" BackgroundColor="#1a6366F1" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Music}"
                                        FontFamily="FontAwesome"
@@ -71,12 +121,12 @@
                     </Border>
 
                     <!-- Videos Card -->
-                    <Border Grid.Row="0" Grid.Column="1" Background="{StaticResource CardBackground}"
+                    <Border x:Name="VideosCard" Grid.Row="0" Grid.Column="1" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToVideosCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="*,Auto" HeightRequest="120">
+                        <Grid RowDefinitions="*,Auto" HeightRequest="{OnPlatform WinUI=180, Default=136}">
                             <Grid Grid.Row="0" BackgroundColor="#1aF472B6" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Video}"
                                        FontFamily="FontAwesome"
@@ -100,12 +150,12 @@
                     </Border>
 
                     <!-- Artists Card -->
-                    <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBackground}"
+                    <Border x:Name="ArtistsCard" Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToArtistsCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="*,Auto" HeightRequest="120">
+                        <Grid RowDefinitions="*,Auto" HeightRequest="{OnPlatform WinUI=180, Default=136}">
                             <Grid Grid.Row="0" BackgroundColor="#1a22D3EE" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Artist}"
                                        FontFamily="FontAwesome"
@@ -129,12 +179,12 @@
                     </Border>
 
                     <!-- Albums Card -->
-                    <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackground}"
+                    <Border x:Name="AlbumsCard" Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToAlbumsCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="*,Auto" HeightRequest="120">
+                        <Grid RowDefinitions="*,Auto" HeightRequest="{OnPlatform WinUI=180, Default=136}">
                             <Grid Grid.Row="0" BackgroundColor="#1aA78BFA" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Album}"
                                        FontFamily="FontAwesome"
@@ -158,12 +208,12 @@
                     </Border>
 
                     <!-- Playlists Card -->
-                    <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource CardBackground}"
+                    <Border x:Name="PlaylistsCard" Grid.Row="2" Grid.Column="0" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToPlaylistsCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="*,Auto" HeightRequest="120">
+                        <Grid RowDefinitions="*,Auto" HeightRequest="{OnPlatform WinUI=180, Default=136}">
                             <Grid Grid.Row="0" BackgroundColor="#1aFBBF24" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Playlist}"
                                        FontFamily="FontAwesome"
@@ -187,12 +237,12 @@
                     </Border>
 
                     <!-- Folders Card -->
-                    <Border Grid.Row="2" Grid.Column="1" Background="{StaticResource CardBackground}"
+                    <Border x:Name="FoldersCard" Grid.Row="2" Grid.Column="1" Background="{StaticResource CardBackground}"
                            Stroke="Transparent" StrokeShape="RoundRectangle 16" Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding NavigateToFoldersCommand}"/>
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="*,Auto" HeightRequest="120">
+                        <Grid RowDefinitions="*,Auto" HeightRequest="{OnPlatform WinUI=180, Default=136}">
                             <Grid Grid.Row="0" BackgroundColor="#1a4ADE80" Padding="16">
                                 <Label Text="{x:Static helpers:FontIcons.Folder}"
                                        FontFamily="FontAwesome"

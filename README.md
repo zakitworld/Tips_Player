@@ -26,7 +26,7 @@ A modern, cross-platform audio/video player built with .NET MAUI featuring a sle
 - Visual Studio 2022 (17.8+) or VS Code with C# Dev Kit
 - Platform-specific requirements:
   - **Windows**: Windows 10 version 1809 or higher
-  - **Android**: Android 5.0 (API 21) or higher
+  - **Android**: Android 8.0 (API 26) or higher
   - **iOS**: iOS 15.0 or higher
   - **macOS**: macOS 15.0 or higher
 
@@ -53,6 +53,16 @@ dotnet restore
 dotnet build --framework net10.0-windows10.0.19041.0
 dotnet run --framework net10.0-windows10.0.19041.0
 ```
+
+Release builds produce an MSIX bundle. A distribution build can be signed without storing a certificate in source control:
+
+```powershell
+dotnet publish "Tips Player/Tips Player.csproj" -f net10.0-windows10.0.19041.0 -c Release `
+  -p:PackageCertificateKeyFile="C:\secure\tips-player.pfx" `
+  -p:PackageCertificatePassword="$env:TIPS_PLAYER_CERT_PASSWORD"
+```
+
+Omit the certificate properties for an unsigned local validation package.
 
 **Android:**
 ```bash
@@ -148,12 +158,15 @@ Tips Player/
 
 The app follows the **MVVM (Model-View-ViewModel)** pattern:
 
+- **Tips Player.Core** - Platform-neutral models, validation, results, and bounded atomic JSON persistence
 - **Models** - Data structures for media items and playlists
 - **Views** - XAML pages and controls for the UI
 - **ViewModels** - Business logic and state management
 - **Services** - Abstracted platform services (media playback, file picking)
+- **Persistence adapters** - Transactional SQLite storage for the media library and listening sessions
 
 Dependency Injection is configured in `MauiProgram.cs` with services registered as singletons for shared state across the application.
+Legacy JSON library and statistics files are imported into SQLite once and retained with a `.migrated` suffix for recovery.
 
 ## Color Scheme
 

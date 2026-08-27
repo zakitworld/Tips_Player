@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:converters="clr-namespace:Tips_Player.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -14,35 +14,35 @@
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,8">
-            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
-                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
-                <Label Text="Lyrics" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
-            </HorizontalStackLayout>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,32,24,12">
+            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                <Label Text="SING ALONG" Style="{StaticResource EyebrowStyle}"/>
+                <Label Text="Lyrics" Style="{StaticResource PageTitleStyle}"/>
+            </VerticalStackLayout>
             <HorizontalStackLayout Grid.Column="1" Spacing="8">
                 <!-- Font Size Controls -->
                 <Button Text="&#xf068;" FontFamily="FontAwesome"
                         Command="{Binding DecreaseFontSizeCommand}"
-                        BackgroundColor="{StaticResource CardBackground}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"
+                        Style="{StaticResource IconButtonStyle}"
+                        FontSize="14" HeightRequest="44" WidthRequest="44"
+                        AutomationProperties.Name="Decrease lyrics font size"
                         ToolTipProperties.Text="Decrease Font Size"/>
                 <Button Text="&#xf067;" FontFamily="FontAwesome"
                         Command="{Binding IncreaseFontSizeCommand}"
-                        BackgroundColor="{StaticResource CardBackground}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="14" HeightRequest="36" WidthRequest="36" CornerRadius="18" Padding="0"
+                        Style="{StaticResource IconButtonStyle}"
+                        FontSize="14" HeightRequest="44" WidthRequest="44"
+                        AutomationProperties.Name="Increase lyrics font size"
                         ToolTipProperties.Text="Increase Font Size"/>
             </HorizontalStackLayout>
         </Grid>
 
         <!-- Current Track Info -->
-        <Border Grid.Row="1" Background="{StaticResource CardBackground}" Stroke="Transparent"
-               StrokeShape="RoundRectangle 12" Padding="16" Margin="16,8,16,8"
+        <Border Grid.Row="1" Background="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}"
+               StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="16" Margin="20,8,20,10"
                IsVisible="{Binding CurrentMedia, Converter={StaticResource IsNotNullConverter}}">
             <Grid ColumnDefinitions="48,*" ColumnSpacing="12">
                 <Border Grid.Column="0" Background="{StaticResource SurfaceBackground}"
-                       StrokeShape="RoundRectangle 8" Stroke="Transparent" Padding="0" HeightRequest="48" WidthRequest="48">
+                       StrokeShape="RoundRectangle 16" Stroke="{StaticResource BorderColor}" StrokeThickness="1" Padding="0" HeightRequest="48" WidthRequest="48">
                     <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="20"
                            TextColor="{StaticResource AccentColor}" HorizontalOptions="Center" VerticalOptions="Center"/>
                 </Border>
@@ -72,7 +72,7 @@
                        TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
                 <Label Text="No track playing" FontSize="20" FontAttributes="Bold"
                        TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"/>
-                <Label Text="Play a song to see lyrics" FontSize="14"
+                <Label Text="Start a song and its lyrics will appear here" FontSize="14"
                        TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center"/>
             </VerticalStackLayout>
 
@@ -83,7 +83,7 @@
                        TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
                 <Label Text="No lyrics available" FontSize="20" FontAttributes="Bold"
                        TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"/>
-                <Label Text="Lyrics not found for this track" FontSize="14"
+                <Label Text="Add an .lrc or .txt file beside the track to see lyrics here" FontSize="14"
                        TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center"/>
             </VerticalStackLayout>
 

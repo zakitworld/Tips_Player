@@ -2,15 +2,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Maui.ApplicationModel;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
+using Tips_Player.Constants;
 
 namespace Tips_Player.Services;
 
 public class FilePickerService : IFilePickerService
 {
     private readonly ILogger<FilePickerService> _logger;
-    private static readonly string[] AudioExtensions = [".mp3", ".wav", ".aac", ".m4a", ".flac", ".ogg", ".wma"];
-    private static readonly string[] VideoExtensions = [".mp4", ".avi", ".mkv", ".mov", ".wmv", ".webm", ".m4v"];
-
     public FilePickerService(ILogger<FilePickerService> logger)
     {
         _logger = logger;
@@ -39,7 +37,7 @@ public class FilePickerService : IFilePickerService
             };
 
             var results = await FilePicker.Default.PickMultipleAsync(options);
-            var mediaItems = results.Where(r => r != null).Select(r => CreateMediaItem(r!)).ToList();
+            var mediaItems = (results ?? []).Select(CreateMediaItem).OfType<MediaItem>().ToList();
             _logger.LogInformation("Picked {Count} media files", mediaItems.Count);
             return mediaItems;
         }
@@ -64,7 +62,6 @@ public class FilePickerService : IFilePickerService
             var result = await FilePicker.Default.PickAsync(options);
             if (result != null)
             {
-                _logger.LogInformation("Picked single media file: {FilePath}", result.FullPath);
                 return CreateMediaItem(result);
             }
             return null;
@@ -86,16 +83,21 @@ public class FilePickerService : IFilePickerService
         }
     }
 
-    private static MediaItem CreateMediaItem(FileResult file)
+    private static MediaItem? CreateMediaItem(FileResult file)
     {
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var mediaType = VideoExtensions.Contains(extension) ? MediaType.Video : MediaType.Audio;
+        var isAudio = FileConstants.AudioExtensions.Contains(extension);
+        var isVideo = FileConstants.VideoExtensions.Contains(extension);
+        if (!isAudio && !isVideo)
+        {
+            return null;
+        }
 
         return new MediaItem
         {
             Title = Path.GetFileNameWithoutExtension(file.FileName),
             FilePath = file.FullPath,
-            MediaType = mediaType,
+            MediaType = isVideo ? MediaType.Video : MediaType.Audio,
             DateAdded = DateTime.Now
         };
     }

@@ -1,0 +1,8 @@
+<Project>
+  <Target Name="SignLocalWindowsBuild"
+          AfterTargets="Build"
+          Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(LocalCodeSigningThumbprint)' != '' and Exists('$(MSBuildThisFileDirectory)scripts\Sign-BuildOutput.ps1')">
+    <Exec Command="&quot;$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)scripts\Sign-BuildOutput.ps1&quot; -TargetFile &quot;$(TargetPath)&quot; -Thumbprint &quot;$(LocalCodeSigningThumbprint)&quot;"
+          WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
+</Project>

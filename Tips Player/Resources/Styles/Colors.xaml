@@ -4,21 +4,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- Tips Player Dark Theme Colors -->
-    <Color x:Key="AccentColor">#6366F1</Color>
-    <Color x:Key="AccentColorLight">#818CF8</Color>
-    <Color x:Key="AccentColorDark">#4F46E5</Color>
+    <Color x:Key="AccentColor">#7C6CF2</Color>
+    <Color x:Key="AccentColorLight">#A99FF8</Color>
+    <Color x:Key="AccentColorDark">#5B4BD9</Color>
+    <Color x:Key="AccentSecondary">#3DD6C6</Color>
+    <Color x:Key="AccentWarm">#FFB86B</Color>
 
-    <Color x:Key="PageBackground">#0A0A0B</Color>
-    <Color x:Key="CardBackground">#1A1A1D</Color>
-    <Color x:Key="CardBackgroundHover">#252529</Color>
-    <Color x:Key="SurfaceBackground">#141416</Color>
+    <Color x:Key="PageBackground">#0B0D14</Color>
+    <Color x:Key="CardBackground">#171A24</Color>
+    <Color x:Key="CardBackgroundHover">#222636</Color>
+    <Color x:Key="SurfaceBackground">#11141D</Color>
+    <Color x:Key="ElevatedBackground">#1D2130</Color>
 
     <Color x:Key="TextPrimary">#FAFAFA</Color>
-    <Color x:Key="TextSecondary">#A1A1AA</Color>
-    <Color x:Key="TextMuted">#71717A</Color>
+    <Color x:Key="TextSecondary">#B3B8C8</Color>
+    <Color x:Key="TextMuted">#7F869B</Color>
 
-    <Color x:Key="BorderColor">#27272A</Color>
-    <Color x:Key="DividerColor">#3F3F46</Color>
+    <Color x:Key="BorderColor">#2A2F40</Color>
+    <Color x:Key="DividerColor">#353B50</Color>
 
     <!-- Legacy colors for compatibility -->
     <Color x:Key="Primary">#6366F1</Color>

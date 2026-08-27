@@ -1,4 +1,4 @@
-using CommunityToolkit.Maui.Core.Primitives;
+using CommunityToolkit.Maui.Core;
 using Tips_Player.ViewModels;
 
 namespace Tips_Player.Views;
@@ -6,6 +6,7 @@ namespace Tips_Player.Views;
 public partial class PlayerPage : ContentPage
 {
     private PlayerViewModel? _viewModel;
+    private bool _enteringFullscreen;
 
     public PlayerPage()
     {
@@ -36,7 +37,6 @@ public partial class PlayerPage : ContentPage
             // when returning from the fullscreen modal.
             _viewModel.SetMediaElement(MediaElement);
 
-            UpdateMediaElementLayout();
             UpdateVideoControlsVisibility();
         }
     }
@@ -48,7 +48,6 @@ public partial class PlayerPage : ContentPage
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         NormalMediaContainer.SizeChanged += (_, _) =>
         {
-            UpdateMediaElementLayout();
             UpdateVideoControlsVisibility();
         };
     }
@@ -67,56 +66,44 @@ public partial class PlayerPage : ContentPage
         {
             UpdateVideoControlsVisibility();
         }
+#if ANDROID
+        if (e.PropertyName is nameof(PlayerViewModel.ShowVideoPlayer) or nameof(PlayerViewModel.IsPlaying))
+            Tips_Player.MainActivity.SetKeepScreenOn(
+                _viewModel?.ShowVideoPlayer == true && _viewModel.IsPlaying);
+#endif
     }
 
     private async Task EnterFullscreenAsync()
     {
-        if (_viewModel == null) return;
+        if (_viewModel == null || _enteringFullscreen) return;
+        _enteringFullscreen = true;
 
-        var position  = MediaElement.Position;
-        var isPlaying = MediaElement.CurrentState == MediaElementState.Playing;
-
-        // Pause so there's no audio overlap during the modal transition
-        MediaElement.Pause();
-
-        var fullscreenPage = new FullscreenVideoPage(
-            _viewModel, MediaElement, position, isPlaying);
-
-        await Navigation.PushModalAsync(fullscreenPage, animated: false);
-    }
-
-    // ───────── normal-mode video overlay positioning ─────────
-
-    private bool _isUpdatingLayout;
-    private void UpdateMediaElementLayout()
-    {
-        if (_viewModel == null || _isUpdatingLayout || Width <= 0) return;
-        _isUpdatingLayout = true;
-
-        MainThread.BeginInvokeOnMainThread(() =>
+        try
         {
-            var bounds = NormalMediaContainer.Bounds;
-            if (bounds.Width > 0 && bounds.Height > 0)
-            {
-                MediaElement.HorizontalOptions = LayoutOptions.Start;
-                MediaElement.VerticalOptions   = LayoutOptions.Start;
-                MediaElement.Margin            = new Thickness(bounds.X, bounds.Y, 0, 0);
-                MediaElement.WidthRequest      = bounds.Width;
-                MediaElement.HeightRequest     = bounds.Height;
-            }
-            else
-            {
-                // Fallback until first layout pass provides bounds
-                MediaElement.HorizontalOptions = LayoutOptions.Fill;
-                MediaElement.VerticalOptions   = LayoutOptions.Start;
-                MediaElement.Margin = Width > 850
-                    ? new Thickness(24, 72, 424, 0)
-                    : new Thickness(24, 56, 24, 0);
-                MediaElement.HeightRequest = Width > 850 ? -1 : 280;
-                MediaElement.WidthRequest  = -1;
-            }
-            _isUpdatingLayout = false;
-        });
+            var position  = MediaElement.Position;
+            var isPlaying = MediaElement.CurrentState == MediaElementState.Playing;
+
+            // Pause so there's no audio overlap during the modal transition.
+            MediaElement.Pause();
+
+            var fullscreenPage = new FullscreenVideoPage(
+                _viewModel, MediaElement, position, isPlaying);
+
+            await Navigation.PushModalAsync(fullscreenPage, animated: false);
+        }
+        catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or InvalidOperationException)
+        {
+            _viewModel.IsFullScreen = false;
+            _viewModel.SetMediaElement(MediaElement);
+            System.Diagnostics.Debug.WriteLine($"[TipsPlayer] Could not enter fullscreen: {ex}");
+            await DisplayAlertAsync("Fullscreen unavailable",
+                "Windows could not switch this video to fullscreen. Playback can continue in the player window.",
+                "OK");
+        }
+        finally
+        {
+            _enteringFullscreen = false;
+        }
     }
 
     private void UpdateVideoControlsVisibility()
@@ -127,27 +114,23 @@ public partial class PlayerPage : ContentPage
         {
             bool show = _viewModel.ShowVideoPlayer && !_viewModel.IsFullScreen;
             NormalVideoControls.IsVisible = show;
-
-            if (show)
-            {
-                var bounds    = NormalMediaContainer.Bounds;
-                double right  = bounds.Width > 0
-                    ? Width - (bounds.X + bounds.Width) + 8
-                    : (Width > 850 ? 436 : 36);
-                double top    = bounds.Width > 0 ? bounds.Y + 8 : 84;
-
-                NormalVideoControls.HorizontalOptions = LayoutOptions.End;
-                NormalVideoControls.VerticalOptions   = LayoutOptions.Start;
-                NormalVideoControls.Margin            = new Thickness(0, top, right, 0);
-            }
         });
     }
 
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
-        UpdateMediaElementLayout();
         UpdateVideoControlsVisibility();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+#if ANDROID
+        Tips_Player.MainActivity.SetKeepScreenOn(false);
+#endif
+        if (_viewModel?.ShowVideoPlayer == true && !_viewModel.IsFullScreen)
+            _ = _viewModel.PauseVideoForBackgroundAsync();
     }
 
     // ───────── event handlers ─────────

@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:controls="clr-namespace:Tips_Player.Views.Controls"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -17,7 +17,7 @@
         <Grid Grid.Row="0" RowDefinitions="Auto,*">
 
             <VerticalStackLayout Grid.Row="0" Spacing="0">
-                <Grid ColumnDefinitions="*,Auto" Padding="24,40,24,8">
+                <Grid ColumnDefinitions="*,Auto" Padding="24,32,24,12">
                     <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
                         <Image Source="app_logo.png"
                                HeightRequest="32"
@@ -98,10 +98,14 @@
                                         <!-- Media Icon / Wave indicator -->
                                         <Border Grid.Column="0"
                                                Background="{StaticResource SurfaceBackground}"
-                                               CornerRadius="8"
                                                Padding="0"
                                                HeightRequest="56"
                                                WidthRequest="56">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="8" />
+                                            </Border.StrokeShape>
+                                            <Image Source="{Binding AlbumArtPath}" Aspect="AspectFill"
+                                                   IsVisible="{Binding AlbumArtPath, Converter={StaticResource IsNotNullConverter}}"/>
                                             <!-- Music note - shown when not current track -->
                                             <Label Text="{x:Static helpers:FontIcons.Music}"
                                                    FontFamily="FontAwesome"
@@ -109,7 +113,7 @@
                                                    TextColor="{StaticResource AccentColor}"
                                                    HorizontalOptions="Center"
                                                    VerticalOptions="Center"
-                                                   IsVisible="{Binding IsCurrentTrack, Converter={StaticResource InverseBoolConverter}}"/>
+                                                   IsVisible="{Binding AlbumArtPath, Converter={StaticResource IsNotNullConverter}, ConverterParameter=Invert}"/>
                                             <!-- Animated wave - shown when this is the current track -->
                                             <controls:SoundWaveIndicator
                                                    IsVisible="{Binding IsCurrentTrack}"

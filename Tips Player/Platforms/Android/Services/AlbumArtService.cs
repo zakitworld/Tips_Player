@@ -1,4 +1,5 @@
 using Android.Media;
+using Bitmap = Android.Graphics.Bitmap;
 using Tips_Player.Models;
 using Tips_Player.Services.Interfaces;
 
@@ -41,15 +42,30 @@ public class AlbumArtService : IAlbumArtService
                 retriever.SetDataSource(filePath);
             }
 
-            var artBytes = retriever.GetEmbeddedPicture();
-            if (artBytes == null || artBytes.Length == 0) return null;
-
-            File.WriteAllBytes(cachePath, artBytes);
+            if (itemIsVideo(retriever))
+            {
+                using var frame = retriever.GetFrameAtTime(-1, Option.ClosestSync);
+                if (frame == null) return null;
+                using var output = File.Create(cachePath);
+                frame.Compress(Bitmap.CompressFormat.Jpeg!, 84, output);
+            }
+            else
+            {
+                var artBytes = retriever.GetEmbeddedPicture();
+                if (artBytes == null || artBytes.Length == 0) return null;
+                File.WriteAllBytes(cachePath, artBytes);
+            }
             return cachePath;
         }
         catch
         {
             return null;
         }
+    }
+
+    private static bool itemIsVideo(MediaMetadataRetriever retriever)
+    {
+        var hasVideo = retriever.ExtractMetadata(MetadataKey.HasVideo);
+        return string.Equals(hasVideo, "yes", StringComparison.OrdinalIgnoreCase) || hasVideo == "1";
     }
 }

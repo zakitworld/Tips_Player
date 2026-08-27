@@ -9,9 +9,9 @@
     Shell.BackgroundColor="{StaticResource PageBackground}"
     Shell.ForegroundColor="{StaticResource TextPrimary}"
     Shell.TitleColor="{StaticResource TextPrimary}"
-    Shell.TabBarBackgroundColor="{StaticResource CardBackground}"
+    Shell.TabBarBackgroundColor="{StaticResource SurfaceBackground}"
     Shell.TabBarForegroundColor="{StaticResource AccentColor}"
-    Shell.TabBarTitleColor="{StaticResource TextSecondary}"
+    Shell.TabBarTitleColor="{StaticResource TextPrimary}"
     Shell.TabBarUnselectedColor="{StaticResource TextMuted}">
 
     <TabBar>

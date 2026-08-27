@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Tips_Player.Views.SearchPage"
@@ -13,37 +13,34 @@
     <Grid RowDefinitions="Auto,*">
 
         <!-- Header with Search -->
-        <VerticalStackLayout Grid.Row="0" Spacing="0">
-            <Grid ColumnDefinitions="*" Padding="24,40,24,8">
-                <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                    <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
-                    <Label Text="Search" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
-                </HorizontalStackLayout>
-            </Grid>
+        <VerticalStackLayout Grid.Row="0" Spacing="0" Padding="24,32,24,14">
+            <VerticalStackLayout Spacing="3">
+                <Label Text="FIND YOUR SOUND" Style="{StaticResource EyebrowStyle}"/>
+                <Label Text="Search" Style="{StaticResource PageTitleStyle}"/>
+                <Label Text="Songs, artists, albums, videos and playlists" Style="{StaticResource PageSubtitleStyle}"/>
+            </VerticalStackLayout>
 
-            <Grid ColumnDefinitions="*,Auto" Margin="16,8,16,16">
+            <Grid ColumnDefinitions="*,Auto" Margin="0,18,0,0" ColumnSpacing="8">
                 <SearchBar Grid.Column="0"
                            Text="{Binding SearchQuery}"
-                           Placeholder="Search songs, artists, albums..."
-                           TextColor="{StaticResource TextPrimary}"
-                           PlaceholderColor="{StaticResource TextMuted}"
-                           BackgroundColor="{StaticResource CardBackground}"
-                           CancelButtonColor="{StaticResource AccentColor}"/>
+                           Placeholder="What do you want to play?"
+                           Style="{StaticResource SearchBarStyle}"
+                           AutomationProperties.Name="Search your media library"
+                           SemanticProperties.Hint="Enter a song, artist, album, video or playlist name"/>
                 <Button Grid.Column="1"
                         Text="{x:Static helpers:FontIcons.Close}"
                         FontFamily="FontAwesome"
                         Command="{Binding ClearSearchCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource TextMuted}"
-                        FontSize="16" HeightRequest="40" WidthRequest="40"
+                        Style="{StaticResource IconButtonStyle}"
                         IsVisible="{Binding SearchQuery.Length, Converter={StaticResource IsNotNullConverter}}"
-                        ToolTipProperties.Text="Clear Search"/>
+                        AutomationProperties.Name="Clear search"
+                        ToolTipProperties.Text="Clear search"/>
             </Grid>
         </VerticalStackLayout>
 
         <!-- Search Results / History -->
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="16,0,16,24" Spacing="16">
+            <VerticalStackLayout Padding="20,4,20,32" Spacing="20" MaximumWidthRequest="1400" HorizontalOptions="Center">
 
                 <!-- Search History (when no query) -->
                 <VerticalStackLayout IsVisible="{Binding SearchQuery.Length, Converter={StaticResource InverseBoolConverter}}"

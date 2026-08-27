@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Tips_Player.ViewModels"
-             xmlns:models="clr-namespace:Tips_Player.Models"
+             xmlns:models="clr-namespace:Tips_Player.Models;assembly=Tips.Player.Core"
              xmlns:helpers="clr-namespace:Tips_Player.Helpers"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Tips_Player.Views.QueuePage"
@@ -13,35 +13,33 @@
     <Grid RowDefinitions="Auto,Auto,*">
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,40,24,8">
-            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
-                <Image Source="app_logo.png" HeightRequest="32" WidthRequest="32" VerticalOptions="Center"/>
-                <Label Text="Queue" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center"/>
-            </HorizontalStackLayout>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="24,32,24,12">
+            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                <Label Text="PLAYBACK ORDER" Style="{StaticResource EyebrowStyle}"/>
+                <Label Text="Queue" Style="{StaticResource PageTitleStyle}"/>
+            </VerticalStackLayout>
             <HorizontalStackLayout Grid.Column="1" Spacing="8">
                 <Button Text="{x:Static helpers:FontIcons.Shuffle}"
                         FontFamily="FontAwesome"
                         Command="{Binding ShuffleQueueCommand}"
-                        BackgroundColor="{StaticResource CardBackground}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"
+                        Style="{StaticResource IconButtonStyle}"
+                        AutomationProperties.Name="Shuffle queue"
                         ToolTipProperties.Text="Shuffle Queue"/>
                 <Button Text="{x:Static helpers:FontIcons.Trash}"
                         FontFamily="FontAwesome"
                         Command="{Binding ClearQueueCommand}"
-                        BackgroundColor="{StaticResource CardBackground}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="16" HeightRequest="40" WidthRequest="40" CornerRadius="20" Padding="0"
+                        Style="{StaticResource IconButtonStyle}"
+                        AutomationProperties.Name="Clear queue"
                         ToolTipProperties.Text="Clear Queue"/>
             </HorizontalStackLayout>
         </Grid>
 
         <!-- Now Playing -->
-        <Border Grid.Row="1" Background="{StaticResource CardBackground}" Stroke="Transparent"
-               StrokeShape="RoundRectangle 12" Padding="16" Margin="16,8,16,16"
+        <Border Grid.Row="1" Background="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}"
+               StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="18" Margin="20,8,20,18"
                IsVisible="{Binding CurrentlyPlaying, Converter={StaticResource IsNotNullConverter}}">
             <Grid ColumnDefinitions="56,*" ColumnSpacing="12">
-                <Border Grid.Column="0" Background="{StaticResource AccentColor}" StrokeShape="RoundRectangle 8" Stroke="Transparent" Padding="0"
+                <Border Grid.Column="0" Background="{StaticResource AccentColor}" StrokeShape="RoundRectangle 16" Stroke="{StaticResource BorderColor}" StrokeThickness="1" Padding="0"
                        HeightRequest="56" WidthRequest="56">
                     <Label Text="{x:Static helpers:FontIcons.Music}" FontFamily="FontAwesome" FontSize="24"
                            TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
@@ -66,7 +64,7 @@
                        TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
                 <Label Text="Queue is empty" FontSize="20" FontAttributes="Bold"
                        TextColor="{StaticResource TextPrimary}" HorizontalTextAlignment="Center"/>
-                <Label Text="Add songs to start playing" FontSize="14"
+                <Label Text="Pick a song from your library and it will appear here" FontSize="14"
                        TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center"/>
             </VerticalStackLayout>
 
@@ -93,7 +91,7 @@
                             </SwipeView.RightItems>
 
                             <Border Background="{StaticResource CardBackground}"
-                                   Stroke="Transparent" StrokeShape="RoundRectangle 8" Padding="12" Margin="0,4">
+                                   Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 16" Padding="12" Margin="0,4">
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding IsCurrentlyPlaying}" Value="True">
                                         <Setter Property="Background" Value="{StaticResource SurfaceBackground}"/>

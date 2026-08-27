@@ -14,6 +14,7 @@ public interface ILibraryService
     ObservableCollection<Album> Albums { get; }
     ObservableCollection<Folder> Folders { get; }
     ObservableCollection<SmartPlaylist> SmartPlaylists { get; }
+    Task DeviceScanTask { get; }
 
     // Basic operations
     Task LoadLibraryAsync(CancellationToken cancellationToken = default);

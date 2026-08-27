@@ -41,11 +41,7 @@ public class InverseBoolConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool boolValue)
-        {
-            return !boolValue;
-        }
-        return true;
+        return !HasMeaningfulValue(value);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -56,6 +52,18 @@ public class InverseBoolConverter : IValueConverter
         }
         return false;
     }
+
+    private static bool HasMeaningfulValue(object? value) => value switch
+    {
+        null => false,
+        bool boolean => boolean,
+        string text => !string.IsNullOrWhiteSpace(text),
+        int number => number > 0,
+        long number => number > 0,
+        double number => number > 0,
+        System.Collections.ICollection collection => collection.Count > 0,
+        _ => true
+    };
 }
 
 public class MediaTypeToIconConverter : IValueConverter
@@ -79,7 +87,16 @@ public class IsNotNullConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        var isNotNull = value != null;
+        var isNotNull = value switch
+        {
+            null => false,
+            string text => !string.IsNullOrWhiteSpace(text),
+            int number => number > 0,
+            long number => number > 0,
+            double number => number > 0,
+            System.Collections.ICollection collection => collection.Count > 0,
+            _ => true
+        };
 
         // If parameter is "Invert", return the opposite
         if (parameter is string paramStr && paramStr.Equals("Invert", StringComparison.OrdinalIgnoreCase))
